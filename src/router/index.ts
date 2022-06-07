@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHashHistory, RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
 import Login from '../views/Login.vue'
 const routes: Array<RouteRecordRaw> = [
   {
@@ -56,5 +56,11 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
+  if (to.name !== 'login' && !sessionStorage.token) {
+    return next({name: 'login'})
+  }
+  return next()
 })
 export default router

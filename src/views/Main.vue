@@ -1,6 +1,6 @@
 <template>
   <el-container class="common-layout">
-    <el-aside width="auto" class="aside-box">
+    <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-box">
       <el-scrollbar>
         <div :class="['logo-title', isCollapse ? 'collapse' : 'expand' ]">
           <img src="../assets/img/home/logo1.png" alt="王者荣耀" />
@@ -8,9 +8,10 @@
         <el-menu
           ref="menuEl"
           class="el-menu-vertical-demo"
-          background-color="#1f2d48"
+          background-color="#343843"
           text-color="#fff"
           active-text-color="#ffd04b"
+          :collapse-transition="false"
           router
           :collapse="isCollapse"
           :default-active="defaultActive"
@@ -44,6 +45,7 @@
                   v-for="(item2, index2) in item1.menuItemList"
                   :key="index2"
                   :index="item2.index"
+                  @click="selectMenu"
                 >{{item2.name}}</el-menu-item>
               </el-menu-item-group>
             </template>
@@ -54,18 +56,17 @@
     <el-container class="content">
       <el-header>
         <div class="left">
-          <!-- <el-button type="primary" @click="isCollapse = !isCollapse">切换</el-button> -->
           <div class="tag-icon" @click="isCollapse = !isCollapse">
             <el-icon v-if="isCollapse"><Expand /></el-icon>
             <el-icon v-else><Fold /></el-icon>
           </div>
           <el-breadcrumb separator="/">
             <el-breadcrumb-item to="/" @click="toMain">首页</el-breadcrumb-item>
-            <el-breadcrumb-item></el-breadcrumb-item>
+            <el-breadcrumb-item v-for="(item, index) in breadCrumb" :key="index">{{item}}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="right">
-          <el-button>退出</el-button>
+          <el-button @click="loginOut">退出</el-button>
         </div>
       </el-header>
       <el-main>
@@ -78,7 +79,8 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 const menuList = [
   {
@@ -154,25 +156,68 @@ const menuList = [
   },
 ]
 
+let breadCrumb = ref<string[]>([])
+const setBreadCrumb = (val:string) => {
+  firstLoop:
+  for (const item1 of menuList) {
+    breadCrumb.value = []
+    if (item1.menuItem) {
+      for (const item2 of item1.menuItem) {
+        if (item2.index === val) {
+          breadCrumb.value.push(item1.menu, item2.name)
+          break firstLoop
+        }
+      }
+    }
+    if (item1.menuItemGroup) {
+      for (const item2 of item1.menuItemGroup) {
+        for (const item3 of item2.menuItemList) {
+          if (item3.index === val) {
+            breadCrumb.value.push(item1.menu, item2.groupName, item3.name)
+            break firstLoop
+          }
+        }
+      }
+    }
+  }
+}
 const selectMenu = (val:any) => {
-  console.log(val.index);
+  setBreadCrumb(val.index)
 }
 
 const route = useRoute()
-// const router = useRouter()
-// let defaultActive = ref<string>('')
-const { path: defaultActive } = route
+const router = useRouter()
+const { path } = route
+let defaultActive = ref<string>(path)
+setBreadCrumb(defaultActive.value)
+
 const isCollapse = ref(false);
 
 const menuEl:any = ref(null)
 const toMain = () => {
+  defaultActive.value = '/welcome'
   menuList.forEach((item) => {
     menuEl.value.close(item.index)
   })
 }
-
 const loginOut = () => {
-  console.log("退出");
+  ElMessageBox.confirm(
+    '确定要退出登录吗?',
+    '退出',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+  .then(() => {
+    ElMessage({
+      type: 'success',
+      message: '退出成功!',
+    })
+    sessionStorage.clear()
+    router.push({name: 'login'})
+  })
 };
 </script>
 
@@ -181,13 +226,14 @@ const loginOut = () => {
   height: 100%;
   .aside-box {
     height: 100%;
-    background-color: #1f2d48;
+    background-color: #343843;
+    transition: width .2s;
     .logo-title {
       padding: 5px 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #1d2940;
+      background-color: #343843;
       &.collapse {
         img {
           width: 50px;
@@ -195,7 +241,7 @@ const loginOut = () => {
       }
       img {
         width: 80px;
-        transition: all .25s;
+        transition: all .2s;
       }
     }
 
@@ -234,7 +280,7 @@ const loginOut = () => {
       }
     }
     .el-main {
-
+      padding: 15px;
     }
   }
 }

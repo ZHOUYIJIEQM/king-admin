@@ -287,3 +287,98 @@ server: {
   }
 </style>
 ```
+但这种做法在右侧内容区域使用表格后, 展开/收缩会很卡
+```html
+<el-aside :width="isCollapse ? '64px' : '200px'" class="aside-box">
+  <el-menu
+    :collapse-transition="false"
+  ></el-menu>
+</el-aside>
+
+<style lang="scss" scoped>
+  .aside-box {
+    /* 加这个过渡时长 */
+    transition: width .2s;
+  }
+</style>
+```
+
+#### 使用 ```ElMessageBox```, 弹出框没有样式
+```bash
+yarn add -D unplugin-element-plus
+```
+编辑```vite.config.ts```
+```ts
+import ElementPlus from 'unplugin-element-plus/vite'
+export default {
+  plugins: [ElementPlus()],
+}
+```
+
+#### 在多个组件都使用 ```loading```
+新建 ```utils/loading.ts```
+```ts
+import { ElLoading } from 'element-plus'
+let loadingFlag:any = null
+function openLoading() {
+  loadingFlag = ElLoading.service({
+    lock: true,
+    text: '正在加载...',
+    background: 'rgba(0, 0, 0, 0.6)',
+  })
+}
+function closeLoading() {
+  setTimeout(() => {
+    loadingFlag.close()
+  }, 300)
+}
+export default {
+  openLoading,
+  closeLoading
+}
+```
+在组件使用时
+```ts
+import loading from '@/utils/loading'
+loading.openLoading()
+loading.closeLoading()
+```
+
+#### ```reactive```数组, 异步获取数据后赋值无效?!
+```ts
+let data = reactive([])
+setTimeout(() => {
+  data = [{a: 'a'}, {b: 'b'}]
+}, 1000)
+
+<div>{{data}}</div> // 一秒后数据没有更新, 一直是 []
+```
+换成 ```ref```, 则没问题
+```ts
+let data = ref([])
+setTimeout(() => {
+  data.value = [{a: 'a'}, {b: 'b'}]
+}, 1000)
+
+<div>{{data}}</div> // 一秒后数据会更新
+```
+如果还要使用 ```reactive```
+```ts
+// 写成对象
+let data = reactive({treeData: []})
+setTimeout(() => {
+  data.treeData = [{a: 'a'}, {b: 'b'}]
+}, 1000)
+
+<div>{{data}}</div> // 一秒后数据会更新
+```
+
+#### 无法获取 ```el-dialog``` 里面的 ref dom
+间接获取
+```js
+const app = getCurrentInstance()
+app?.ctx.$refs.formName?.focus()
+```
+
+
+
