@@ -5,7 +5,7 @@
         <span class="text">王者荣耀后台管理系统</span>
       </p>
       <p class="feature">功能:</p>
-      <p class="list">1. 分类管理</p>
+      <p class="list">分类管理:  对分类增删改</p>
     </div>
   </div>
 </template>

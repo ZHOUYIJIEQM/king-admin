@@ -63,7 +63,7 @@ const checkUserName = (rule: any, value: any, callback: any) => {
 };
 
 const validatePass = (rule: any, value: any, callback: any) => {
-  if (value === "") {
+  if (value.trim() === "") {
     callback(new Error("请输入密码!"));
   } else {
     if (value.length < 6) {
@@ -91,7 +91,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid) => {
     if (valid) {
-      // todo: 登录操作
+      //  登录操作
       loading.openLoading()
       try {
         const loginRes = await $http({
@@ -118,7 +118,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         loading.closeLoading()
       }
     } else {
-      // todo: 不能提交
+      // 不能提交
       console.log("error submit!");
       ElMessage({
         showClose: true,
