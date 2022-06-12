@@ -121,6 +121,7 @@ const token = computed(() => {
 })
 
 let isLoading = ref<boolean>(false)
+let rowId = ref('')
 
 // 获取物品
 interface GetGoods {
@@ -169,6 +170,7 @@ let dialogAddVisible = ref<boolean>(false)
 // 按钮 添加装备
 const addGoods = async () => {
   dialogAddVisible.value = true
+  isAddStatus.value = true
   imageUrl.value = ''
   await nextTick()
   app?.ctx.$refs.goodsName.focus()
@@ -176,7 +178,7 @@ const addGoods = async () => {
 interface GoodsForm {
   name: string,
   icon: string,
-  star: number | string,
+  star: number,
   desc: string,
   detail: string
 }
@@ -189,8 +191,8 @@ let addGoodsForm = ref<GoodsForm>({
 })
 // 确认添加
 const confirmAdd = async () => {
-  // 添加装备
-  if (isAddStatus) {
+  if (isAddStatus.value) {
+    console.log('添加装备');
     try {
       isLoading.value = true
       // 添加装备
@@ -212,24 +214,41 @@ const confirmAdd = async () => {
       }
       getGoods(pageParams)
       dialogAddVisible.value = false
-      await nextTick()
     } catch (error) {
       console.log('添加装备失败:', error);      
     } finally {
       isLoading.value = false
     }
   } else {
-  // 编辑装备
-
+    console.log('更新装备');
+    // console.log(addGoodsForm.value);
+    let res = await $http({
+      url: `/rest/items/${rowId.value}`,
+      method: 'put',
+      data: addGoodsForm.value
+    })
+    console.log(res);
+    if (res.status === 200) {
+      ElMessage({
+        type: 'success',
+        message: '更新成功!'
+      })
+    }
+    dialogAddVisible.value = false
+    rowId.value = ''
+    getGoods(pageParams)
   }
 }
 // 编辑
-const handleEdit = (row: any) => {
+const handleEdit = async (row: any) => {
+  rowId.value = row._id
   dialogAddVisible.value = true
   isAddStatus.value = false
   imageUrl.value = row.icon
   addGoodsForm.value = row
   addGoodsForm.value.star = Number(row.star)
+  await nextTick()
+  app?.ctx.$refs.goodsName.focus()
 }
 // 删除
 const handleDelete = async (row: any) => {
@@ -281,7 +300,7 @@ const dialogClosed = () => {
 const imageUrl = ref('')
 // todo: 需要修改上传路径
 const actionUrl = 'http://localhost:3333/admin/api/upload/item'
-
+// 上传
 const handleAvatarSuccess: UploadProps['onSuccess'] = (
   response,
   uploadFile
@@ -331,6 +350,7 @@ const handleCurrentChange = (val: number) => {
     display: flex;
     .item-icon {
       width: 50px;
+      height: 50px;
     }
   }
 }
