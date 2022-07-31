@@ -8,6 +8,7 @@
         :data="cateList"
         row-key="_id"
         border
+        empty-text="暂无分类!"
       >
         <!-- <el-table-column type="index" label="序列" width="100" align="center" /> -->
         <el-table-column prop="name" label="日期" min-width="200" />
@@ -74,23 +75,24 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { getCurrentInstance, nextTick, reactive, ref } from 'vue';
+import { getCurrentInstance, nextTick, onMounted, reactive, ref } from 'vue';
 import { Delete, Edit, } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus';
-import type { FormInstance } from 'element-plus'
 
-const app = getCurrentInstance()
-const $http = app?.appContext.config.globalProperties.$http
-
-let test = ref<boolean>(true)
+const app: any = getCurrentInstance()
+const $http = app.proxy.$http
+const {getCategoryList} = app.proxy.$CateApi
 
 let isLoading = ref<boolean>(false)
 
 // 获取分类
 let cateList = ref([])
 const getCateList = async () => {
+  // 加载提示
   isLoading.value = true
-  const cateRes = await $http.get('/rest/categories')
+  const cateRes = await $http.get('/rest/category')
+  // const cateRes = await getCategoryList()
+  // console.log('-----', cateRes);
   const { data } = cateRes
   // 选择分类 同时也是关联
   cateList.value = data
@@ -99,7 +101,6 @@ const getCateList = async () => {
     isLoading.value = false
   }, 500)
 }
-getCateList()
 
 // 编辑
 let dialogEditVisible = ref(false)
@@ -226,6 +227,11 @@ const dialogClosed = () => {
   editForm.name = '',
   editForm.desc = ''
 }
+
+onMounted(async () => {
+  await getCateList()
+  
+})
 
 </script>
 <style lang="scss" scoped>

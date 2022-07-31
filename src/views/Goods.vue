@@ -7,6 +7,7 @@
         v-loading="isLoading"
         :data="goodsList"
         border
+        empty-text="暂无物品!"
       >
         <el-table-column type="expand" label="展开" width="60">
           <template #default="props">
@@ -108,7 +109,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import type { UploadProps } from 'element-plus'
 import { computed, getCurrentInstance, nextTick, reactive, ref } from 'vue';
 
-const app = getCurrentInstance()
+const app:any = getCurrentInstance()
 const $http = app?.appContext.config.globalProperties.$http
 const token = computed(() => {
   const token = sessionStorage.token

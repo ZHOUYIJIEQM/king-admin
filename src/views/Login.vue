@@ -39,6 +39,7 @@
 </template>
 
 <script lang="ts" setup>
+import axios from 'axios'
 import { getCurrentInstance, reactive, ref } from "vue";
 import { UserFilled, Lock } from "@element-plus/icons-vue";
 import { ElMessage, FormInstance } from "element-plus";
@@ -46,8 +47,9 @@ import { useRouter } from "vue-router";
 import loading from '@/utils/loading'
 
 const ruleFormRef = ref<FormInstance>();
-const app = getCurrentInstance()
-const $http = app?.appContext.config.globalProperties.$http
+const app: any = getCurrentInstance()
+const $http = app?.proxy.$http
+const { login } = app?.proxy.$LoginApi
 const router = useRouter()
 
 const checkUserName = (rule: any, value: any, callback: any) => {
@@ -94,11 +96,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
       //  登录操作
       loading.openLoading()
       try {
-        const loginRes = await $http({
-          url: '/login',
-          method: 'post',
-          data: ruleForm
-        })
+        const loginRes = await login(ruleForm)
         if (loginRes?.status === 200) {
           sessionStorage.setItem('token', loginRes.data.token)
           router.push('/')
@@ -113,7 +111,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         }
         loading.closeLoading()
       } catch (err) {
-        console.log(err);
+        console.log('登录接口错误:', err);
       } finally {
         loading.closeLoading()
       }

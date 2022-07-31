@@ -33,7 +33,17 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'hero',
         name: 'hero',
-        component: () => import('@/views/Hero.vue')
+        component: () => import('@/views/Hero/Hero.vue')
+      },
+      {
+        path: 'hero/create',
+        name: 'heroCreate',
+        component: () => import('@/views/Hero/HeroEdit.vue')
+      },
+      {
+        path: 'hero/edit/:id',
+        name: 'heroEdit',
+        component: () => import('@/views/Hero/HeroEdit.vue')
       },
       {
         path: 'article',

@@ -9,6 +9,7 @@ const instance = axios.create({
 instance.interceptors.request.use(
   (config: AxiosRequestConfig | any) => {
     const token = sessionStorage.token
+    console.log('token', token);
     if (token) {
       config.headers.Authorization = `Bear ${token}`
     }

@@ -17,7 +17,7 @@
           :default-active="defaultActive"
         >
           <el-sub-menu
-            v-for="(item, index) in menuList"
+            v-for="(item, index) in menuList.data"
             :key="index"
             :index="item.index"
           >
@@ -77,89 +77,92 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed, markRaw, nextTick, reactive, ref, watch } from "vue";
 import { Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
 
-const menuList = [
-  {
-    menu: '分类管理',
-    index: '1',
-    icon: Grid,
-    menuItem: [
-      {
-        name: '分类列表',
-        index: '/category',
-      },
-    ]
-  },
-  {
-    menu: '物品管理',
-    index: '2',
-    icon: Menu,
-    menuItem: [
-      {
-        name: '物品列表',
-        index: '/goods',
-      },
-    ]
-  },
-  {
-    menu: '英雄管理',
-    icon: Management,
-    index: '3',
-    menuItem: [
-      {
-        name: '英雄列表',
-        index: '/hero',
-      },
-    ]
-  },
-  {
-    menu: '文章管理',
-    icon: List,
-    index: '4',
-    menuItem: [
-      {
-        name: '文章列表',
-        index: '/article',
-      },
-    ]
-  },
-  {
-    menu: '广告位',
-    icon: Ticket,
-    index: '5',
-    menuItem: [
-      {
-        name: '广告位列表',
-        index: '/advertise',
-      },
-    ]
-  },
-  {
-    menu: '用户管理',
-    icon: UserFilled,
-    index: '6',
-    menuItemGroup: [
-      {
-        groupName: '用户',
-        menuItemList: [
-          {
-            name: '用户列表',
-            index: '/user',
-          },
-        ]
-      }
-    ]
-  },
-]
+let menuList = reactive({
+  data: [
+    {
+      menu: '分类管理',
+      index: '1',
+      icon: markRaw(Grid),
+      menuItem: [
+        {
+          name: '分类列表',
+          index: '/category',
+        },
+      ]
+    },
+    {
+      menu: '物品管理',
+      index: '2',
+      icon: markRaw(Menu),
+      menuItem: [
+        {
+          name: '物品列表',
+          index: '/goods',
+        },
+      ]
+    },
+    {
+      menu: '英雄管理',
+      icon: markRaw(Management),
+      index: '3',
+      menuItem: [
+        {
+          name: '英雄列表',
+          index: '/hero',
+        },
+      ]
+    },
+    {
+      menu: '文章管理',
+      icon: markRaw(List),
+      index: '4',
+      menuItem: [
+        {
+          name: '文章列表',
+          index: '/article',
+        },
+      ]
+    },
+    {
+      menu: '广告位',
+      icon: markRaw(Ticket),
+      index: '5',
+      menuItem: [
+        {
+          name: '广告位列表',
+          index: '/advertise',
+        },
+      ]
+    },
+    {
+      menu: '用户管理',
+      icon: markRaw(UserFilled),
+      index: '6',
+      menuItemGroup: [
+        {
+          groupName: '用户',
+          menuItemList: [
+            {
+              name: '用户列表',
+              index: '/user',
+            },
+          ]
+        }
+      ]
+    },
+  ]
+})
 
+// 面包屑内容
 let breadCrumb = ref<string[]>([])
 const setBreadCrumb = (val:string) => {
   firstLoop:
-  for (const item1 of menuList) {
+  for (const item1 of menuList.data) {
     breadCrumb.value = []
     if (item1.menuItem) {
       for (const item2 of item1.menuItem) {
@@ -181,25 +184,60 @@ const setBreadCrumb = (val:string) => {
     }
   }
 }
+// 选中菜单项
 const selectMenu = (val:any) => {
   setBreadCrumb(val.index)
+  defaultActive.value = val.index
 }
 
 const route = useRoute()
 const router = useRouter()
 const { path } = route
+// 默认的菜单
 let defaultActive = ref<string>(path)
 setBreadCrumb(defaultActive.value)
-
+// 是否折叠状态
 const isCollapse = ref(false);
-
 const menuEl:any = ref(null)
+// 点击首页
 const toMain = () => {
+  breadCrumb.value = []
   defaultActive.value = '/welcome'
-  menuList.forEach((item) => {
+  menuList.data.forEach((item) => {
     menuEl.value.close(item.index)
   })
 }
+
+
+watch(
+  () => route.name,
+  (newV, oldV) => {
+    defaultActive.value = route.path
+    let heroIndex = menuList.data.findIndex(i => i.menu === '英雄管理')
+    if (newV === 'heroCreate') {
+      menuList.data[heroIndex].menuItem?.unshift({
+        name: '新增英雄',
+        index: '/hero/create'
+      })
+      selectMenu({index: '/hero/create'})
+    } else if (newV === 'heroEdit') {
+      menuList.data[heroIndex].menuItem?.unshift({
+        name: '编辑英雄',
+        index: `/hero/edit/${route.params.id}`
+      })
+      selectMenu({index: `/hero/edit/${route.params.id}`})
+    } else {
+      if ((menuList.data[heroIndex].menuItem as Array<any>).length > 1) {
+        menuList.data[heroIndex].menuItem?.shift()
+      }
+    }
+  },
+  {
+    immediate: true
+  }
+)
+
+// 退出
 const loginOut = () => {
   ElMessageBox.confirm(
     '确定要退出登录吗?',

@@ -84,6 +84,20 @@ import router from './router'
 
 createApp(App).use(router).mount('#app')
 ```
+3. 在组件里使用
+```js
+<script setup>
+// router
+import { useRouter } from "vue-router";
+const router = useRouter()
+router.push({
+  name: 'heroEdit',
+  params: {
+    id: row._id
+  }
+})
+</script>
+```
 ##### 使用 ```pinia```
 1. 新建 ```store/index.js```
 ```js
@@ -114,6 +128,7 @@ app.mount('#app')
 3. 在组件里使用
 ```js
 <script setup>
+// pinia
 import { mainStore } from '../store';
 const store = mainStore()
 console.log(store.msg)
@@ -239,6 +254,10 @@ export default {
   }
 };
 
+// 在 main.ts 引入
+import request from '@/api/request'
+app.use(request)
+
 // 在组件里使用时
 let app:any = getCurrentInstance()
 let request = app.appContext.config.globalProperties.$http
@@ -262,7 +281,7 @@ request.get(...)
 server: {			
   // 设置后可以通过局域网访问
   host: '0.0.0.0',
-  // port: 3000,  // 端口号，一般情况下为8080
+  // port: 3000,  // 端口号
 }
 ```
 
