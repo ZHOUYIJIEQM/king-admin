@@ -1,10 +1,9 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
-import Login from '../views/Login.vue'
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
-    component: Login,
+    component: () => import('@/views/Login.vue'),
     meta: {
       noRequiredAuth: true
     },
@@ -48,7 +47,17 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: 'article',
         name: 'article',
-        component: () => import('@/views/Article.vue')
+        component: () => import('@/views/Article/Article.vue')
+      },
+      {
+        path: 'article/create',
+        name: 'articleCreate',
+        component: () => import('@/views/Article/ArticleEdit.vue')
+      },
+      {
+        path: 'article/edit/:id',
+        name: 'articleEdit',
+        component: () => import('@/views/Article/ArticleEdit.vue')
       },
       {
         path: 'advertise',

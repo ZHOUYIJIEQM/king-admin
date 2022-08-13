@@ -39,16 +39,14 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios'
 import { getCurrentInstance, reactive, ref } from "vue";
 import { UserFilled, Lock } from "@element-plus/icons-vue";
-import { ElMessage, FormInstance } from "element-plus";
+import { ElNotification, FormInstance } from "element-plus";
 import { useRouter } from "vue-router";
 import loading from '@/utils/loading'
 
 const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
-const $http = app?.proxy.$http
 const { login } = app?.proxy.$LoginApi
 const router = useRouter()
 
@@ -91,7 +89,7 @@ const rules = reactive({
  */
 const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  formEl.validate(async (valid) => {
+  formEl.validate(async (valid: any) => {
     if (valid) {
       //  登录操作
       loading.openLoading()
@@ -100,14 +98,19 @@ const submitForm = (formEl: FormInstance | undefined) => {
         if (loginRes?.status === 200) {
           sessionStorage.setItem('token', loginRes.data.token)
           router.push('/')
-          ElMessage({
-            showClose: true,
+          ElNotification({
+            title: 'Success',
             message: '登录成功!',
-            type: 'success'
+            type: 'success',
           })
         } else if (loginRes) {
           // 失败
-          ElMessage(loginRes.data?.message)
+          // ElMessage(loginRes.data?.message)
+          ElNotification({
+            title: 'Error',
+            message: loginRes.data?.message,
+            type: 'error',
+          })
         }
         loading.closeLoading()
       } catch (err) {
@@ -117,10 +120,10 @@ const submitForm = (formEl: FormInstance | undefined) => {
       }
     } else {
       // 不能提交
-      console.log("error submit!");
-      ElMessage({
-        showClose: true,
-        message: '请检查填写内容',
+      // console.log("error submit!");
+      ElNotification({
+        title: 'Warning',
+        message: '请检查填写内容!',
         type: 'warning',
       })
       return false;

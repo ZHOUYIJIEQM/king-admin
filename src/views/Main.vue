@@ -57,8 +57,8 @@
       <el-header>
         <div class="left">
           <div class="tag-icon" @click="isCollapse = !isCollapse">
-            <el-icon v-if="isCollapse"><Expand /></el-icon>
-            <el-icon v-else><Fold /></el-icon>
+            <el-icon v-show="isCollapse"><Expand /></el-icon>
+            <el-icon v-show="!isCollapse"><Fold /></el-icon>
           </div>
           <el-breadcrumb separator="/">
             <el-breadcrumb-item to="/" @click="toMain">首页</el-breadcrumb-item>
@@ -69,18 +69,28 @@
           <el-button @click="loginOut">退出</el-button>
         </div>
       </el-header>
-      <el-main>
-        <router-view></router-view>
-      </el-main>
+      <el-scrollbar ref="mainScroll">
+        <el-main>
+          <router-view></router-view>
+        </el-main>
+      </el-scrollbar>
     </el-container>
   </el-container>
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw, nextTick, reactive, ref, watch } from "vue";
+import { markRaw, getCurrentInstance, reactive, ref, watch, onMounted } from "vue";
 import { Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElMessage, ElMessageBox } from "element-plus";
+import { ElNotification, ElMessageBox } from "element-plus";
+import { commonStore } from "../store/index";
+
+const app: any = getCurrentInstance()
+
+onMounted(() => {
+  commonStore().setElScrollEl(app?.proxy.$refs.mainScroll)
+})
+
 
 let menuList = reactive({
   data: [
@@ -214,6 +224,8 @@ watch(
   (newV, oldV) => {
     defaultActive.value = route.path
     let heroIndex = menuList.data.findIndex(i => i.menu === '英雄管理')
+    let articleIndex = menuList.data.findIndex(i => i.menu === '文章管理')
+    // console.log(articleIndex);
     if (newV === 'heroCreate') {
       menuList.data[heroIndex].menuItem?.unshift({
         name: '新增英雄',
@@ -226,9 +238,26 @@ watch(
         index: `/hero/edit/${route.params.id}`
       })
       selectMenu({index: `/hero/edit/${route.params.id}`})
+    } else if (newV === 'articleCreate') {
+      menuList.data[articleIndex].menuItem?.unshift({
+        name: '新增文章',
+        index: 'article/create'
+      })
+      selectMenu({index: '/article/create'})
+    } else if (newV === 'articleEdit') {
+      menuList.data[articleIndex].menuItem?.unshift({
+        name: '编辑文章',
+        index: `/article/edit/${route.params.id}`
+      })
+      selectMenu({index: `/article/edit/${route.params.id}`})
     } else {
       if ((menuList.data[heroIndex].menuItem as Array<any>).length > 1) {
         menuList.data[heroIndex].menuItem?.shift()
+        selectMenu({index: route.path})
+      }
+      if ((menuList.data[articleIndex].menuItem as Array<any>).length > 1) {
+        menuList.data[articleIndex].menuItem?.shift()
+        selectMenu({index: route.path})
       }
     }
   },
@@ -249,9 +278,10 @@ const loginOut = () => {
     }
   )
   .then(() => {
-    ElMessage({
-      type: 'success',
+    ElNotification({
+      title: 'Success',
       message: '退出成功!',
+      type: 'success',
     })
     sessionStorage.clear()
     router.push({name: 'login'})
@@ -304,6 +334,7 @@ const loginOut = () => {
       .left {
         display: flex;
         align-items: center;
+        min-width: 300px;
         .tag-icon {
           cursor: pointer;
           padding: 15px;
@@ -318,8 +349,14 @@ const loginOut = () => {
       }
     }
     .el-main {
-      padding: 15px;
+      padding: 20px 15px 80px;
     }
   }
 }
+// :deep(.el-scrollbar__view) {
+//   height: 100%;
+//   .el-main {
+//     min-height: 100%;
+//   }
+// }
 </style>

@@ -77,11 +77,11 @@
 <script lang="ts" setup>
 import { getCurrentInstance, nextTick, onMounted, reactive, ref } from 'vue';
 import { Delete, Edit, } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElNotification, ElMessageBox } from 'element-plus';
+import loading from '@/utils/loading'
 
 const app: any = getCurrentInstance()
-const $http = app.proxy.$http
-const {getCategoryList} = app.proxy.$CateApi
+const { getCategoryList, getCateById, createCate, deleteCate, updateCate } = app.proxy.$CateApi
 
 let isLoading = ref<boolean>(false)
 
@@ -90,8 +90,8 @@ let cateList = ref([])
 const getCateList = async () => {
   // 加载提示
   isLoading.value = true
-  const cateRes = await $http.get('/rest/category')
-  // const cateRes = await getCategoryList()
+  // const cateRes = await $http.get('/rest/category')
+  const cateRes = await getCategoryList()
   // console.log('-----', cateRes);
   const { data } = cateRes
   // 选择分类 同时也是关联
@@ -112,20 +112,18 @@ let updateId:string = ''
 const handleEdit = async (index: number, row: any) => {
   updateId = row._id
   editForm.name = row.name
+  editForm.desc = row.desc
   dialogEditVisible.value = true
   await nextTick()
   app?.ctx.$refs.editFormName.focus()
 }
 const confirmEdit = async () => {
-  let res = await $http({
-    url: `/rest/categories/${updateId}`,
-    method: 'put',
-    data: editForm
-  })
+  let res = await updateCate(updateId, editForm)
   if (res.status === 200) {
-    ElMessage({
+    ElNotification({
+      title: 'Success',
+      message: '编辑成功!',
       type: 'success',
-      message: '编辑成功!'
     })
   }
   getCateList()
@@ -145,16 +143,22 @@ const handleDelete = async (index: number, row: any) => {
     }
   )
   .then(async res => {
-    const delRes = await $http({
-      url: `/rest/categories/${row._id}`,
-      method: 'delete'
-    })
-    if (delRes.status === 200) {
-      ElMessage({
-        type: 'success',
-        message: `${row.name} 删除成功!`,
-      })
-      getCateList()
+    try {
+      loading.openLoading()
+      const delRes = await deleteCate(row._id)
+      console.log(`删除${row._id}`);
+      if (delRes.status === 200) {
+        ElNotification({
+          title: 'Success',
+          message: `分类 ${row.name} 删除成功!`,
+          type: 'success',
+        })
+        getCateList()
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      loading.closeLoading()
     }
   })
   .catch(err => {
@@ -185,23 +189,23 @@ const props1 = {
 const handleSelectClass = () => { }
 // 确定 添加
 const confirmAddSelect = async () => {
-  const addSelectRes = await $http({
-    url: '/rest/categories',
-    method: 'post',
-    data: form
-  })
-  if (addSelectRes?.status) {
-    getCateList()
-    dialogFormVisible.value = false
-    ElMessage({
-      message: '添加分类成功!',
-      type: 'success'
-    })
-  } else {
-    ElMessage({
-      message: '添加分类失败!',
-      type: 'error'
-    })
+  try {
+    loading.openLoading()
+    const addSelectRes = await createCate(form)
+    // console.log('新建分类', addSelectRes);
+    if (addSelectRes?.status) {
+      getCateList()
+      dialogFormVisible.value = false
+      ElNotification({
+        title: 'Success',
+        message: '添加分类成功!',
+        type: 'success',
+      })
+    }
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.closeLoading()
   }
 }
 

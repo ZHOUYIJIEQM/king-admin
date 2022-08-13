@@ -29,6 +29,7 @@ instance.interceptors.response.use(
       message: `${error.response.data.message}`,
       type: 'error',
     })
+    
     // todo: 加入未登录跳转
     if (error.response.status === 401) { }
     if (error.response.status === 422) {

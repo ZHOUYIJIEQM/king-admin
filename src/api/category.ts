@@ -1,4 +1,5 @@
 import { apiInstance } from "./instance";
+import type { cateType } from "../models/api"
 
 const CateApi = {
   /**
@@ -10,10 +11,45 @@ const CateApi = {
     })
   },
   /**
-   * 根据id读取分类
+   * 根据分类 id 获取分类数据
+   * @param id 分类 id
    */
   getCateById(id: string) {
-    console.log('根据id读取分类', id);
+    return apiInstance({
+      url: `/category/${id}`
+    })
+  },
+  /**
+   * 新建分类
+   * @param data 
+   */
+  createCate(data: cateType) {
+    return apiInstance({
+      url: '/category',
+      method: 'post',
+      data
+    })
+  },
+  /**
+   * 根据分类 id 更新数据
+   * @param id 分类id
+   */
+  updateCate(id: string, data: cateType) {
+    return apiInstance({
+      url: `/category/${id}`,
+      method: 'put',
+      data
+    })
+  },
+  /**
+   * 根据分类 id 删除
+   * @param id 分类id
+   */
+  deleteCate(id: string) {
+    return apiInstance({
+      url: `/category/${id}`,
+      method: 'delete'
+    })
   }
 
 }

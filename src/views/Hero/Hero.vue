@@ -28,21 +28,34 @@
           >添加新英雄</el-button>
         </el-col>
       </el-row>
-      <el-table :data="heroList" v-loading="isLoading" empty-text="暂无英雄数据!" border stripe>
+      <el-table 
+        :data="heroList"
+        v-loading="isLoading"
+        empty-text="暂无英雄数据!"
+        border
+        stripe
+      >
         <el-table-column type="expand" label="展开" width="60">
           <template #default="props">
-            <!-- todo: 数据库里很多图片没用了, 需要修改 -->
-            <div class="skills" v-for="item in props.row.skills" :key="item._id">
-              <div class="skill">
-                <img class="skill-icon" :src="item.icon" />
-                <h3>{{item.name}}</h3>
+            <div class="hero-detail-box">
+              <div class="skills-box detail-item">
+                <div class="title">查看技能:</div>
+                <div class="skill-item" v-for="item in props.row.skills" :key="item._id">
+                  <div class="left">
+                    <el-image class="skill-icon" :src="item.icon" />
+                  </div>
+                  <div class="right">
+                    <h3>{{item.name}}</h3>
+                    <p>{{item.desc}}</p>
+                  </div>
+                </div>
               </div>
             </div>
           </template>
         </el-table-column>
         <el-table-column label="英雄名称" prop="name"></el-table-column>
-        <el-table-column label="英雄称号" prop="title"></el-table-column>
-        <el-table-column label="所属分类" border stripe>
+        <el-table-column label="英雄称号" prop="nickname"></el-table-column>
+        <el-table-column label="所属分类">
           <template #default="scope">
             <span>{{category(scope.row.cate)}}</span>
           </template>
@@ -50,11 +63,11 @@
         <el-table-column label="头像">
           <template #default="scope">
             <div class="hero-avatar-box">
-              <img class="hero-avatar" :src="scope.row.avatar" />
+              <el-image lazy class="hero-avatar" :src="scope.row.avatar" />
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center">
+        <el-table-column label="操作" align="center" width="150">
           <template #default="scope">
             <div class="option">
               <el-button
@@ -63,7 +76,7 @@
                 plain
                 :icon="Edit"
                 @click="handleEdit(scope.row)"
-              >编辑</el-button>
+              >查看 / 编辑</el-button>
               <el-button
                 size="small"
                 type="danger"
@@ -77,8 +90,8 @@
       </el-table>
       <div class="pagination-box">
         <el-pagination
-          v-model:currentPage="pageParams.pagenum"
-          v-model:page-size="pageParams.pagesize"
+          v-model:currentPage="pageParams.pageNum"
+          v-model:page-size="pageParams.pageSize"
           :page-sizes="[10, 15, 20]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
@@ -91,14 +104,15 @@
 </template>
 
 <script lang="ts" setup>
+import loading from '@/utils/loading'
 import { getCurrentInstance, ref } from 'vue';
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElNotification, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 
 const router = useRouter()
-const app = getCurrentInstance()
-const $http = app?.appContext.config.globalProperties.$http
+const app: any = getCurrentInstance()
+const { getHeroList, deleteHero, heroSearch } = app?.proxy.$HeroApi
 
 const category = (data:any) => {
   return data.map((item:any) => item.name).join('/')
@@ -111,33 +125,28 @@ let heroList = ref([])
 let total = ref(0)
 // 请求页参数
 interface GetGoods {
-  pagenum: number,
-  pagesize: number,
-  query: string
+  pageNum: number,
+  pageSize: number,
 }
 let pageParams: GetGoods = {
-  pagenum: 1,
-  pagesize: 10,
-  query: ''
+  pageNum: 1,
+  pageSize: 10,
 }
 // 加载提示
 let isLoading = ref<boolean>(false)
 // 获取英雄列表
-const getHeroList = async () => {
+const getHeroData = async () => {
   isLoading.value = true
   try {
-    let res = await $http({
-      url: '/rest/heros',
-      params: pageParams
-    })
-    // console.log(res);
+    let res = await getHeroList(pageParams)
+    console.log(res.data.data);
     if (res.status === 200) {
       heroList.value = res.data.data
       total.value = res.data.total
     }
   } catch (error) {
     console.log(error);
-    ElMessage({
+    ElNotification({
       type: 'error',
       message: '获取英雄列表出错!'
     })
@@ -147,24 +156,34 @@ const getHeroList = async () => {
     }, 300)
   }
 }
-getHeroList()
+getHeroData()
 
 // 每页条数改变
 const handleSizeChange = (val: number) => {
-  pageParams.pagesize = val
-  getHeroList()
+  pageParams.pageSize = val
+  getHeroData()
 }
 // 页数改变
 const handleCurrentChange = (val: number) => {
-  pageParams.pagenum = val
-  getHeroList()
+  pageParams.pageNum = val
+  getHeroData()
 }
 // 搜索
 const searchHero = async (event:any) => {
   event.target.blur()
-  pageParams.pagenum = 1
-  pageParams.query = heroQuery.value
-  getHeroList()
+  pageParams.pageNum = 1
+  // todo: 根据名称搜索英雄
+  // console.log(heroQuery.value);
+  try {
+    loading.openLoading()
+    let res = await heroSearch({name: heroQuery.value})
+    // console.log(res.data);
+    heroList.value = res.data
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.closeLoading()
+  }
 }
 // 添加英雄
 const addHero = () => {
@@ -193,20 +212,17 @@ const handleDelete = (row: any) => {
     }
   )
   .then(async response => {
-    console.log(response);
-    const res = await $http({
-      url: `/rest/heros/${row._id}`,
-      method: 'delete'
-    })
-    console.log(res);
+    // console.log(response);
+    const res = await deleteHero(row._id)
+    // console.log(res);
     if (res.status === 200) {
-      getHeroList()
-      ElMessage({
+      getHeroData()
+      ElNotification({
         type: 'success',
-        message: res.data.message
+        message: `${row.name} ${res.data.message}`
       })
     } else {
-      ElMessage({
+      ElNotification({
         type: 'error',
         message: res.data.message
       })
@@ -220,6 +236,56 @@ const handleDelete = (row: any) => {
 </script>
 
 <style lang="scss" scoped>
+.hero-detail-box {
+  padding: 15px 0 0;
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .detail-item {
+    padding: 0 15px;
+  }
+  .skills-box {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    .skill-item {
+      display: flex;
+      // align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #ebeef5;
+      &:first-child {
+        padding-top: 0;
+      }
+      &:last-child {
+        border-bottom: 0;
+      }
+      .left {
+        .skill-icon {
+          border-radius: 50%;
+          width: 60px;
+          aspect-ratio: 1;
+        }
+        margin-right: 15px;
+      }
+      .right {
+        h3 {
+          font-size: 14px;
+          margin-bottom: 8px;
+        }
+        p {
+          font-size: 13px;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
+
+:deep(.el-table__cell.el-table__expanded-cell) {
+  padding: 0;
+}
+
 :deep(.el-card) {
   min-width: 650px;
   .pagination-box {
@@ -227,7 +293,6 @@ const handleDelete = (row: any) => {
     display: flex;
     justify-content: center;
   }
-
 }
 :deep(.el-table) {
   margin-top: 20px;
@@ -237,28 +302,36 @@ const handleDelete = (row: any) => {
   align-items: center;
   .hero-avatar {
     min-width: 50px;
+    aspect-ratio: 1;
     max-width: 80px;
   }
 }
 
 .option {
+  display: flex;
+  flex-wrap: wrap;
   .el-button {
-    transition: all .2s;
+    width: 100%;
+    margin-left: 0;
+    &:last-child {
+      margin-top: 10px;
+    }
+    // transition: all .2s;
   }
 }
 
 @media screen and (max-width: 1180px) {
-  .option {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    .el-button {
-      width: 80%;
-    }
-    .el-button:last-child {
-      margin-left: 0;
-      margin-top: 10px;
-    }
-  }
+  // .option {
+  //   display: flex;
+  //   align-items: center;
+  //   flex-direction: column;
+  //   .el-button {
+  //     width: 80%;
+  //   }
+  //   .el-button:last-child {
+  //     margin-left: 0;
+  //     margin-top: 10px;
+  //   }
+  // }
 }
 </style>

@@ -1,5 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
-import { ElMessage } from 'element-plus';
+import { ElNotification } from 'element-plus';
 
 const apiInstance = axios.create({
   // baseURL: "http://localhost:3080/admin/api",
@@ -32,8 +32,8 @@ apiInstance.interceptors.response.use(
     if (error.response.status === 401) { }
     // 用户名 密码 错误
     if (error.response.status === 422) {
-      ElMessage({
-        showClose: true,
+      ElNotification({
+        title: 'Error',
         message: `${error.response.data.message}`,
         type: 'error',
       })
@@ -43,8 +43,8 @@ apiInstance.interceptors.response.use(
 )
 
 const featureInstance = axios.create({
-  baseURL: "http://localhost:3080/admin/api",
-  // baseURL: "http://192.168.1.5:3080/admin/api",
+  // baseURL: "http://localhost:3080/admin/api",
+  baseURL: "http://192.168.1.5:3080/admin/api",
   timeout: 8 * 1000,
 })
 
@@ -64,8 +64,8 @@ featureInstance.interceptors.response.use(
     console.log('错误:', error);
     // 用户名 密码 错误
     if (error.response.status === 422) {
-      ElMessage({
-        showClose: true,
+      ElNotification({
+        title: 'Error',
         message: `${error.response.data.message}`,
         type: 'error',
       })
