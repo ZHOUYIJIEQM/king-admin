@@ -5,7 +5,7 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    CardItem: typeof import('./src/components/cardItem.vue')['default']
+    CardItem: typeof import('./src/components/CardItem.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
@@ -45,6 +45,7 @@ declare module '@vue/runtime-core' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Test: typeof import('./src/components/test.vue')['default']
+    TinymceEditor: typeof import('./src/components/TinymceEditor.vue')['default']
     Upload: typeof import('./src/components/Upload.vue')['default']
     UploadComp: typeof import('./src/components/UploadComp.vue')['default']
     UploadFile: typeof import('./src/components/UploadFile.vue')['default']

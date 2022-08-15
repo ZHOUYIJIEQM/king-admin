@@ -221,7 +221,7 @@ const toMain = () => {
 
 watch(
   () => route.name,
-  (newV, oldV) => {
+  async (newV, oldV) => {
     defaultActive.value = route.path
     let heroIndex = menuList.data.findIndex(i => i.menu === '英雄管理')
     let articleIndex = menuList.data.findIndex(i => i.menu === '文章管理')
@@ -241,7 +241,7 @@ watch(
     } else if (newV === 'articleCreate') {
       menuList.data[articleIndex].menuItem?.unshift({
         name: '新增文章',
-        index: 'article/create'
+        index: '/article/create'
       })
       selectMenu({index: '/article/create'})
     } else if (newV === 'articleEdit') {

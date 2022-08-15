@@ -40,7 +40,7 @@
         <el-table-column min-width="20" label="文章分类" prop="cate"></el-table-column>
         <el-table-column min-width="20%" label="创建时间">
           <template #default="scope">
-            <div>{{ scope.row.createdTime.split(' ').at(0) }}</div>
+            <div>{{ scope.row.createdTime?.split(' ').at(0) }}</div>
           </template>
         </el-table-column>
         <el-table-column min-width="10%" label="操作" align="center" width="150">
@@ -82,9 +82,10 @@
 import { ref, reactive, watch, getCurrentInstance, onMounted } from "vue";
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
 import { useRouter } from "vue-router";
+import { ElNotification, ElMessageBox } from 'element-plus';
 
 const app: any = getCurrentInstance();
-const { getArticleList, articleSearch } = app.proxy.$ArticleApi;
+const { getArticleList, articleSearch, deleteArticle } = app.proxy.$ArticleApi;
 const router = useRouter()
 
 const queryObj = reactive({
@@ -114,6 +115,7 @@ const searchArticle = async ($event: any) => {
   }
 }
 const addArticle = () => {
+  router.push({ name: 'articleCreate' })
 }
 const handleEdit = (row: any) => {
   router.push({
@@ -123,7 +125,39 @@ const handleEdit = (row: any) => {
     }
   })
 }
-const handleDelete = (row: any) => {
+/**
+ * 删除
+ */
+const handleDelete = async (row: any) => {
+  ElMessageBox.confirm(
+    '确定要删除该文章吗?',
+    '删除文章',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  )
+  .then(async response => {
+    // console.log(response);
+    const res = await deleteArticle(row._id)
+    // console.log(res);
+    if (res.status === 200) {
+      await getArticle()
+      ElNotification({
+        type: 'success',
+        message: `${row.title} ${res.data.message}`
+      })
+    } else {
+      ElNotification({
+        type: 'error',
+        message: res.data.message
+      })
+    }
+  })
+  .catch(err => {
+    // console.log(err);
+  })
 }
 // 每页条数改变
 const handleSizeChange = async (val: number) => {

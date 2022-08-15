@@ -139,7 +139,7 @@ const getHeroData = async () => {
   isLoading.value = true
   try {
     let res = await getHeroList(pageParams)
-    console.log(res.data.data);
+    // console.log(res.data.data);
     if (res.status === 200) {
       heroList.value = res.data.data
       total.value = res.data.total

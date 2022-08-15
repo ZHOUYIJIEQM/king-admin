@@ -380,7 +380,7 @@ import type { TabsPaneContext } from 'element-plus'
 import { ElNotification } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import UploadFileVue from '@/components/UploadFile.vue';
-import cardItemVue from '@/components/cardItem.vue';
+import cardItemVue from '@/components/CardItem.vue';
 import { commonStore } from "@/store/index";
 
 const $route = useRoute()
@@ -416,11 +416,16 @@ let levelUp = ref<any[]>([])
 const handleClick = async (tab: TabsPaneContext, event: Event) => {
   console.log(tab.props.name);
   if (tab.props.name === 'equipment') {
-    if (heroData.data.skills[0].id) {
+    // if (heroData.data.skills[0].id.length && ) {
       heroData.data.skills = heroData.data.skills.map((i: any, index: number) => {
-        return Object.assign(i, {id: `skill${index+1}`})
+        // return Object.assign(i, {id: `skill${index+1}`})
+        if (i.id.length && i.id.indexOf('skill') === -1) {
+          return i
+        } else {
+          return Object.assign(i, {id: `skill${index+1}`})
+        }
       })
-    }
+    // }
     levelUp.value = heroData.data.levelUp.map((i: any) => i.id)
     console.log(heroData.data.skills);
   }
@@ -700,7 +705,7 @@ const initAll = async () => {
     } else {
       editType.value = 'create'
       initHeroData()
-      console.log('新建');
+      // console.log('新建');
     }
     initEnd.value = true
   } catch (error) {
