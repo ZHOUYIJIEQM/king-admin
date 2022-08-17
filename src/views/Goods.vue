@@ -157,7 +157,6 @@
 <script lang="ts" setup>
 import { DocumentAdd, Delete, Edit, Plus, CloseBold } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
-import type { UploadProps } from 'element-plus'
 import { deepClone } from "@/utils/func";
 import { computed, getCurrentInstance, nextTick, onMounted, reactive, ref } from 'vue';
 import UploadFileVue from '@/components/UploadFile.vue';

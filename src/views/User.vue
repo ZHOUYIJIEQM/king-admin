@@ -136,7 +136,7 @@ const handleEdit = (val: any) => {
   isAdd.value = false
   dialogVisible.value = true
   dialogData.value = deepClone(val)
-  console.log('---', dialogData.value);
+  // console.log('---', dialogData.value);
   // deepClone(val)
 }
 /**
@@ -220,10 +220,10 @@ const getUser = async () => {
     loading.openLoading()
     tableLoading.value = true
     let res = await getUsers(pageParams)
-    console.log(res);
+    // console.log(res);
     tableList.value = res.data.data
     total.value = res.data.total
-    console.log(tableList.value);
+    // console.log(tableList.value);
   } catch (error) {
     console.log(error); 
   } finally {

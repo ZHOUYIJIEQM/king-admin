@@ -44,7 +44,6 @@ import { UserFilled, Lock } from "@element-plus/icons-vue";
 import { ElNotification, FormInstance } from "element-plus";
 import { useRouter } from "vue-router";
 import loading from '@/utils/loading'
-import { commonStore } from "@/store/index";
 
 const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
@@ -99,7 +98,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         // console.log('登录', loginRes);
         if (loginRes?.status === 200) {
           sessionStorage.setItem('token', loginRes.data.token)
-          commonStore().setUserName(loginRes.data.username)
+          sessionStorage.setItem('userName', loginRes.data.username)
           router.push('/')
           ElNotification({
             title: 'Success',

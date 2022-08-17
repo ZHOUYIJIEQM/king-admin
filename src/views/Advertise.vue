@@ -197,7 +197,7 @@ const saveContent = async () => {
       })
     }
   } else {
-    console.log('保存', adItemData);
+    // console.log('保存', adItemData);
     let res = await updateAd(adItemData.value._id, adItemData.value)
     if (res.status === 200) {
       ElNotification({
@@ -233,7 +233,7 @@ const handleCurrentChange = async (val: number) => {
  * 上传后
  */
 const uploadSuccess = (val: string, data: any, key: string) => {
-  console.log(val, data, key);
+  // console.log(val, data, key);
   data[key] = val
 }
 
@@ -245,10 +245,10 @@ const getAllAd = async () => {
     loading.openLoading()
     tableLoading.value = true
     let res = await getAd(pageParams)
-    console.log(res);
+    // console.log(res);
     tableList.value = res.data.data
     total.value = res.data.total
-    console.log(tableList.value);
+    // console.log(tableList.value);
   } catch (error) {
     console.log(error); 
   } finally {

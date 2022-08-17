@@ -209,7 +209,7 @@ const setBreadCrumb = (val:string) => {
 }
 // 选中菜单项
 const selectMenu = (val:any) => {
-  console.log('点击了菜单项', val);
+  // console.log('点击了菜单项', val);
   router.push(val.index)
   setBreadCrumb(val.index)
   defaultActive.value = val.index

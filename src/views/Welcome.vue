@@ -8,6 +8,9 @@
       <p class="list">分类管理: 对分类增删改</p>
       <p class="list">物品管理: 对装备列表进行增删改</p>
       <p class="list">英雄管理: 对英雄列表进行增删改查</p>
+      <p class="list">文章管理: 对文章列表进行增删改查</p>
+      <p class="list">广告管理: 对广告列表进行增删改查</p>
+      <p class="list">用户管理: 对用户列表进行增删改查</p>
     </div>
   </div>
 </template>
