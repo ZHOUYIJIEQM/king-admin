@@ -391,7 +391,7 @@ const { getHeroList, createHero, getHeroById, updateHero, getInscription, getSum
 const { getGoodsList } = app?.proxy.$GoodsApi
 
 // 上传接口
-const actionUrl = 'http://localhost:3080/admin/api/upload/hero'
+const actionUrl = `${commonStore().uploadPath}hero`
 // 初始化数据
 let initEnd = ref<boolean>(false)
 // 标记编辑/新增
@@ -749,9 +749,9 @@ onMounted(async () => {
       max-height: 100px;
     }
   }
-  .hero-photo {
+  .hero-banner, .hero-photo {
     .el-upload {
-      width: 200px;
+      width: 60%;
     }
   }
   .skins-avatar {
@@ -834,7 +834,6 @@ onMounted(async () => {
     }
   }
 }
-
 
 .desc-item {
   margin-bottom: 8px;

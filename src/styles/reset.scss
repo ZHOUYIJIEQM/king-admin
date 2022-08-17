@@ -52,6 +52,13 @@ html, body, #app {
 	// min-width: 800px;
 }
 
+.eli {
+	white-space: nowrap;
+	// width: 100%;
+	// display: block;
+	overflow: hidden;	
+}
+
 // 滚动条
 ::-webkit-scrollbar {
 	width: 8px;

@@ -105,7 +105,7 @@
 
 <script lang="ts" setup>
 import loading from '@/utils/loading'
-import { getCurrentInstance, ref } from 'vue';
+import { getCurrentInstance, ref, onMounted } from 'vue';
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
@@ -156,7 +156,6 @@ const getHeroData = async () => {
     }, 300)
   }
 }
-getHeroData()
 
 // 每页条数改变
 const handleSizeChange = (val: number) => {
@@ -232,6 +231,17 @@ const handleDelete = (row: any) => {
     // console.log(err);
   })
 }
+
+onMounted(async() => {
+  try {
+    loading.openLoading()
+    await getHeroData()
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.closeLoading()
+  }
+})
 
 </script>
 

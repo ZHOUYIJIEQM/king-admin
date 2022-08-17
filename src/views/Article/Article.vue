@@ -83,6 +83,7 @@ import { ref, reactive, watch, getCurrentInstance, onMounted } from "vue";
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
 import { useRouter } from "vue-router";
 import { ElNotification, ElMessageBox } from 'element-plus';
+import loading from '@/utils/loading'
 
 const app: any = getCurrentInstance();
 const { getArticleList, articleSearch, deleteArticle } = app.proxy.$ArticleApi;
@@ -197,7 +198,14 @@ const getArticle = async () => {
 }
 
 onMounted(async () => {
-  await getArticle()
+  try {
+    loading.openLoading()
+    await getArticle()
+  } catch (error) {
+    console.log(error);
+  } finally {
+    loading.closeLoading()
+  }
 })
 
 </script>

@@ -4,21 +4,41 @@ const AdApi = {
   /**
    * 获取广告轮播
    */
-  getAd() {
+  getAd(params: any) {
     return apiInstance({
-      url: "/ad"
+      url: "/ad",
+      params
     })
   },
   /**
-   * 更新所有ad
+   * 新建轮播
    */
-  updataAd(data: any) {
+  createAd(data: any) {
     return apiInstance({
-      url: '/ad',
-      method: 'post',
+      url: "/ad",
+      method: "post",
+      data,
+    });
+  },
+  /**
+   * 更新信息
+   */
+  updateAd(id: string, data: any) {
+    return apiInstance({
+      url: `/ad/${id}`,
+      method: 'put',
       data
     })
-  }
+  },
+  /**
+   * 删除
+   */
+  deleteAd(id: string) {
+    return apiInstance({
+      url: `/ad/${id}`,
+      method: 'delete'
+    })
+  },
 }
 
 export default AdApi

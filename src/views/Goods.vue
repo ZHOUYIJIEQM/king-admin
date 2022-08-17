@@ -1,7 +1,7 @@
 <template>
   <div class="goods-page">
     <el-card>
-      <el-button type="primary" plain @click="addGoods">添加装备</el-button>
+      <el-button :icon="DocumentAdd" type="primary" plain @click="addGoods">添加装备</el-button>
       <el-table
         class="table"
         v-loading="tableLoading"
@@ -44,16 +44,6 @@
           </template>
         </el-table-column>
         <el-table-column sortable="custom" label="价格" prop="price">
-          <!-- <template #header>
-            <span class="price">
-              价格
-            </span>
-          </template>
-          <template #default="scope">
-            <div>
-              {{scope.row.price}}
-            </div>
-          </template> -->
         </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template #default="scope">
@@ -116,18 +106,6 @@
             <el-input ref="goodsName" v-model="goodsForm.name" placeholder="请输入装备名!"></el-input>
           </el-form-item>
           <el-form-item label="装备图标">
-            <!-- <el-upload
-              class="avatar-uploader"
-              :action="actionUrl"
-              :headers="token"
-              :data="uploadData.data"
-              :show-file-list="false"
-              :before-upload="beforeAvatarUpload"
-              :on-success="handleAvatarSuccess"
-            >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-            </el-upload> -->
             <UploadFileVue
               class="hero-avatar"
               :actionUrl="actionUrl"
@@ -177,12 +155,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Delete, Edit, Plus, CloseBold } from '@element-plus/icons-vue'
+import { DocumentAdd, Delete, Edit, Plus, CloseBold } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import type { UploadProps } from 'element-plus'
 import { deepClone } from "@/utils/func";
 import { computed, getCurrentInstance, nextTick, onMounted, reactive, ref } from 'vue';
 import UploadFileVue from '@/components/UploadFile.vue';
+import { commonStore } from "@/store/index";
 
 const app: any = getCurrentInstance()
 const { proxy } = app
@@ -434,40 +413,12 @@ const confirmAdd = async () => {
 }
 
 
-// todo: 需要修改上传接口路径
-// const actionUrl = 'http://localhost:3333/admin/api/upload/item'
-const actionUrl = 'http://localhost:3080/admin/api/upload/items'
-let uploadData = reactive({
-  data: {}
-})
-// 上传
-const handleAvatarSuccess: UploadProps['onSuccess'] = (
-  response,
-  uploadFile
-) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
-  goodsForm.value.icon = response.url
-}
+const actionUrl = `${commonStore().uploadPath}items`
 
 const uploadSuccess = (val: string) => {
   imageUrl.value = val
   goodsForm.value.icon = val
 }
-
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  uploadData.data = {
-    name: rawFile.name
-  }
-  if (rawFile.size / 1024 / 1024 > 2) {
-    ElNotification({
-      message: '图片不能大于2M!',
-      type: 'error',
-    })
-    return false
-  }
-  return true
-}
-
 
 /**
  * 新增属性

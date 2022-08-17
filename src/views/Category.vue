@@ -1,7 +1,7 @@
 <template>
   <div class="category-page">
     <el-card class="main-card">
-      <el-button type="primary" @click="addCate">添加分类</el-button>
+      <el-button :icon="DocumentAdd" plain type="primary" @click="addCate">添加分类</el-button>
       <el-table
         class="table"
         v-loading="isLoading"
@@ -11,19 +11,21 @@
         empty-text="暂无分类!"
       >
         <!-- <el-table-column type="index" label="序列" width="100" align="center" /> -->
-        <el-table-column prop="name" label="日期" min-width="200" />
+        <el-table-column prop="name" label="分类" min-width="200" />
         <el-table-column label="编辑" width="300" align="center">
           <template #default="scope">
             <el-button
               size="small"
               type="primary"
               :icon="Edit"
+              plain
               @click="handleEdit(scope.$index, scope.row)"
             >编辑</el-button>
             <el-button
               size="small"
               type="danger"
               :icon="Delete"
+              plain
               @click="handleDelete(scope.$index, scope.row)"
             >删除</el-button>
           </template>
@@ -76,7 +78,7 @@
 </template>
 <script lang="ts" setup>
 import { getCurrentInstance, nextTick, onMounted, reactive, ref } from 'vue';
-import { Delete, Edit, } from '@element-plus/icons-vue'
+import { DocumentAdd, Delete, Edit, } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import loading from '@/utils/loading'
 
@@ -90,6 +92,7 @@ let cateList = ref([])
 const getCateList = async () => {
   // 加载提示
   isLoading.value = true
+  loading.openLoading()
   // const cateRes = await $http.get('/rest/category')
   const cateRes = await getCategoryList()
   // console.log('-----', cateRes);
@@ -97,9 +100,8 @@ const getCateList = async () => {
   // 选择分类 同时也是关联
   cateList.value = data
   // console.log(cateList.value);
-  setTimeout(() => {
-    isLoading.value = false
-  }, 500)
+  loading.closeLoading()
+  isLoading.value = false
 }
 
 // 编辑

@@ -12,7 +12,6 @@
           text-color="#fff"
           active-text-color="#ffd04b"
           :collapse-transition="false"
-          router
           :collapse="isCollapse"
           :default-active="defaultActive"
         >
@@ -196,6 +195,8 @@ const setBreadCrumb = (val:string) => {
 }
 // 选中菜单项
 const selectMenu = (val:any) => {
+  console.log('点击了菜单项', val);
+  router.push(val.index)
   setBreadCrumb(val.index)
   defaultActive.value = val.index
 }
@@ -221,7 +222,7 @@ const toMain = () => {
 
 watch(
   () => route.name,
-  async (newV, oldV) => {
+  (newV, oldV) => {
     defaultActive.value = route.path
     let heroIndex = menuList.data.findIndex(i => i.menu === '英雄管理')
     let articleIndex = menuList.data.findIndex(i => i.menu === '文章管理')

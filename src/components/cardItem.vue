@@ -29,7 +29,7 @@ function close() {
 </script>
 <style lang="scss" scoped>
 .card-item-comp {
-  border: 2px solid var(--el-card-border-color);
+  border: 2px solid #e4e7ed;
   border-radius: 6px;
   margin-bottom: 15px;
   .top, .center {
@@ -40,7 +40,7 @@ function close() {
     justify-content: space-between;
     align-items: center;
     padding: 5px 0 5px 15px;
-    border-bottom: 1px solid var(--el-card-border-color);
+    border-bottom: 1px solid #e4e7ed;
     .title {
       font-weight: bold;
     }

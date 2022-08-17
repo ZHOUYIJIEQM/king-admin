@@ -5,6 +5,7 @@ export const commonStore = defineStore("common", {
     return {
       elScrollEl: null,
       token: "",
+      uploadPath: "http://localhost:3080/admin/api/upload/",
     };
   },
   getters: {

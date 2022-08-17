@@ -26,7 +26,7 @@
         </el-form-item>
         <div class="editor-title">文章内容</div>
         <div class="editor-box">
-          <vue3-tinymce v-model="articleForm.content" :setting="juejin_setting"></vue3-tinymce>
+          <vue3-tinymce ref="tinymceEditor" v-model="articleForm.content" :setting="juejin_setting"></vue3-tinymce>
         </div>
       </el-form>
       <div class="bottom">
@@ -42,6 +42,7 @@ import { useRoute, useRouter } from "vue-router";
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index";
 import { ElNotification } from "element-plus";
+
 
 const editType = ref<string>('')
 const $route = useRoute()
@@ -77,7 +78,7 @@ const juejin_setting = {
   // 自定义 图片上传模式
   custom_images_upload: true,
   custom_images_upload_header: commonStore().getToken,
-  images_upload_url: 'http://localhost:3080/admin/api/upload/articles',
+  images_upload_url: `${commonStore().uploadPath}aticles`,
   custom_images_upload_callback: (res:any) => {
     // console.log('上传图片回调', res);
     return res.url
@@ -86,7 +87,6 @@ const juejin_setting = {
   // 以中文简体为例
   language: 'zh_CN',
   language_url: 'https://unpkg.com/@jsdawn/vue3-tinymce@1.1.6/dist/tinymce/langs/zh_CN.js',
-
 };
 
 /**
@@ -199,7 +199,7 @@ const initAll = async () => {
 }
 
 /**
- * 给iframe 设置滚动条
+ * 给iframe 设置滚动条样式
  */
 const setScroll = () => {
   let i:any = document.querySelector('iframe')
@@ -224,10 +224,14 @@ const setScroll = () => {
 
 onMounted(async () => {
   await initAll()
-  console.log('---------');
-  setTimeout(() => {
-    setScroll()
-  }, 200)
+  let intervalTimer: any = null
+  intervalTimer = setInterval(() => {
+    if (app.proxy.$refs.tinymceEditor) {
+      setScroll()
+      clearInterval(intervalTimer)
+      // console.log(app.proxy.$refs);
+    } 
+  }, 100)
 })
 
 </script>
