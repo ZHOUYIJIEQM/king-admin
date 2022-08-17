@@ -71,7 +71,7 @@
             <el-form-item label="权限级别">
               <el-select v-model="dialogData.level" class="m-2" placeholder="Select">
                 <el-option
-                  v-for="item in 10"
+                  v-for="item in 5"
                   :key="item"
                   :label="item"
                   :value="item"

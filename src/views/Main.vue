@@ -65,7 +65,18 @@
           </el-breadcrumb>
         </div>
         <div class="right">
-          <el-button @click="loginOut">退出</el-button>
+          <el-dropdown trigger="click" placement="bottom-end">
+            <span class="right-user">
+              <el-image class="avatarPic" :src="avatarPic"></el-image>
+              <el-icon><CaretBottom /></el-icon>
+            </span>
+            <template #dropdown>
+              <div class="dropdown-menu">
+                <div>{{userName}}</div>
+                <div class="out" @click="loginOut">退出</div>
+              </div>
+            </template>
+          </el-dropdown>
         </div>
       </el-header>
       <el-scrollbar ref="mainScroll">
@@ -79,10 +90,13 @@
 
 <script lang="ts" setup>
 import { markRaw, getCurrentInstance, reactive, ref, watch, onMounted } from "vue";
-import { Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
+import { CaretBottom, Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElNotification, ElMessageBox } from "element-plus";
 import { commonStore } from "../store/index";
+import avatarPic from '@/assets/img/home/avatar.png'
+
+const userName = commonStore().userName
 
 const app: any = getCurrentInstance()
 
@@ -347,6 +361,21 @@ const loginOut = () => {
       .right {
         margin-left: auto;
         margin-right: 15px;
+        position: relative;
+        .content {
+          position: absolute;
+          left: 50%;
+          transform: translate(-50%, 0);
+        }
+        .right-user {
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          .avatarPic {
+            width: 35px;
+            border-radius: 50%;
+          }
+        }
       }
     }
     .el-main {
@@ -354,10 +383,23 @@ const loginOut = () => {
     }
   }
 }
-// :deep(.el-scrollbar__view) {
-//   height: 100%;
-//   .el-main {
-//     min-height: 100%;
-//   }
-// }
+</style>
+
+<style lang="scss">
+.dropdown-menu {
+  width: 130px;
+  &>div {
+    padding: 8px 12px;
+    font-size: var(--el-font-size-base);
+    color: var(--el-text-color-regular);
+    cursor: pointer;
+    &:hover {
+      background-color: var(--el-dropdown-menuItem-hover-fill);
+      color: var(--el-dropdown-menuItem-hover-color);
+    }
+  }
+  .out {
+    border-top: 1px solid #ececec;
+  }
+}
 </style>

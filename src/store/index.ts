@@ -4,6 +4,7 @@ export const commonStore = defineStore("common", {
   state: () => {
     return {
       elScrollEl: null,
+      userName: "",
       token: "",
       uploadPath: "http://localhost:3080/admin/api/upload/",
     };
@@ -23,5 +24,8 @@ export const commonStore = defineStore("common", {
     setElScrollEl(val: any) {
       this.elScrollEl = val;
     },
+    setUserName(val: string) {
+      this.userName = val
+    }
   },
 });
