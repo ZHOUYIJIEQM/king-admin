@@ -11,6 +11,7 @@
       >
         <el-form-item class="username" prop="username">
           <el-input
+            clearable
             size="large"
             :prefix-icon="UserFilled"
             placeholder="用户名"
@@ -21,6 +22,7 @@
         </el-form-item>
         <el-form-item class="password" prop="password">
           <el-input
+            show-password
             size="large"
             :prefix-icon="Lock"
             placeholder="密码"
@@ -44,6 +46,7 @@ import { UserFilled, Lock } from "@element-plus/icons-vue";
 import { ElNotification, FormInstance } from "element-plus";
 import { useRouter } from "vue-router";
 import loading from '@/utils/loading'
+import { commonStore } from "@/store/index"
 
 const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
@@ -95,10 +98,13 @@ const submitForm = (formEl: FormInstance | undefined) => {
       loading.openLoading()
       try {
         const loginRes = await login(ruleForm)
-        // console.log('登录', loginRes);
+        console.log('登录', loginRes);
         if (loginRes?.status === 200) {
           sessionStorage.setItem('token', loginRes.data.token)
           sessionStorage.setItem('userName', loginRes.data.username)
+          sessionStorage.setItem('userLevel', loginRes.data.userLevel)
+          commonStore().userName = loginRes.data.username
+          commonStore().userLevel = loginRes.data.level
           router.push('/')
           ElNotification({
             title: 'Success',

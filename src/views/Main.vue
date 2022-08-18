@@ -73,6 +73,7 @@
             <template #dropdown>
               <div class="dropdown-menu">
                 <div>{{userName}}</div>
+                <div>{{userAuth}}</div>
                 <div class="out" @click="loginOut">退出</div>
               </div>
             </template>
@@ -97,6 +98,8 @@ import { commonStore } from "../store/index";
 import avatarPic from '@/assets/img/home/avatar.png'
 
 const userName = commonStore().userName
+const userAuth = commonStore().getAuth
+console.log('=====', userName, userAuth);
 
 const app: any = getCurrentInstance()
 
