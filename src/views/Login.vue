@@ -100,9 +100,10 @@ const submitForm = (formEl: FormInstance | undefined) => {
         const loginRes = await login(ruleForm)
         console.log('登录', loginRes);
         if (loginRes?.status === 200) {
+          // console.log(loginRes.data);
           sessionStorage.setItem('token', loginRes.data.token)
           sessionStorage.setItem('userName', loginRes.data.username)
-          sessionStorage.setItem('userLevel', loginRes.data.userLevel)
+          sessionStorage.setItem('userLevel', loginRes.data.level)
           commonStore().userName = loginRes.data.username
           commonStore().userLevel = loginRes.data.level
           router.push('/')

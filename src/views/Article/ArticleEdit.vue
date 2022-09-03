@@ -94,7 +94,7 @@ const juejin_setting = {
  */
 const saveContent = async () => {
   articleForm.createdTime = getCurrentTime(new Date())
-  console.log('保存', articleForm);
+  // console.log('保存', articleForm);
   if (!articleForm.cate.length) {
     ElNotification({
       type: 'warning',
@@ -177,7 +177,7 @@ const initAll = async () => {
     if ($route.params?.id) {
       editType.value = 'edit'
       let res = await getArticleById($route.params?.id)
-      console.log(res.data);
+      // console.log(res.data);
       if (res.status === 200) {
         articleForm.cate = res.data.cate
         articleForm.title = res.data.title

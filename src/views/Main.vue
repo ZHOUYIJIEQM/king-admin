@@ -31,8 +31,9 @@
                 v-for="(item1, index1) in item.menuItem"
                 :key="index1"
                 :index="item1.index"
-                @click="selectMenu"
+                @click="selectMenu(item1)"
               >{{item1.name}}</el-menu-item>
+                <!-- @click="selectMenu" -->
             </template>
             <template v-if="item.menuItemGroup?.length">
               <el-menu-item-group
@@ -44,7 +45,7 @@
                   v-for="(item2, index2) in item1.menuItemList"
                   :key="index2"
                   :index="item2.index"
-                  @click="selectMenu"
+                  @click="selectMenu(item2)"
                 >{{item2.name}}</el-menu-item>
               </el-menu-item-group>
             </template>
@@ -99,7 +100,7 @@ import avatarPic from '@/assets/img/home/avatar.png'
 
 const userName = commonStore().userName
 const userAuth = commonStore().getAuth
-console.log('=====', userName, userAuth);
+// console.log('=====', userName, userAuth);
 
 const app: any = getCurrentInstance()
 
@@ -212,11 +213,16 @@ const setBreadCrumb = (val:string) => {
 }
 // 选中菜单项
 const selectMenu = (val:any) => {
-  // console.log('点击了菜单项', val);
+  // console.log(menuList.data);
+  // console.log('点击了菜单项', val.index);
   router.push(val.index)
   setBreadCrumb(val.index)
   defaultActive.value = val.index
 }
+
+// const selectMenu1 = (val: any) => {
+//   console.log('===', val);
+// }
 
 const route = useRoute()
 const router = useRouter()
@@ -271,11 +277,11 @@ watch(
     } else {
       if ((menuList.data[heroIndex].menuItem as Array<any>).length > 1) {
         menuList.data[heroIndex].menuItem?.shift()
-        selectMenu({index: route.path})
+        // selectMenu({index: route.path})
       }
       if ((menuList.data[articleIndex].menuItem as Array<any>).length > 1) {
         menuList.data[articleIndex].menuItem?.shift()
-        selectMenu({index: route.path})
+        // selectMenu({index: route.path})
       }
     }
   },

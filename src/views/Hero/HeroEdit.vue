@@ -414,7 +414,7 @@ let levelUp = ref<any[]>([])
  * 点击标签
  */
 const handleClick = async (tab: TabsPaneContext, event: Event) => {
-  console.log(tab.props.name);
+  // console.log(tab.props.name);
   if (tab.props.name === 'equipment') {
     // if (heroData.data.skills[0].id.length && ) {
       heroData.data.skills = heroData.data.skills.map((i: any, index: number) => {
@@ -427,7 +427,7 @@ const handleClick = async (tab: TabsPaneContext, event: Event) => {
       })
     // }
     levelUp.value = heroData.data.levelUp.map((i: any) => i.id)
-    console.log(heroData.data.skills);
+    // console.log(heroData.data.skills);
   }
 }
 
@@ -470,7 +470,7 @@ const getHeroData = async (id: string) => {
   let res = await getHeroById(id)
   heroData.data = res.data
   heroData.data.cate = res.data.cate.map((i: any) => i._id)
-  console.log(heroData.data);
+  // console.log(heroData.data);
 }
 
 /**
@@ -611,7 +611,7 @@ const initHeroData = () => {
  * 保存
  */
 const saveHeroData = async () => {
-  console.log(heroData.data);
+  // console.log(heroData.data);
   loading.openLoading()
   if (editType.value === 'edit') {
     try {

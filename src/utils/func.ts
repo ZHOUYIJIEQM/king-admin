@@ -15,7 +15,7 @@ function deepClone(obj: any) {
     }
   }
   return objClone;
-};
+}
 
 export {
   deepClone

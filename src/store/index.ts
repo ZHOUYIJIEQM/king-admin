@@ -20,7 +20,6 @@ export const commonStore = defineStore("common", {
       return {};
     },
     getAuth() {
-      console.log('=-=-', this.userLevel);
       if (this.userLevel && Number(this.userLevel) <= 1) {
         return '管理员'
       } else {
