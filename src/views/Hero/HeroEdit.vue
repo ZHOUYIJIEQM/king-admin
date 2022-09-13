@@ -80,7 +80,7 @@
           </el-tab-pane>
           <el-tab-pane label="技能介绍" name="skills">
             <div class="pane-innerbox skills-box">
-              <cardItemVue 
+              <CardItemVue 
                 v-for="(item, index) in heroData.data.skills"
                 :key="item._id || index"
                 :title="`技能${index+1}`"
@@ -106,7 +106,7 @@
                 <el-form-item label="技能用法">
                   <el-input :autosize="{ minRows: 3, maxRows: 5 }" type="textarea" clearable v-model="item.tips" placeholder="请输入技能用法!"></el-input>
                 </el-form-item>
-              </cardItemVue>
+              </CardItemVue>
               <div class="card-item">
                 <el-button class="button" text @click="addSkills">
                   <el-icon :size="25" class="plus"><Plus /></el-icon>
@@ -118,7 +118,7 @@
           <el-tab-pane label="英雄皮肤" name="skins">
             <div class="pane-innerbox skins-box">
               <div class="skins">
-                <cardItemVue 
+                <CardItemVue 
                   class="skins-item" 
                   v-for="(item, index) in heroData.data.skins" 
                   :key="item._id"
@@ -136,7 +136,7 @@
                       @uploadSuccess="uploadSuccess($event, heroData.data.skins[index], 'img')"
                     ></UploadFileVue>
                   </el-form-item>
-                </cardItemVue>
+                </CardItemVue>
                 <div class="skins-item add-item">
                   <el-button class="button" text @click="addSkin">
                     <el-icon class="plus"><Plus /></el-icon>
@@ -300,7 +300,7 @@
           </el-tab-pane>
           <el-tab-pane label="使用技巧" name="tips">
             <div class="pane-innerbox tip-box">
-              <cardItemVue 
+              <CardItemVue 
                 v-for="(item, index) in heroData.data.tips"
                 :key="index"
                 :title="`使用技巧${index+1}`"
@@ -312,7 +312,7 @@
                 <el-form-item label="技巧内容">
                   <el-input :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" v-model="item.content" placeholder="请输入技巧内容, 方便参考哦!"></el-input>
                 </el-form-item>
-              </cardItemVue>
+              </CardItemVue>
               <div class="card-item">
                 <el-button class="button" text @click="addTips">
                   <el-icon :size="25" class="plus"><Plus /></el-icon>
@@ -331,7 +331,7 @@
                   :title="item.title" 
                   :name="String(index+1)"
                 >
-                  <cardItemVue
+                  <CardItemVue
                     v-for="(item1, index1) in item.hero"
                     :title="`${item.title}${index1+1}`"
                     @close-item="item.hero.splice(index1, 1)"
@@ -353,7 +353,7 @@
                     <el-form-item label="关系内容">
                       <el-input :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" v-model="item1.content" placeholder="请输入技巧内容, 方便参考哦!"></el-input>
                     </el-form-item>
-                  </cardItemVue>
+                  </CardItemVue>
                   <div class="card-item">
                     <el-button class="button" text @click="addRelations(item)">
                       <el-icon :size="25" class="plus"><Plus /></el-icon>
@@ -380,7 +380,7 @@ import type { TabsPaneContext } from 'element-plus'
 import { ElNotification } from "element-plus";
 import { useRoute, useRouter } from 'vue-router';
 import UploadFileVue from '@/components/UploadFile.vue';
-import cardItemVue from '@/components/CardItem.vue';
+import CardItemVue from '@/components/CardItem.vue';
 import { commonStore } from "@/store/index";
 
 const $route = useRoute()

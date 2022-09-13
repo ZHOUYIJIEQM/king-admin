@@ -38,7 +38,13 @@
         <el-table-column type="expand" label="展开" width="60">
           <template #default="props">
             <div class="hero-detail-box">
-              <div class="skills-box detail-item">
+              <div class="hero-rate detail-item">
+                <div class="title">英雄评估:</div>
+                <div class="chart-box">
+                  <NightingaleChart :chartOption="getOption(props.row.scores)"></NightingaleChart>
+                </div>
+              </div>
+              <!-- <div class="skills-box detail-item">
                 <div class="title">查看技能:</div>
                 <div class="skill-item" v-for="item in props.row.skills" :key="item._id">
                   <div class="left">
@@ -49,7 +55,7 @@
                     <p>{{item.desc}}</p>
                   </div>
                 </div>
-              </div>
+              </div> -->
             </div>
           </template>
         </el-table-column>
@@ -109,6 +115,7 @@ import { getCurrentInstance, ref, onMounted } from 'vue';
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
+import NightingaleChart from '@/components/NightingaleChart.vue'
 
 const router = useRouter()
 const app: any = getCurrentInstance()
@@ -116,6 +123,44 @@ const { getHeroList, deleteHero, heroSearch } = app?.proxy.$HeroApi
 
 const category = (data:any) => {
   return data.map((item:any) => item.name).join('/')
+}
+
+const getOption = (obj: any) => {
+  // obj = { difficulty: 3, skill: 4, attack: 3, survive: 10 };
+  let cn = { skill: '技能', attack: '攻击', survive: '生存', difficulty: '难度', }
+  let seriesData = Object.keys(obj).map(i => {
+    return { value: Number(obj[i]), name: cn[i] }
+  })
+  // console.log(obj);
+  let option = {
+    title: {
+      text: '英雄评估',
+      left: 'center'
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b} : {c}'
+    },
+    legend: {
+      left: 'center',
+      top: 'bottom',
+      data: seriesData.map(i => i.name)
+    },
+    series: [
+      {
+        name: '英雄评估',
+        type: 'pie',
+        radius: [15, 60],
+        center: ['50%', '50%'],
+        roseType: 'area',
+        itemStyle: {
+          borderRadius: 2
+        },
+        data: seriesData
+      }
+    ]
+  }
+  return option
 }
 
 // input 查询词
@@ -255,10 +300,19 @@ onMounted(async() => {
   .detail-item {
     padding: 0 15px;
   }
+  .hero-rate {
+    .chart-box {
+      height: 200px;
+      box-sizing: content-box;
+      padding: 15px 0;
+      // border-bottom: 1px solid #ebeef5;
+    }
+  }
   .skills-box {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
+    margin-top: 15px;
     .skill-item {
       display: flex;
       // align-items: center;

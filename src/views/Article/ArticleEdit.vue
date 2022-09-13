@@ -251,6 +251,7 @@ onMounted(async () => {
   }
   .editor-box {
     width: 100%;
+    min-height: 300px;
   }
   
   .bottom {
