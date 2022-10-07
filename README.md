@@ -396,7 +396,8 @@ setTimeout(() => {
 间接获取
 ```js
 const app = getCurrentInstance()
-app?.ctx.$refs.formName?.focus()
+// app?.ctx.$refs.formName?.focus()
+app.proxy.$refs.formName?.focus()
 ```
 
 

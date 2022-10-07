@@ -219,14 +219,14 @@ const searchHero = async (event:any) => {
   // todo: 根据名称搜索英雄
   // console.log(heroQuery.value);
   try {
-    loading.openLoading()
+    // loading.openLoading()
     let res = await heroSearch({name: heroQuery.value})
     // console.log(res.data);
     heroList.value = res.data
   } catch (error) {
     console.log(error);
   } finally {
-    loading.closeLoading()
+    // loading.closeLoading()
   }
 }
 // 添加英雄

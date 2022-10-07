@@ -92,7 +92,7 @@ let cateList = ref([])
 const getCateList = async () => {
   // 加载提示
   isLoading.value = true
-  loading.openLoading()
+  // loading.openLoading()
   // const cateRes = await $http.get('/rest/category')
   const cateRes = await getCategoryList()
   // console.log('-----', cateRes);
@@ -100,7 +100,7 @@ const getCateList = async () => {
   // 选择分类 同时也是关联
   cateList.value = data
   // console.log(cateList.value);
-  loading.closeLoading()
+  // loading.closeLoading()
   isLoading.value = false
 }
 

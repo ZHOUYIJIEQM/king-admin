@@ -4,7 +4,7 @@ export const commonStore = defineStore("common", {
   state: () => {
     return {
       elScrollEl: null,
-      uploadPath: "http://localhost:3080/admin/api/upload/",
+      uploadPath: "https://app.yjsjyb.top/admin/api/upload/",
       userName: sessionStorage.getItem("userName"),
       userLevel: sessionStorage.getItem("userLevel"),
     };

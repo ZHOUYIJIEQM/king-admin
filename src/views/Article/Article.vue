@@ -199,12 +199,12 @@ const getArticle = async () => {
 
 onMounted(async () => {
   try {
-    loading.openLoading()
+    // loading.openLoading()
     await getArticle()
   } catch (error) {
     console.log(error);
   } finally {
-    loading.closeLoading()
+    // loading.closeLoading()
   }
 })
 

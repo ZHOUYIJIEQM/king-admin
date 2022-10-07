@@ -217,7 +217,7 @@ const handleCurrentChange = async (val: number) => {
  */
 const getUser = async () => {
   try {
-    loading.openLoading()
+    // loading.openLoading()
     tableLoading.value = true
     let res = await getUsers(pageParams)
     // console.log(res);
@@ -227,7 +227,7 @@ const getUser = async () => {
   } catch (error) {
     console.log(error); 
   } finally {
-    loading.closeLoading()
+    // loading.closeLoading()
     tableLoading.value = false
   }
 }

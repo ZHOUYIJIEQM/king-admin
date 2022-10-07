@@ -2,8 +2,8 @@ import axios, { type AxiosRequestConfig } from 'axios'
 import { ElNotification } from 'element-plus';
 
 const apiInstance = axios.create({
-  // baseURL: "http://localhost:3080/admin/api",
-  baseURL: "http://192.168.1.5:3080/admin/api/resource",
+  baseURL: "https://app.yjsjyb.top/admin/api/resource",
+  // baseURL: "http://192.168.1.5:3080/admin/api/resource",
   timeout: 8 * 1000,
 })
 apiInstance.interceptors.request.use(
@@ -23,8 +23,7 @@ apiInstance.interceptors.response.use(
     return response
   },
   error => {
-    ElMessage({
-      showClose: true,
+    ElNotification({
       message: `${error.response.data.message}`,
       type: 'error',
     })
@@ -43,8 +42,8 @@ apiInstance.interceptors.response.use(
 )
 
 const featureInstance = axios.create({
-  // baseURL: "http://localhost:3080/admin/api",
-  baseURL: "http://192.168.1.5:3080/admin/api",
+  baseURL: "https://app.yjsjyb.top/admin/api",
+  // baseURL: "http://192.168.1.5:3080/admin/api",
   timeout: 8 * 1000,
 })
 

@@ -98,7 +98,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
       loading.openLoading()
       try {
         const loginRes = await login(ruleForm)
-        console.log('登录', loginRes);
+        // console.log('登录', loginRes);
         if (loginRes?.status === 200) {
           // console.log(loginRes.data);
           sessionStorage.setItem('token', loginRes.data.token)

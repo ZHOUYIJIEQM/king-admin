@@ -242,7 +242,7 @@ const uploadSuccess = (val: string, data: any, key: string) => {
  */
 const getAllAd = async () => {
   try {
-    loading.openLoading()
+    // loading.openLoading()
     tableLoading.value = true
     let res = await getAd(pageParams)
     // console.log(res);
@@ -252,7 +252,7 @@ const getAllAd = async () => {
   } catch (error) {
     console.log(error); 
   } finally {
-    loading.closeLoading()
+    // loading.closeLoading()
     tableLoading.value = false
   }
 }
