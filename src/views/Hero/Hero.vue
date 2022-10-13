@@ -279,12 +279,12 @@ const handleDelete = (row: any) => {
 
 onMounted(async() => {
   try {
-    loading.openLoading()
+    // loading.openLoading()
     await getHeroData()
   } catch (error) {
     console.log(error);
   } finally {
-    loading.closeLoading()
+    // loading.closeLoading()
   }
 })
 

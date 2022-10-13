@@ -4,7 +4,8 @@ export const commonStore = defineStore("common", {
   state: () => {
     return {
       elScrollEl: null,
-      uploadPath: "https://app.yjsjyb.top/admin/api/upload/",
+      uploadPath: "https://localhost:3080/admin/api/upload/",
+      // uploadPath: "https://app.yjsjyb.top/admin/api/upload/",
       userName: sessionStorage.getItem("userName"),
       userLevel: sessionStorage.getItem("userLevel"),
     };
@@ -13,9 +14,7 @@ export const commonStore = defineStore("common", {
     getToken() {
       let token = sessionStorage.getItem("token");
       if (token) {
-        return {
-          Authorization: token
-        };
+        return { Authorization: token };
       }
       return {};
     },

@@ -2,7 +2,8 @@ import axios, { type AxiosRequestConfig } from 'axios'
 import { ElNotification } from 'element-plus';
 
 const apiInstance = axios.create({
-  baseURL: "https://app.yjsjyb.top/admin/api/resource",
+  // baseURL: "https://app.yjsjyb.top/admin/api/resource",
+  baseURL: "http://localhost:3080/admin/api/resource",
   // baseURL: "http://192.168.1.5:3080/admin/api/resource",
   timeout: 8 * 1000,
 })
@@ -42,7 +43,8 @@ apiInstance.interceptors.response.use(
 )
 
 const featureInstance = axios.create({
-  baseURL: "https://app.yjsjyb.top/admin/api",
+  // baseURL: "https://app.yjsjyb.top/admin/api",
+  baseURL: "http://localhost:3080/admin/api",
   // baseURL: "http://192.168.1.5:3080/admin/api",
   timeout: 8 * 1000,
 })

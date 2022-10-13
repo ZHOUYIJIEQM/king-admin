@@ -74,7 +74,7 @@
         <el-pagination
           v-model:currentPage="pageParams.pageNum"
           v-model:page-size="pageParams.pageSize"
-          :page-sizes="[5, 10, 15, 20]"
+          :page-sizes="[10, 20, 30]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="goodsTotal"
           @size-change="handleSizeChange"
@@ -189,7 +189,7 @@ interface GetGoods {
 // 请求参数
 let pageParams: GetGoods = {
   pageNum: 1,
-  pageSize: 5,
+  pageSize: 10,
   orderType: 'ascending',
   sortItem: 'price'
 }

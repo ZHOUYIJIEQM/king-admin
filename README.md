@@ -1,7 +1,8 @@
-# 记录流程
+# 王者荣耀后台管理系统
+> 基于Vue3+TypeScript+Vite+Vue-Router+Axios+Pinia开发, 项目还包含了[Vue3仿王者荣耀移动端](https://github.com/ZHOUYIJIEQM/king-mobile), [node+express后端](https://github.com/ZHOUYIJIEQM/king-server)
 
-### 后台管理 ```web```
 
+## 记录一些问题
 #### 配置路径别名
 ##### 安装 ```@types/node```
 ```bash
@@ -135,7 +136,7 @@ console.log(store.msg)
 </script>
 ```
 
-#### 使用```Element Plus```, 自动导入, 安装好后就可以直接使用
+#### [按需导入](http://element-plus.org/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5), 使用```Element Plus```, 自动导入, 安装好后就可以直接使用
 ```bash
 yarn add element-plus
 yarn add unplugin-vue-components unplugin-auto-import -D
@@ -165,47 +166,48 @@ export default defineConfig({
 yarn add sass -D
 ```
 
-#### ```css reset```
+#### [```css reset```重置浏览器默认css样式](https://meyerweb.com/eric/tools/css/reset/)
 ```css
-/* http://meyerweb.com/eric/tools/css/reset/ 
-   v2.0 | 20110126
-   License: none (public domain)
+/* 
+  http://meyerweb.com/eric/tools/css/reset/ 
+  v2.0 | 20110126
+  License: none (public domain)
 */
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
-	display: block;
+  display: block;
 }
 body {
-	line-height: 1;
+  line-height: 1;
 }
 ol, ul {
-	list-style: none;
+  list-style: none;
 }
 blockquote, q {
-	quotes: none;
+  quotes: none;
 }
 blockquote:before, blockquote:after,
 q:before, q:after {
-	content: '';
-	content: none;
+  content: '';
+  content: none;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 ```
 在 ```main.js``` 引入
 
-#### 使用 ```nprogress```
+#### 使用 [请求进度条```nprogress```](https://github.com/callumacrae/nprogress)
 ```bash
 yarn add nprogress
 # ts需要这个
@@ -222,12 +224,12 @@ NProgress.done()
 ```js
 import axios, { type AxiosRequestConfig } from 'axios'
 const instance = axios.create({
-  baseURL: "http://192.168.31.43:3333/admin/api",
+  baseURL: "http://localhost:3080/admin/api",
   timeout: 5000,
 })
 instance.interceptors.request.use(
   (config: AxiosRequestConfig | any) => {
-    // 加入 token
+    // 请求拦截, 加入 token
     const token = sessionStorage.token
     if (token) {
       config.headers.Authorization = `Bear ${token}`
@@ -260,7 +262,7 @@ app.use(request)
 
 // 在组件里使用时
 let app:any = getCurrentInstance()
-let request = app.appContext.config.globalProperties.$http
+let request = app.proxy.$http
 // 这样就可以发请求了
 request.get(...)
 ```
@@ -278,7 +280,7 @@ request.get(...)
 
 #### ```vite.config.ts``` 局域网访问
 ```json
-server: {			
+server: {      
   // 设置后可以通过局域网访问
   host: '0.0.0.0',
   // port: 3000,  // 端口号
@@ -316,7 +318,7 @@ server: {
 
 <style lang="scss" scoped>
   .aside-box {
-    /* 加这个过渡时长 */
+    /* 加个过渡时长 */
     transition: width .2s;
   }
 </style>
@@ -363,7 +365,7 @@ loading.openLoading()
 loading.closeLoading()
 ```
 
-#### ```reactive```数组, 异步获取数据后赋值无效?!
+#### ```reactive```数组, 直接赋值不触发数据更新
 ```ts
 let data = reactive([])
 setTimeout(() => {
@@ -396,7 +398,6 @@ setTimeout(() => {
 间接获取
 ```js
 const app = getCurrentInstance()
-// app?.ctx.$refs.formName?.focus()
 app.proxy.$refs.formName?.focus()
 ```
 

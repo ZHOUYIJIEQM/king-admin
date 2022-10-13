@@ -88,7 +88,14 @@ const routes: Array<RouteRecordRaw> = [
 ]
 const router = createRouter({
   history: createWebHashHistory(),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  },
 })
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
   if (to.name !== 'login' && !sessionStorage.token) {

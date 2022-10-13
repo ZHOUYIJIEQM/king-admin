@@ -26,7 +26,11 @@
         </el-form-item>
         <div class="editor-title">文章内容</div>
         <div class="editor-box">
-          <vue3-tinymce ref="tinymceEditor" v-model="articleForm.content" :setting="juejin_setting"></vue3-tinymce>
+          <vue3-tinymce 
+            ref="tinymceEditor" 
+            v-model="articleForm.content" 
+            :setting="juejin_setting"
+          ></vue3-tinymce>
         </div>
       </el-form>
       <div class="bottom">
@@ -35,6 +39,12 @@
     </el-card>    
   </div>
 </template>
+<script lang="ts">
+export default {
+  name: 'ArticleEditExclude'
+}
+</script>
+
 <script lang="ts" setup>
 import { getCurrentInstance, ref, reactive, onMounted, nextTick } from "vue";
 import Vue3Tinymce from '@jsdawn/vue3-tinymce';
@@ -221,6 +231,8 @@ const setScroll = () => {
   `
   h.appendChild(s)
 }
+
+
 
 onMounted(async () => {
   await initAll()

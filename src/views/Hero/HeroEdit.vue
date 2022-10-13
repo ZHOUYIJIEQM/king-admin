@@ -1,7 +1,7 @@
 <template>
   <div class="hero-edit-page">
     <el-card v-if="initEnd">
-      <el-form>
+      <el-form ref="editForm">
         <el-tabs v-model="activeName" class="demo-tabs" @tab-click="handleClick">
           <el-tab-pane label="基本信息" name="info">
             <div class="pane-innerbox info-box">
@@ -372,13 +372,19 @@
     </el-card>
   </div>
 </template>
+<script lang="ts">
+export default {
+  name: 'HeroEditExclude'
+}
+</script>
+
 <script lang="ts" setup>
 import loading from '@/utils/loading'
 import { Plus } from '@element-plus/icons-vue'
-import { getCurrentInstance, onMounted, reactive, ref } from 'vue';
+import { getCurrentInstance, onActivated, onDeactivated, onMounted, reactive, ref } from 'vue';
 import type { TabsPaneContext } from 'element-plus'
 import { ElNotification } from "element-plus";
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router';
 import UploadFileVue from '@/components/UploadFile.vue';
 import CardItemVue from '@/components/CardItem.vue';
 import { commonStore } from "@/store/index";
@@ -409,6 +415,7 @@ let goodsList = ref<any[]>([])
 let summoner = ref<any[]>([])
 let allHero = ref<any[]>([])
 let levelUp = ref<any[]>([])
+let articleId = ref<string>('')
 
 /**
  * 点击标签
@@ -667,7 +674,6 @@ const saveHeroData = async () => {
  * 初始化
  */
 const initAll = async () => {
-  loading.openLoading()
   try {
     await getCate()
     let res = await getGoodsList()
@@ -711,14 +717,33 @@ const initAll = async () => {
   } catch (error) {
     console.log(error);
   } finally {
-    loading.closeLoading()
     // setTimeout(() => {loading.closeLoading()}, 3000)
   }
 }
 
 onMounted(async () => {
+  loading.openLoading()
   await initAll()
+  setTimeout(() => { loading.closeLoading() }, 300)
 })
+
+// onActivated(async () => {
+//   loading.openLoading()
+//   if (articleId.value !== $route.params.id) {
+//     console.log('不一样', $route.params.id, articleId.value);
+//     // initHeroData()
+//     await initAll()
+//   }
+//   // await initAll()
+//   setTimeout(() => { loading.closeLoading() }, 300)
+// })
+
+
+// onBeforeRouteLeave((to, from, next) => {
+//   articleId.value = $route.params.id
+//   next()
+// })
+
 </script>
 <style lang="scss" scoped>
 :deep(.el-card) {
