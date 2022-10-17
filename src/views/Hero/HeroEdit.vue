@@ -320,12 +320,10 @@
                 </el-button>
               </div>
             </div>
-          </el-tab-pane>
+          </el-tab-pane> 
           <el-tab-pane label="英雄关系" name="relations">
             <div class="pane-innerbox relations-box">
-              <el-collapse
-              >
-              <!-- v-model="relationActive" -->
+              <el-collapse v-model="activeNames">
                 <el-collapse-item 
                   v-for="(item, index) in heroData.data.relations"
                   :title="item.title" 
@@ -351,7 +349,7 @@
                       </el-select>
                     </el-form-item>
                     <el-form-item label="关系内容">
-                      <el-input :autosize="{ minRows: 2, maxRows: 4 }" type="textarea" v-model="item1.content" placeholder="请输入技巧内容, 方便参考哦!"></el-input>
+                      <el-input :autosize="{ minRows: 3, maxRows: 4 }" type="textarea" v-model="item1.content" placeholder="请输入技巧内容, 方便参考哦!"></el-input>
                     </el-form-item>
                   </CardItemVue>
                   <div class="card-item">
@@ -363,7 +361,7 @@
                 </el-collapse-item>
               </el-collapse>
             </div>
-          </el-tab-pane>
+          </el-tab-pane> 
         </el-tabs>
         <div class="bottom">
           <el-button class="save" type="primary" plain @click="saveHeroData">保存</el-button>
@@ -416,6 +414,7 @@ let summoner = ref<any[]>([])
 let allHero = ref<any[]>([])
 let levelUp = ref<any[]>([])
 let articleId = ref<string>('')
+let activeNames = ref<string []>(['1', '2', '3'])
 
 /**
  * 点击标签
@@ -625,6 +624,7 @@ const saveHeroData = async () => {
       let res = await updateHero(heroData.data._id, heroData.data)
       if (res.status === 200) {
         ElNotification({
+          duration: commonStore().tipDurationS,
           title: 'Success',
           message: '数据更新成功!',
           type: 'success',
@@ -638,6 +638,7 @@ const saveHeroData = async () => {
     } catch (error) {
       console.log('数据更新失败', error);
       ElNotification({
+        duration: commonStore().tipDurationS,
         title: 'Error',
         message: '数据更新失败了!',
         type: 'error',
@@ -651,6 +652,7 @@ const saveHeroData = async () => {
       let res = await createHero(heroData.data)
       if (res.status === 200) {
         ElNotification({
+          duration: commonStore().tipDurationS,
           title: 'Success',
           message: '数据更新成功!',
           type: 'success',
@@ -660,6 +662,7 @@ const saveHeroData = async () => {
     } catch (error) {
       console.log('数据新增失败', error);
       ElNotification({
+        duration: commonStore().tipDurationS,
         title: 'Error',
         message: '数据新增失败了!',
         type: 'error',

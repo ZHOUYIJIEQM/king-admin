@@ -81,6 +81,9 @@ import { getCurrentInstance, nextTick, onMounted, reactive, ref } from 'vue';
 import { DocumentAdd, Delete, Edit, } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import loading from '@/utils/loading'
+import { commonStore } from "@/store/index"
+import {saveScrollH} from '@/utils/saveScroll'
+saveScrollH()
 
 const app: any = getCurrentInstance()
 const { getCategoryList, getCateById, createCate, deleteCate, updateCate } = app.proxy.$CateApi
@@ -123,6 +126,7 @@ const confirmEdit = async () => {
   let res = await updateCate(updateId, editForm)
   if (res.status === 200) {
     ElNotification({
+      duration: commonStore().tipDurationS,
       title: 'Success',
       message: '编辑成功!',
       type: 'success',
@@ -151,6 +155,7 @@ const handleDelete = async (index: number, row: any) => {
       console.log(`删除${row._id}`);
       if (delRes.status === 200) {
         ElNotification({
+          duration: commonStore().tipDurationS,
           title: 'Success',
           message: `分类 ${row.name} 删除成功!`,
           type: 'success',
@@ -199,6 +204,7 @@ const confirmAddSelect = async () => {
       getCateList()
       dialogFormVisible.value = false
       ElNotification({
+        duration: commonStore().tipDurationS,
         title: 'Success',
         message: '添加分类成功!',
         type: 'success',

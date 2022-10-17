@@ -57,6 +57,7 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
   };
   if (rawFile.size / 1024 / 1024 > props.maxFileSize) {
     ElNotification({
+      duration: commonStore().tipDurationS,
       title: 'Error',
       message: `图片不能大于${props.maxFileSize}M!`,
       type: 'error',

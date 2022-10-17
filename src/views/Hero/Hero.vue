@@ -108,7 +108,6 @@
     </el-card>
   </div>
 </template>
-
 <script lang="ts" setup>
 import loading from '@/utils/loading'
 import { getCurrentInstance, ref, onMounted } from 'vue';
@@ -116,6 +115,9 @@ import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import NightingaleChart from '@/components/NightingaleChart.vue'
+import { commonStore } from "@/store/index"
+import {saveScrollH} from '@/utils/saveScroll'
+saveScrollH()
 
 const router = useRouter()
 const app: any = getCurrentInstance()
@@ -192,6 +194,7 @@ const getHeroData = async () => {
   } catch (error) {
     console.log(error);
     ElNotification({
+      duration: commonStore().tipDurationS,
       type: 'error',
       message: '获取英雄列表出错!'
     })
@@ -258,17 +261,18 @@ const handleDelete = (row: any) => {
   .then(async response => {
     // console.log(response);
     const res = await deleteHero(row._id)
-    // console.log(res);
     if (res.status === 200) {
       getHeroData()
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
-        message: `${row.name} ${res.data.message}`
+        message: `${row.name} ${res.data.message}`,
       })
     } else {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'error',
-        message: res.data.message
+        message: res.data.message,
       })
     }
   })

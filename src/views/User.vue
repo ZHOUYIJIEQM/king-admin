@@ -102,6 +102,8 @@ import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
 import { ElNotification } from 'element-plus'
 import { deepClone } from "@/utils/func";
+import {saveScrollH} from '@/utils/saveScroll'
+saveScrollH()
 
 const app: any = getCurrentInstance()
 const { proxy } = app
@@ -147,6 +149,7 @@ const handleDelete = async (val: any) => {
     let res = await deleteUser(val._id)
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
         message: '删除成功!'
       })
@@ -178,6 +181,7 @@ const saveContent = async () => {
       // console.log('添加', res);
       if (res.status === 200) {
         ElNotification({
+          duration: commonStore().tipDurationS,
           type: 'success',
           message: '新增成功!'
         })
@@ -189,6 +193,7 @@ const saveContent = async () => {
       // console.log('更新', res);
       if (res.status === 200) {
         ElNotification({
+          duration: commonStore().tipDurationS,
           type: 'success',
           message: '更新成功!'
         })

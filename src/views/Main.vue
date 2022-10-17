@@ -85,17 +85,10 @@
         <el-main>
           <!-- <router-view></router-view> -->
           <router-view v-slot="{ Component }">
-            <keep-alive :exclude="/^.*?Exclude/">
+            <keep-alive :exclude="/^.*?Exclude/" :max="5">
               <component :is="Component" />
             </keep-alive>
           </router-view>
-          <!-- <router-view v-slot="{ Component }">
-            <transition>
-              <keep-alive>
-                <component :is="Component" />
-              </keep-alive>
-            </transition>
-          </router-view> -->
         </el-main>
       </el-scrollbar>
     </el-container>
@@ -117,7 +110,7 @@ const userAuth = commonStore().getAuth
 const app: any = getCurrentInstance()
 
 onMounted(() => {
-  commonStore().setElScrollEl(app?.proxy.$refs.mainScroll)
+  commonStore().setScrollEl(app?.proxy.$refs.mainScroll)
 })
 
 
@@ -315,6 +308,7 @@ const loginOut = () => {
   )
   .then(() => {
     ElNotification({
+      duration: commonStore().tipDurationS,
       title: 'Success',
       message: '退出成功!',
       type: 'success',

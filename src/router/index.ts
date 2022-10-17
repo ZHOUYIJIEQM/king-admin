@@ -1,23 +1,12 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw, RouteLocationNormalized } from 'vue-router'
-// 这里不要用懒加载 () => import('路径'), 不然网速慢的时候, 点击菜单后不能直接跳转
-import Login from '@/views/Login.vue';
-import Main from '@/views/Main.vue';
-import Welcome from '@/views/Welcome.vue';
-import Category from '@/views/Category.vue';
-import Goods from '@/views/Goods.vue';
-import Hero from '@/views/Hero/Hero.vue';
-import HeroEdit from '@/views/Hero/HeroEdit.vue';
-import Article from '@/views/Article/Article.vue'
-import ArticleEdit from '@/views/Article/ArticleEdit.vue'
-import Advertise from '@/views/Advertise.vue';
-import User from '@/views/User.vue';
-
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/login',
     name: 'login',
-    component: Login,
+    component: () => import('@/views/Login.vue'),
     meta: {
       noRequiredAuth: true
     },
@@ -25,67 +14,68 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'main',
-    component: Main,
+    component: () => import('@/views/Main.vue'),
     redirect: {name: 'welcome'},
     children: [
       {
         path: 'welcome',
         name: 'welcome',
-        component: Welcome
+        component: () => import('@/views/Welcome.vue')
       },
       {
         path: 'category',
         name: 'category',
-        component: Category
+        component: () => import('@/views/Category.vue')
       },
       {
         path: 'goods',
         name: 'goods',
-        component: Goods
+        component: () => import('@/views/Goods.vue')
       },
       {
         path: 'hero',
         name: 'hero',
-        component: Hero
+        component: () => import('@/views/Hero/Hero.vue')
       },
       {
         path: 'hero/create',
         name: 'heroCreate',
-        component: HeroEdit
+        component: () => import('@/views/Hero/HeroEdit.vue')
       },
       {
         path: 'hero/edit/:id',
         name: 'heroEdit',
-        component: HeroEdit
+        component: () => import('@/views/Hero/HeroEdit.vue')
       },
       {
         path: 'article',
         name: 'article',
-        component: Article
+        component: () => import('@/views/Article/Article.vue')
       },
       {
         path: 'article/create',
         name: 'articleCreate',
-        component: ArticleEdit
+        component: () => import('@/views/Article/ArticleEdit.vue')
       },
       {
         path: 'article/edit/:id',
         name: 'articleEdit',
-        component: ArticleEdit
+        component: () => import('@/views/Article/ArticleEdit.vue')
       },
       {
         path: 'advertise',
         name: 'advertise',
-        component: Advertise
+        component: () => import('@/views/Advertise.vue')
       },
       {
         path: 'user',
         name: 'user',
-        component: User
+        component: () => import('@/views/User.vue')
       },
     ]
   }
 ]
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
@@ -97,10 +87,22 @@ const router = createRouter({
     }
   },
 })
+
 router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
+  NProgress.start()
+  // 不是去登录页, 也没有 token, 跳到登录页
   if (to.name !== 'login' && !sessionStorage.token) {
     return next({name: 'login'})
   }
+  // 已经有token表示已登录, 还要去登录页就跳到欢迎页面
+  if (sessionStorage.token && to.name === "login") {
+    return next({name: "welcome"})
+  }
   return next()
 })
+
+router.afterEach((to: RouteLocationNormalized) => {
+  NProgress.done()
+})
+
 export default router

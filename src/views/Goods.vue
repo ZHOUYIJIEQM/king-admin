@@ -162,6 +162,10 @@ import { computed, getCurrentInstance, nextTick, onMounted, reactive, ref } from
 import UploadFileVue from '@/components/UploadFile.vue';
 import { commonStore } from "@/store/index";
 
+// 逻辑复用 恢复滚动高度
+import {saveScrollH} from '@/utils/saveScroll'
+saveScrollH()
+
 const app: any = getCurrentInstance()
 const { proxy } = app
 const { getGoodsList, createGoods, getGoodsById, updateGoods, deleteGoods } = proxy.$GoodsApi
@@ -244,6 +248,7 @@ const getGoods = async (params: GetGoods) => {
     goodsList.value = res.data.data
   } catch (error) {
     ElNotification({
+      duration: commonStore().tipDurationS,
       type: 'error',
       message: '获取装备失败!'
     })
@@ -294,12 +299,14 @@ const handleDelete = async (row: any) => {
     // console.log(res);
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
         message: `${row.name} ${res.data.message}`
       })
       getGoods(pageParams)
     } else {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'error',
         message: res.data.message
       })
@@ -378,6 +385,7 @@ const confirmAdd = async () => {
       const res = await createGoods(goodsForm.value)
       if (res.status === 200) {
         ElNotification({
+          duration: commonStore().tipDurationS,
           type: 'success',
           message: '添加成功!'
         })
@@ -387,6 +395,7 @@ const confirmAdd = async () => {
     } catch (error) {
       console.log('添加装备失败:', error);      
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'error',
         message: '添加失败!'
       })
@@ -400,6 +409,7 @@ const confirmAdd = async () => {
     // console.log(res);
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
         message: '更新成功!'
       })
@@ -439,6 +449,7 @@ const deleteProperty = (arr: any, index: number) => {
     arr.splice(index, 1)
   } else {
     ElNotification({
+      duration: commonStore().tipDurationM,
       type: 'warning',
       message: '至少需有一个!'
     })
@@ -519,7 +530,7 @@ onMounted(async () => {
   .pagination-box {
     margin-top: 20px;
     display: flex;
-    // justify-content: center;
+    justify-content: center;
   }
 
   :deep(.el-overlay-dialog) {

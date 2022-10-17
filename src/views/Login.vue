@@ -33,7 +33,8 @@
         </el-form-item>
         <el-form-item class="btns">
           <el-button size="large" type="primary" @click="submitForm(ruleFormRef)">登录</el-button>
-          <el-button size="large" @click="resetForm(ruleFormRef)">重置</el-button>
+          <el-button size="large" @click="switchUser">切换</el-button>
+          <!-- <el-button size="large" @click="resetForm(ruleFormRef)">重置</el-button> -->
         </el-form-item>
       </el-form>
     </div>
@@ -106,8 +107,15 @@ const submitForm = (formEl: FormInstance | undefined) => {
           sessionStorage.setItem('userLevel', loginRes.data.level)
           commonStore().userName = loginRes.data.username
           commonStore().userLevel = loginRes.data.level
-          router.push('/')
+
+          console.log(commonStore().getAuth);
+          if (commonStore().getAuth) {
+            
+          }
+          
+          router.replace('/')
           ElNotification({
+            duration: commonStore().tipDurationS,
             title: 'Success',
             message: '登录成功!',
             type: 'success',
@@ -116,6 +124,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
           // 失败
           // ElMessage(loginRes.data?.message)
           ElNotification({
+            duration: commonStore().tipDurationS,
             title: 'Error',
             message: loginRes.data?.message,
             type: 'error',
@@ -131,6 +140,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
       // 不能提交
       // console.log("error submit!");
       ElNotification({
+        duration: commonStore().tipDurationM,
         title: 'Warning',
         message: '请检查填写内容!',
         type: 'warning',
@@ -139,6 +149,15 @@ const submitForm = (formEl: FormInstance | undefined) => {
     }
   });
 };
+
+
+const switchUser = () => {
+  if(ruleForm.username === 'admin') {
+    ruleForm.username = 'xiaoming'
+  } else {
+    ruleForm.username = 'admin'
+  }
+}
 
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;

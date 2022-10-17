@@ -83,7 +83,9 @@ import { ref, reactive, watch, getCurrentInstance, onMounted } from "vue";
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
 import { useRouter } from "vue-router";
 import { ElNotification, ElMessageBox } from 'element-plus';
-import loading from '@/utils/loading'
+import { commonStore } from "@/store/index"
+import {saveScrollH} from '@/utils/saveScroll'
+saveScrollH()
 
 const app: any = getCurrentInstance();
 const { getArticleList, articleSearch, deleteArticle } = app.proxy.$ArticleApi;
@@ -146,11 +148,13 @@ const handleDelete = async (row: any) => {
     if (res.status === 200) {
       await getArticle()
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
         message: `${row.title} ${res.data.message}`
       })
     } else {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'error',
         message: res.data.message
       })

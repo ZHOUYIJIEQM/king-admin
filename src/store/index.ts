@@ -8,6 +8,9 @@ export const commonStore = defineStore("common", {
       // uploadPath: "https://app.yjsjyb.top/admin/api/upload/",
       userName: sessionStorage.getItem("userName"),
       userLevel: sessionStorage.getItem("userLevel"),
+      tipDurationS: 1000,
+      tipDurationM: 2000,
+      menuList: []
     };
   },
   getters: {
@@ -27,8 +30,11 @@ export const commonStore = defineStore("common", {
     }
   },
   actions: {
-    setElScrollEl(val: any) {
+    setScrollEl(val: any) {
       this.elScrollEl = val;
     },
+    setMenuList(val: any) {
+      this.menuList = val;
+    }
   },
 });

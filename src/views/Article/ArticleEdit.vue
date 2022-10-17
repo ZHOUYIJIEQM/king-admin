@@ -107,6 +107,7 @@ const saveContent = async () => {
   // console.log('保存', articleForm);
   if (!articleForm.cate.length) {
     ElNotification({
+      duration: commonStore().tipDurationM,
       type: 'warning',
       message: '请选择分类!'
     })
@@ -114,6 +115,7 @@ const saveContent = async () => {
   }
   if (!articleForm.title.trim().length) {
     ElNotification({
+      duration: commonStore().tipDurationM,
       type: 'warning',
       message: '请输入标题!'
     })
@@ -121,6 +123,7 @@ const saveContent = async () => {
   }
   if (!articleForm.content.trim().length) {
     ElNotification({
+      duration: commonStore().tipDurationM,
       type: 'warning',
       message: '请输入文章内容!'
     })
@@ -131,6 +134,7 @@ const saveContent = async () => {
     let res = await updateArticle($route.params?.id, articleForm)
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationM,
         type: 'success',
         message: '更新成功!'
       })
@@ -140,6 +144,7 @@ const saveContent = async () => {
     let res = await createArticle(articleForm)
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationM,
         type: 'success',
         message: '上传成功!'
       })
@@ -199,6 +204,7 @@ const initAll = async () => {
   } catch (error) {
     console.log('获取文章错误', error);
     ElNotification({
+      duration: commonStore().tipDurationS,
       title: 'Error',
       message: '获取文章数据失败了!',
       type: 'error',

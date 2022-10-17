@@ -119,7 +119,8 @@ import CardItemVue from "@/components/CardItem.vue"
 import UploadFileVue from "@/components/UploadFile.vue"
 import { commonStore } from "@/store/index"
 import { ElNotification } from 'element-plus'
-// import { deepClone } from "@/utils/func"
+import {saveScrollH} from '@/utils/saveScroll'
+saveScrollH()
 
 const app: any = getCurrentInstance()
 const { proxy } = app
@@ -174,6 +175,7 @@ const handleDelete = async (val: any) => {
   let res = await deleteAd(val._id)
   if (res.status === 200) {
     ElNotification({
+      duration: commonStore().tipDurationS,
       type: 'success',
       message: '删除成功!'
     })
@@ -192,6 +194,7 @@ const saveContent = async () => {
     let res = await createAd(adItemData.value)
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
         message: '新增成功!'
       })
@@ -201,6 +204,7 @@ const saveContent = async () => {
     let res = await updateAd(adItemData.value._id, adItemData.value)
     if (res.status === 200) {
       ElNotification({
+        duration: commonStore().tipDurationS,
         type: 'success',
         message: '更新成功!'
       })

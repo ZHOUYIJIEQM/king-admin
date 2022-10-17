@@ -1,5 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import { ElNotification } from 'element-plus';
+import { commonStore } from "@/store/index"
 
 const apiInstance = axios.create({
   // baseURL: "https://app.yjsjyb.top/admin/api/resource",
@@ -25,6 +26,7 @@ apiInstance.interceptors.response.use(
   },
   error => {
     ElNotification({
+      duration: commonStore().tipDurationS,
       message: `${error.response.data.message}`,
       type: 'error',
     })
