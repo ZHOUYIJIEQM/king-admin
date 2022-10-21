@@ -48,6 +48,7 @@ import { ElNotification, FormInstance } from "element-plus";
 import { useRouter } from "vue-router";
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
+import { permissionStore } from "@/store/permission";
 
 const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
@@ -105,14 +106,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
           sessionStorage.setItem('token', loginRes.data.token)
           sessionStorage.setItem('userName', loginRes.data.username)
           sessionStorage.setItem('userLevel', loginRes.data.level)
-          commonStore().userName = loginRes.data.username
-          commonStore().userLevel = loginRes.data.level
-
-          console.log(commonStore().getAuth);
-          if (commonStore().getAuth) {
-            
-          }
-          
+          sessionStorage.setItem('roles', JSON.stringify([(loginRes.data.level === 1 ? 'admin' : 'normal')]))
+          // permissionStore().setUserInfo()
           router.replace('/')
           ElNotification({
             duration: commonStore().tipDurationS,

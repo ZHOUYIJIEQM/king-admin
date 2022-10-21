@@ -3,7 +3,7 @@
     <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-box">
       <el-scrollbar>
         <div :class="['logo-title', isCollapse ? 'collapse' : 'expand' ]">
-          <img src="../assets/img/home/logo1.png" alt="王者荣耀" />
+          <img src="../assets/img/home/logo.png" alt="王者荣耀" />
         </div>
         <el-menu
           ref="menuEl"
@@ -15,41 +15,32 @@
           :collapse="isCollapse"
           :default-active="defaultActive"
         >
-          <el-sub-menu
-            v-for="(item, index) in menuList.data"
-            :key="index"
-            :index="item.index"
-          >
-            <template #title>
-              <el-icon>
-                <component :is="item.icon"></component>
-              </el-icon>
-              <span>{{item.menu}}</span>
-            </template>
-            <template v-if="item.menuItem?.length">
-              <el-menu-item
-                v-for="(item1, index1) in item.menuItem"
-                :key="index1"
-                :index="item1.index"
-                @click="selectMenu(item1)"
-              >{{item1.name}}</el-menu-item>
-                <!-- @click="selectMenu" -->
-            </template>
-            <template v-if="item.menuItemGroup?.length">
-              <el-menu-item-group
-                v-for="(item1, index1) in item.menuItemGroup"
-                :key="index1"
-              >
-                <template #title>{{item1.groupName}}</template>
+          <template v-for="item in menuList.data">
+            <template v-if="item.menuItem">
+              <el-sub-menu :index="item.index">
+                <template #title>
+                  <el-icon>
+                    <component :is="item.icon"></component>
+                  </el-icon>
+                  <span>{{item.menu}}</span>
+                </template>
                 <el-menu-item
-                  v-for="(item2, index2) in item1.menuItemList"
-                  :key="index2"
-                  :index="item2.index"
-                  @click="selectMenu(item2)"
-                >{{item2.name}}</el-menu-item>
-              </el-menu-item-group>
+                  v-for="(item1, index1) in item.menuItem"
+                  :key="index1"
+                  :index="item1.index"
+                  @click="selectMenu(item1)"
+                >{{item1.name}}</el-menu-item>
+              </el-sub-menu>
             </template>
-          </el-sub-menu>
+            <template v-else>
+              <el-menu-item :index="item.index" @click="selectMenu(item)">
+                <el-icon>
+                  <component :is="item.icon"></component>
+                </el-icon>
+                <span>{{item.menu}}</span>
+              </el-menu-item>
+            </template>
+          </template>
         </el-menu>
       </el-scrollbar>
     </el-aside>
@@ -68,7 +59,7 @@
         <div class="right">
           <el-dropdown trigger="click" placement="bottom-end">
             <span class="right-user">
-              <el-image class="avatarPic" :src="avatarPic"></el-image>
+              <el-image class="avatarPic" :src="avatar"></el-image>
               <el-icon><CaretBottom /></el-icon>
             </span>
             <template #dropdown>
@@ -85,7 +76,7 @@
         <el-main>
           <!-- <router-view></router-view> -->
           <router-view v-slot="{ Component }">
-            <keep-alive :exclude="/^.*?Exclude/" :max="5">
+            <keep-alive :exclude="/^.*?Exclude/">
               <component :is="Component" />
             </keep-alive>
           </router-view>
@@ -96,16 +87,17 @@
 </template>
 
 <script lang="ts" setup>
-import { markRaw, getCurrentInstance, reactive, ref, watch, onMounted } from "vue";
+import { markRaw, getCurrentInstance, reactive, ref, watch, onMounted, computed } from "vue";
 import { CaretBottom, Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElNotification, ElMessageBox } from "element-plus";
-import { commonStore } from "../store/index";
-import avatarPic from '@/assets/img/home/avatar.png'
+import { commonStore } from "@/store/index"
+import { permissionStore } from '@/store/permission'
+import adminAvatar from '@/assets/img/home/admin.png'
+import normalAvatar from '@/assets/img/home/normal.png'
 
-const userName = commonStore().userName
-const userAuth = commonStore().getAuth
-// console.log('=====', userName, userAuth);
+const userName = permissionStore().userName
+const userAuth = permissionStore().getAuth
 
 const app: any = getCurrentInstance()
 
@@ -113,81 +105,17 @@ onMounted(() => {
   commonStore().setScrollEl(app?.proxy.$refs.mainScroll)
 })
 
+// 获取头像
+const avatar = computed(() => {
+  if (userAuth === '管理员') {
+    return adminAvatar 
+  }
+  return normalAvatar
+})
 
+// 菜单
 let menuList = reactive({
-  data: [
-    {
-      menu: '分类管理',
-      index: '1',
-      icon: markRaw(Grid),
-      menuItem: [
-        {
-          name: '分类列表',
-          index: '/category',
-        },
-      ]
-    },
-    {
-      menu: '物品管理',
-      index: '2',
-      icon: markRaw(Menu),
-      menuItem: [
-        {
-          name: '物品列表',
-          index: '/goods',
-        },
-      ]
-    },
-    {
-      menu: '英雄管理',
-      icon: markRaw(Management),
-      index: '3',
-      menuItem: [
-        {
-          name: '英雄列表',
-          index: '/hero',
-        },
-      ]
-    },
-    {
-      menu: '文章管理',
-      icon: markRaw(List),
-      index: '4',
-      menuItem: [
-        {
-          name: '文章列表',
-          index: '/article',
-        },
-      ]
-    },
-    {
-      menu: '广告位',
-      icon: markRaw(Ticket),
-      index: '5',
-      menuItem: [
-        {
-          name: '广告位列表',
-          index: '/advertise',
-        },
-      ]
-    },
-    {
-      menu: '用户管理',
-      icon: markRaw(UserFilled),
-      index: '6',
-      menuItemGroup: [
-        {
-          groupName: '用户',
-          menuItemList: [
-            {
-              name: '用户列表',
-              index: '/user',
-            },
-          ]
-        }
-      ]
-    },
-  ]
+  data: permissionStore().menuList
 })
 
 // 面包屑内容
@@ -204,30 +132,20 @@ const setBreadCrumb = (val:string) => {
         }
       }
     }
-    if (item1.menuItemGroup) {
-      for (const item2 of item1.menuItemGroup) {
-        for (const item3 of item2.menuItemList) {
-          if (item3.index === val) {
-            breadCrumb.value.push(item1.menu, item2.groupName, item3.name)
-            break firstLoop
-          }
-        }
-      }
+    if (item1.index === val) {
+      breadCrumb.value.push(item1.menu)
+      break firstLoop
     }
   }
 }
 // 选中菜单项
 const selectMenu = (val:any) => {
-  // console.log(menuList.data);
   // console.log('点击了菜单项', val.index);
-  router.push(val.index)
-  setBreadCrumb(val.index)
   defaultActive.value = val.index
+  setBreadCrumb(val.index)
+  router.push(val.index)
 }
 
-// const selectMenu1 = (val: any) => {
-//   console.log('===', val);
-// }
 
 const route = useRoute()
 const router = useRouter()
@@ -314,6 +232,8 @@ const loginOut = () => {
       type: 'success',
     })
     sessionStorage.clear()
+    commonStore().$reset()
+    permissionStore().$reset()
     router.push({name: 'login'})
   })
 };
@@ -401,6 +321,9 @@ const loginOut = () => {
 </style>
 
 <style lang="scss">
+.el-menu-item.is-active {
+  background-color: #2c2f39;
+}
 .dropdown-menu {
   width: 130px;
   &>div {

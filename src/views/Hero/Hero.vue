@@ -20,6 +20,7 @@
             @click="searchHero"
           >搜索</el-button>
           <el-button 
+            v-permission="['admin']"
             type="primary" 
             plain
             :icon="DocumentAdd" 
@@ -85,6 +86,7 @@
               >查看 / 编辑</el-button>
               <el-button
                 size="small"
+                v-permission="['admin']"
                 type="danger"
                 plain
                 :icon="Delete"
@@ -381,7 +383,7 @@ onMounted(async() => {
   .el-button {
     width: 100%;
     margin-left: 0;
-    &:last-child {
+    &:nth-child(2){
       margin-top: 10px;
     }
     // transition: all .2s;

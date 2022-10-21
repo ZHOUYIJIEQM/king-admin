@@ -1,7 +1,7 @@
 <template>
   <div class="goods-page">
     <el-card>
-      <el-button :icon="DocumentAdd" type="primary" plain @click="addGoods">添加装备</el-button>
+      <el-button v-permission="['admin']" class="add-goods" :icon="DocumentAdd" type="primary" plain @click="addGoods">添加装备</el-button>
       <el-table
         class="table"
         v-loading="tableLoading"
@@ -55,9 +55,9 @@
                   plain
                   :icon="Edit"
                   @click="handleEdit(scope.row)"
-                >编辑</el-button>
+                >编辑 / 查看</el-button>
               </div>
-              <div>
+              <div v-permission="['admin']">
                 <el-button
                   size="small"
                   type="danger"
@@ -146,7 +146,7 @@
         </el-form>
       </el-scrollbar>
       <template #footer>
-        <span class="dialog-footer">
+        <span class="dialog-footer" v-permission="['admin']">
           <el-button plain @click="dialogAddVisible = false">取消</el-button>
           <el-button type="primary" plain @click="confirmAdd">确定</el-button>
         </span>
@@ -469,8 +469,10 @@ onMounted(async () => {
       line-height: 1.2;
     }
   }
+  .add-goods {
+    margin-bottom: 20px;
+  }
   .table {
-    margin-top: 20px;
     .expand {
       padding: 5px 15px;
       &>div {

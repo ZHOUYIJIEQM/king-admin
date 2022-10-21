@@ -2,6 +2,7 @@
   <div class="ad-page">
     <el-card>
       <el-button 
+        v-permission="['admin']"
         style="margin-bottom: 15px;" 
         :icon="DocumentAdd"
         class="save-btn"
@@ -19,10 +20,10 @@
             <div class="expand">
               <div class="expand-item" v-for="(item, index) in props.row.items">
                 <div style="font-size: 16px; font-weight: bold; margin-bottom: 18px;">{{`轮播图${index+1}`}}</div>
-                <el-form-item label="轮播图片">
+                <el-form-item label="轮播图片:">
                   <img class="banner-img" :src="item.img" alt="">
                 </el-form-item>
-                <el-form-item label="跳转地址">
+                <el-form-item label="跳转地址:">
                   <a v-if="item.url.length" class="eli" target="_blank" :href="item.url">{{item.url}}</a>
                   <div v-else class="text eli">没有对应跳转地址!</div>
                 </el-form-item>
@@ -42,11 +43,12 @@
                   plain
                   :icon="Edit"
                   @click="handleEdit(scope.row)"
-                >编辑</el-button>
+                >编辑 / 查看</el-button>
               </div>
               <div>
                 <el-button
                   size="small"
+                  v-permission="['admin']"
                   type="danger"
                   plain
                   :icon="Delete"
@@ -105,7 +107,7 @@
       </el-scrollbar>
       <template #footer>
         <div class="bottom">
-          <el-button class="save-btn" type="primary" plain @click="saveContent">保存</el-button>
+          <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">保存</el-button>
         </div>
       </template>
     </el-dialog>

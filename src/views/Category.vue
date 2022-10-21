@@ -1,7 +1,7 @@
 <template>
   <div class="category-page">
     <el-card class="main-card">
-      <el-button :icon="DocumentAdd" plain type="primary" @click="addCate">添加分类</el-button>
+      <el-button class="add-cate" v-permission="['admin']" :icon="DocumentAdd" plain type="primary" @click="addCate">添加分类</el-button>
       <el-table
         class="table"
         v-loading="isLoading"
@@ -20,12 +20,13 @@
               :icon="Edit"
               plain
               @click="handleEdit(scope.$index, scope.row)"
-            >编辑</el-button>
+            >编辑 / 查看</el-button>
             <el-button
               size="small"
               type="danger"
               :icon="Delete"
               plain
+              v-permission="['admin']"
               @click="handleDelete(scope.$index, scope.row)"
             >删除</el-button>
           </template>
@@ -68,7 +69,7 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <span class="dialog-footer">
+        <span class="dialog-footer" v-permission="['admin']">
           <el-button @click="dialogEditVisible = false">取消</el-button>
           <el-button type="primary" @click="confirmEdit">确定</el-button>
         </span>
@@ -249,8 +250,8 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .category-page {
   .main-card {
-    .table {
-      margin-top: 20px;
+    .add-cate {
+      margin-bottom: 20px;
     }
   }
   :deep(.el-dialog) {
@@ -258,6 +259,9 @@ onMounted(async () => {
   }
   :deep(.el-dialog__body) {
     padding-bottom: 0;
+  }
+  :deep(.el-button:only-child) {
+    width: 100%;
   }
 }
 </style>

@@ -16,7 +16,11 @@
       >
         <el-table-column type="index" label="序号" width="60" />
         <el-table-column label="用户名称" prop="username" />
-        <el-table-column label="权限级别" prop="level" width="150" />
+        <el-table-column label="权限级别" prop="level" width="150">
+          <template #default="scope">
+            <span>{{getRole(Number(scope.row.level))}}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="160">
           <template #default="scope">
             <div class="option">
@@ -69,11 +73,11 @@
               <el-input clearable v-model="dialogData.username" placeholder="请输入用户名!"></el-input>
             </el-form-item>
             <el-form-item label="权限级别">
-              <el-select v-model="dialogData.level" class="m-2" placeholder="Select">
+              <el-select v-model="dialogData.level" class="m-2" placeholder="请选择权限">
                 <el-option
-                  v-for="item in 5"
+                  v-for="item in 2"
                   :key="item"
-                  :label="item"
+                  :label="getRole(item)"
                   :value="item"
                 />
               </el-select>
@@ -81,9 +85,9 @@
             <el-form-item label="用户密码">
               <el-input type="password" show-password v-model="dialogData.password" placeholder="请输入密码!"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码">
+            <!-- <el-form-item label="确认密码">
               <el-input type="password" show-password v-model="dialogData.checkPassword" placeholder="再次输入密码!"></el-input>
-            </el-form-item>
+            </el-form-item> -->
           </el-form>
         </div>
       </el-scrollbar>
@@ -98,7 +102,6 @@
 <script lang="ts" setup>
 import { DocumentAdd, Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { getCurrentInstance, reactive, ref, onMounted } from "vue"
-import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
 import { ElNotification } from 'element-plus'
 import { deepClone } from "@/utils/func";
@@ -109,7 +112,6 @@ const app: any = getCurrentInstance()
 const { proxy } = app
 const { getUsers, createUser, updateUser, deleteUser } = proxy.$UserApiApi
 const tableList = ref<any[]>([])
-const actionUrl = `${commonStore().uploadPath}advertisement`
 const tableLoading = ref<boolean>(true)
 const dialogVisible = ref<boolean>(false)
 const isAdd = ref<boolean>(false)
@@ -121,14 +123,12 @@ let pageParams: any = {
   pageSize: 5,
 }
 
-
 /**
  * 新建
  */
 const createItem = () => {
   isAdd.value = true
   dialogVisible.value = true
-  
 }
 
 /**
@@ -167,7 +167,7 @@ const dialogClosed = () => {
     username: "",
     level: "",
     password: "",
-    checkPassword: ""
+    // checkPassword: ""
   }
 }
 /**
@@ -234,6 +234,15 @@ const getUser = async () => {
   } finally {
     // loading.closeLoading()
     tableLoading.value = false
+  }
+}
+
+function getRole(val: number) {
+  if (val === 1) {
+    return '管理员'
+  }
+  if (val === 2) {
+    return '普通用户'
   }
 }
 
