@@ -40,38 +40,45 @@ export const permissionStore = defineStore("permission", {
       menuList: [
         {
           menu: '分类列表',
+          i18n: "menu.category",
           index: '/category',
           icon: markRaw(Grid),
         },
         {
           menu: '物品列表',
+          i18n: "menu.goods",
           index: '/goods',
           icon: markRaw(Menu),
         },
         {
           menu: '英雄管理',
+          i18n: "menu.hero",
           icon: markRaw(Management),
           index: '3',
           menuItem: [
             {
               name: '英雄列表',
               index: '/hero',
+              i18n: "menu.heroList",
             },
           ]
         },
         {
           menu: '文章管理',
+          i18n: "menu.article",
           icon: markRaw(List),
           index: '4',
           menuItem: [
             {
               name: '文章列表',
               index: '/article',
+              i18n: "menu.articleList",
             },
           ]
         },
         {
           menu: '广告列表',
+          i18n: "menu.advertise",
           index: '/advertise',
           icon: markRaw(Ticket),
         },
@@ -97,6 +104,7 @@ export const permissionStore = defineStore("permission", {
       if (this.userLevel === '1') {
         this.menuList.push({
           menu: '用户列表',
+          i18n: 'menu.user',
           index: '/user',
           icon: markRaw(UserFilled),
         })

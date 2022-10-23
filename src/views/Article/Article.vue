@@ -17,7 +17,7 @@
             :icon="Search" 
             style="margin-left: 15px;"
             @click="searchArticle"
-          >搜索</el-button>
+          >{{$t(`btn.search`)}}</el-button>
           <el-button 
             v-permission="['admin']"
             type="primary" 
@@ -25,7 +25,7 @@
             :icon="DocumentAdd" 
             style="margin-left: 15px;"
             @click="addArticle"
-          >添加新文章</el-button>
+          >{{$t(`btn.addArticle`)}}</el-button>
         </el-col>
       </el-row>
       <el-table
@@ -36,15 +36,15 @@
         border
         stripe
       >
-        <el-table-column min-width="5%" type="index" label="序号" width="60"></el-table-column>
-        <el-table-column min-width="45%" label="文章标题" prop="title"></el-table-column>
-        <el-table-column min-width="20" label="文章分类" prop="cate"></el-table-column>
-        <el-table-column min-width="20%" label="创建时间">
+        <el-table-column min-width="5%" type="index" :label="$t(`tableH.orderNum`)" width="70"></el-table-column>
+        <el-table-column min-width="45%" :label="$t(`tableH.articleTitle`)" prop="title"></el-table-column>
+        <el-table-column min-width="20" :label="$t(`tableH.category`)" prop="cate"></el-table-column>
+        <el-table-column min-width="20%" :label="$t(`tableH.createDate`)">
           <template #default="scope">
             <div>{{ scope.row.createdTime?.split(' ').at(0) }}</div>
           </template>
         </el-table-column>
-        <el-table-column min-width="10%" label="操作" align="center" width="150">
+        <el-table-column min-width="10%" :label="$t(`tableH.operation`)" align="center" width="150">
           <template #default="scope">
             <div class="option">
               <el-button
@@ -53,7 +53,7 @@
                 plain
                 :icon="Edit"
                 @click="handleEdit(scope.row)"
-              >查看 / 编辑</el-button>
+              >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
               <el-button
                 size="small"
                 v-permission="['admin']"
@@ -61,7 +61,7 @@
                 plain
                 :icon="Delete"
                 @click="handleDelete(scope.row)"
-              >删除</el-button>
+              >{{$t(`btn.delete`)}}</el-button>
             </div>
           </template>
         </el-table-column>

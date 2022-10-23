@@ -401,5 +401,63 @@ const app = getCurrentInstance()
 app.proxy.$refs.formName?.focus()
 ```
 
+#### 关于使用```i18n```
+```js
+// i18n怎么用
+// zh.ts
+const zh = {
+  login: {
+    title: '后台管理',
+    loginBtn: '登录',
+    switchBtn: "切换",
+  }
+}
+export default zh
+// en.ts
+const en = {
+  login: {
+    title: 'backend system',
+    loginBtn: 'login',
+    switchBtn: "switch",
+  }
+}
+export default en
 
+// index.ts
+import { createI18n } from "vue-i18n";
+import en from "./en";
+import zh from "./zh";
+const messages = { zh, en, };
+const i18n = createI18n({
+  legacy: false,
+  globalInjection: true,
+  locale: localStorage.language || 'zh',
+  messages,
+});
+export default i18n;
+
+// main.ts
+import i18n from "./i18n/index"
+app.use(i18n)
+
+// 使用
+<span>{{$t(`login.title`)}}</span>
+
+// 在组件 setup 外部使用时(如pinia store里), 报错 i18n Must be called at the top of a `setup` function
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
+// 换成这样写, 但是这样切换语言时store里的state不会跟随变化
+import i18n from '@/i18n';
+const { t } = i18n.global;
+// 只能退而求其次, 模板渲染处使用$t("属性名"), 如
+menuList: [{
+  menu: '分类列表', // 期望的效果是i18n改变menu内容, 但不行
+  i18n: "menu.category", // 把这个作为$t()的参数
+  index: '/category',
+  icon: markRaw(Grid),
+}]
+// 模板处写为
+<span v-for="item in menuList">{{$t(item.i18n)}}</span>
+// 这样切换语言时可以变化
+```
 

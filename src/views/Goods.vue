@@ -1,7 +1,7 @@
 <template>
   <div class="goods-page">
     <el-card>
-      <el-button v-permission="['admin']" class="add-goods" :icon="DocumentAdd" type="primary" plain @click="addGoods">添加装备</el-button>
+      <el-button v-permission="['admin']" class="add-goods" :icon="DocumentAdd" type="primary" plain @click="addGoods">{{$t(`btn.addGoods`)}}</el-button>
       <el-table
         class="table"
         v-loading="tableLoading"
@@ -11,7 +11,7 @@
         :data="goodsList"
         :default-sort="{ prop: 'price', order: 'ascending' }"
       >
-        <el-table-column type="expand" label="展开" width="60">
+        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">
             <div class="expand">
               <div class="goods-name">
@@ -35,17 +35,17 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="名称" prop="name" />
-        <el-table-column label="外观">
+        <el-table-column :label="$t(`tableH.name`)" prop="name" />
+        <el-table-column :label="$t(`tableH.appearance`)">
           <template #default="scope">
             <div class="icon-box">
               <el-image lazy class="item-icon" :src="scope.row.icon" />
             </div>
           </template>
         </el-table-column>
-        <el-table-column sortable="custom" label="价格" prop="price">
+        <el-table-column sortable="custom" :label="$t(`tableH.price`)" prop="price">
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200">
+        <el-table-column :label="$t(`tableH.operation`)" align="center" width="200">
           <template #default="scope">
             <div class="option">
               <div>
@@ -55,7 +55,7 @@
                   plain
                   :icon="Edit"
                   @click="handleEdit(scope.row)"
-                >编辑 / 查看</el-button>
+                >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
               </div>
               <div v-permission="['admin']">
                 <el-button
@@ -64,7 +64,7 @@
                   plain
                   :icon="Delete"
                   @click="handleDelete(scope.row)"
-                >删除</el-button>
+                >{{$t(`btn.delete`)}}</el-button>
               </div>
             </div>
           </template>
@@ -147,8 +147,8 @@
       </el-scrollbar>
       <template #footer>
         <span class="dialog-footer" v-permission="['admin']">
-          <el-button plain @click="dialogAddVisible = false">取消</el-button>
-          <el-button type="primary" plain @click="confirmAdd">确定</el-button>
+          <el-button plain @click="dialogAddVisible = false">{{$t(`btn.cancel`)}}</el-button>
+          <el-button type="primary" plain @click="confirmAdd">{{$t(`btn.confirm`)}}</el-button>
         </span>
       </template>
     </el-dialog>

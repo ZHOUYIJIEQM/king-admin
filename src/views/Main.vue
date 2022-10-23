@@ -22,14 +22,14 @@
                   <el-icon>
                     <component :is="item.icon"></component>
                   </el-icon>
-                  <span>{{item.menu}}</span>
+                  <span>{{$t(item.i18n)}}</span>
                 </template>
                 <el-menu-item
                   v-for="(item1, index1) in item.menuItem"
                   :key="index1"
                   :index="item1.index"
                   @click="selectMenu(item1)"
-                >{{item1.name}}</el-menu-item>
+                >{{$t(item1.i18n)}}</el-menu-item>
               </el-sub-menu>
             </template>
             <template v-else>
@@ -37,7 +37,7 @@
                 <el-icon>
                   <component :is="item.icon"></component>
                 </el-icon>
-                <span>{{item.menu}}</span>
+                <span>{{$t(item.i18n)}}</span>
               </el-menu-item>
             </template>
           </template>
@@ -52,11 +52,12 @@
             <el-icon v-show="!isCollapse"><Fold /></el-icon>
           </div>
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item to="/" @click="toMain">首页</el-breadcrumb-item>
-            <el-breadcrumb-item v-for="(item, index) in breadCrumb" :key="index">{{item}}</el-breadcrumb-item>
+            <el-breadcrumb-item to="/" @click="toMain">{{$t(`menu.home`)}}</el-breadcrumb-item>
+            <el-breadcrumb-item v-for="(item, index) in breadCrumb" :key="index">{{$t(item)}}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="right">
+          <TranslateBtn style="margin-right: 10px;"></TranslateBtn>
           <el-dropdown trigger="click" placement="bottom-end">
             <span class="right-user">
               <el-image class="avatarPic" :src="avatar"></el-image>
@@ -95,6 +96,7 @@ import { commonStore } from "@/store/index"
 import { permissionStore } from '@/store/permission'
 import adminAvatar from '@/assets/img/home/admin.png'
 import normalAvatar from '@/assets/img/home/normal.png'
+// import TranslateBtn from '@/components/TranslateBtn.vue'
 
 const userName = permissionStore().userName
 const userAuth = permissionStore().getAuth
@@ -127,13 +129,13 @@ const setBreadCrumb = (val:string) => {
     if (item1.menuItem) {
       for (const item2 of item1.menuItem) {
         if (item2.index === val) {
-          breadCrumb.value.push(item1.menu, item2.name)
+          breadCrumb.value.push(item1.i18n, item2.i18n)
           break firstLoop
         }
       }
     }
     if (item1.index === val) {
-      breadCrumb.value.push(item1.menu)
+      breadCrumb.value.push(item1.i18n)
       break firstLoop
     }
   }
@@ -176,24 +178,28 @@ watch(
     if (newV === 'heroCreate') {
       menuList.data[heroIndex].menuItem?.unshift({
         name: '新增英雄',
+        i18n: 'menu.heroAdd',
         index: '/hero/create'
       })
       selectMenu({index: '/hero/create'})
     } else if (newV === 'heroEdit') {
       menuList.data[heroIndex].menuItem?.unshift({
         name: '编辑英雄',
+        i18n: 'menu.heroEdit',
         index: `/hero/edit/${route.params.id}`
       })
       selectMenu({index: `/hero/edit/${route.params.id}`})
     } else if (newV === 'articleCreate') {
       menuList.data[articleIndex].menuItem?.unshift({
         name: '新增文章',
+        i18n: 'menu.articleAdd',
         index: '/article/create'
       })
       selectMenu({index: '/article/create'})
     } else if (newV === 'articleEdit') {
       menuList.data[articleIndex].menuItem?.unshift({
         name: '编辑文章',
+        i18n: 'menu.articleEdit',
         index: `/article/edit/${route.params.id}`
       })
       selectMenu({index: `/article/edit/${route.params.id}`})
@@ -297,6 +303,8 @@ const loginOut = () => {
         margin-left: auto;
         margin-right: 15px;
         position: relative;
+        display: flex;
+        align-items: center;
         .content {
           position: absolute;
           left: 50%;

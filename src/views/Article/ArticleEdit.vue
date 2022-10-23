@@ -34,7 +34,7 @@
         </div>
       </el-form>
       <div class="bottom">
-        <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">保存</el-button>
+        <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">{{$t(`btn.save`)}}</el-button>
       </div>
     </el-card>    
   </div>

@@ -1,7 +1,12 @@
 <template>
   <div class="login-page">
     <div class="login-ruleForm">
-      <h1 class="title">后台管理</h1>
+      <h1 class="title">
+        <div class="title-text">{{$t(`login.title`)}}</div>
+        <div class="translate-btn">
+          <TranslateBtn></TranslateBtn>
+        </div>
+      </h1>
       <el-form
         ref="ruleFormRef"
         :model="ruleForm"
@@ -32,8 +37,8 @@
           />
         </el-form-item>
         <el-form-item class="btns">
-          <el-button size="large" type="primary" @click="submitForm(ruleFormRef)">登录</el-button>
-          <el-button size="large" @click="switchUser">切换</el-button>
+          <el-button size="large" type="primary" @click="submitForm(ruleFormRef)">{{$t(`login.loginBtn`)}}</el-button>
+          <el-button size="large" @click="switchUser">{{$t(`login.switchBtn`)}}</el-button>
           <!-- <el-button size="large" @click="resetForm(ruleFormRef)">重置</el-button> -->
         </el-form-item>
       </el-form>
@@ -48,7 +53,6 @@ import { ElNotification, FormInstance } from "element-plus";
 import { useRouter } from "vue-router";
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
-import { permissionStore } from "@/store/permission";
 
 const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
@@ -107,7 +111,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
           sessionStorage.setItem('userName', loginRes.data.username)
           sessionStorage.setItem('userLevel', loginRes.data.level)
           sessionStorage.setItem('roles', JSON.stringify([(loginRes.data.level === 1 ? 'admin' : 'normal')]))
-          // permissionStore().setUserInfo()
           router.replace('/')
           ElNotification({
             duration: commonStore().tipDurationS,
@@ -144,7 +147,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
     }
   });
 };
-
 
 const switchUser = () => {
   if(ruleForm.username === 'admin') {
@@ -185,10 +187,26 @@ const resetForm = (formEl: FormInstance | undefined) => {
     box-shadow: 0 2px 12px 0 rgb(0 0 0 / 50%);
 
     .title {
-      text-align: center;
       font-size: 30px;
       font-weight: bold;
       margin-bottom: 30px;
+      position: relative;
+      .title-text {
+        text-align: center;
+      }
+      .translate-btn {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        font-size: 0;
+        transform: translateY(-50%);
+        cursor: pointer;
+        .icon {
+          width: 24px;
+          height: 24px;
+          color: #525252;
+        }
+      }
     }
 
     .username, .password {

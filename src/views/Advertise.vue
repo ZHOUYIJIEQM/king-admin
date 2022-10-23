@@ -8,14 +8,14 @@
         class="save-btn"
         type="primary"
         plain
-        @click="createItem">新建轮播</el-button>
+        @click="createItem">{{$t(`btn.addAds`)}}</el-button>
       <el-table
         v-loading="tableLoading"
         empty-text="暂无轮播广告!"
         border
         :data="tableList"
       >
-        <el-table-column type="expand" label="展开" width="60">
+        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="75">
           <template #default="props">
             <div class="expand">
               <div class="expand-item" v-for="(item, index) in props.row.items">
@@ -31,9 +31,9 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column label="广告类型" prop="name" />
-        <el-table-column label="操作" align="center" width="160">
+        <el-table-column type="index" :label="$t(`tableH.orderNum`)" width="70" />
+        <el-table-column :label="$t(`tableH.category`)" prop="name" />
+        <el-table-column :label="$t(`tableH.operation`)" align="center" width="160">
           <template #default="scope">
             <div class="option">
               <div style="margin-bottom: 6px;">
@@ -43,7 +43,7 @@
                   plain
                   :icon="Edit"
                   @click="handleEdit(scope.row)"
-                >编辑 / 查看</el-button>
+                >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
               </div>
               <div>
                 <el-button
@@ -53,7 +53,7 @@
                   plain
                   :icon="Delete"
                   @click="handleDelete(scope.row)"
-                >删除</el-button>
+                >{{$t(`btn.delete`)}}</el-button>
               </div>
             </div>
           </template>
@@ -107,7 +107,7 @@
       </el-scrollbar>
       <template #footer>
         <div class="bottom">
-          <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">保存</el-button>
+          <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">{{$t(`btn.save`)}}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -116,7 +116,6 @@
 <script lang="ts" setup>
 import { DocumentAdd, Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { getCurrentInstance, reactive, ref, onMounted } from "vue"
-import loading from '@/utils/loading'
 import CardItemVue from "@/components/CardItem.vue"
 import UploadFileVue from "@/components/UploadFile.vue"
 import { commonStore } from "@/store/index"

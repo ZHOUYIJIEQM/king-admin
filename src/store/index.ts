@@ -11,6 +11,7 @@ export const commonStore = defineStore("common", {
       // 右侧提示停留时间
       tipDurationS: 1000,
       tipDurationM: 2000,
+      languageType: localStorage.language || "zh",
     };
   },
   getters: {

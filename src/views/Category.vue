@@ -1,7 +1,7 @@
 <template>
   <div class="category-page">
     <el-card class="main-card">
-      <el-button class="add-cate" v-permission="['admin']" :icon="DocumentAdd" plain type="primary" @click="addCate">添加分类</el-button>
+      <el-button class="add-cate" v-permission="['admin']" :icon="DocumentAdd" plain type="primary" @click="addCate">{{$t(`btn.addCate`)}}</el-button>
       <el-table
         class="table"
         v-loading="isLoading"
@@ -11,8 +11,8 @@
         empty-text="暂无分类!"
       >
         <!-- <el-table-column type="index" label="序列" width="100" align="center" /> -->
-        <el-table-column prop="name" label="分类" min-width="200" />
-        <el-table-column label="编辑" width="300" align="center">
+        <el-table-column prop="name" :label="$t(`tableH.category`)" min-width="200" />
+        <el-table-column :label="$t(`tableH.edit`)" width="300" align="center">
           <template #default="scope">
             <el-button
               size="small"
@@ -20,7 +20,7 @@
               :icon="Edit"
               plain
               @click="handleEdit(scope.$index, scope.row)"
-            >编辑 / 查看</el-button>
+            >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
             <el-button
               size="small"
               type="danger"
@@ -28,7 +28,7 @@
               plain
               v-permission="['admin']"
               @click="handleDelete(scope.$index, scope.row)"
-            >删除</el-button>
+            >{{$t(`btn.delete`)}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -54,8 +54,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmAddSelect">确定</el-button>
+          <el-button @click="dialogFormVisible = false">{{$t(`btn.cancel`)}}</el-button>
+          <el-button type="primary" @click="confirmAddSelect">{{$t(`btn.confirm`)}}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -70,8 +70,8 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer" v-permission="['admin']">
-          <el-button @click="dialogEditVisible = false">取消</el-button>
-          <el-button type="primary" @click="confirmEdit">确定</el-button>
+          <el-button @click="dialogEditVisible = false">{{$t(`btn.cancel`)}}</el-button>
+          <el-button type="primary" @click="confirmEdit">{{$t(`btn.confirm`)}}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -260,7 +260,7 @@ onMounted(async () => {
   :deep(.el-dialog__body) {
     padding-bottom: 0;
   }
-  :deep(.el-button:only-child) {
+  :deep(.cell .el-button:only-child) {
     width: 100%;
   }
 }

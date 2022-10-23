@@ -18,7 +18,7 @@
             :icon="Search" 
             style="margin-left: 15px;"
             @click="searchHero"
-          >搜索</el-button>
+          >{{$t(`btn.search`)}}</el-button>
           <el-button 
             v-permission="['admin']"
             type="primary" 
@@ -26,7 +26,7 @@
             :icon="DocumentAdd" 
             style="margin-left: 15px;"
             @click="addHero"
-          >添加新英雄</el-button>
+          >{{$t(`btn.addHero`)}}</el-button>
         </el-col>
       </el-row>
       <el-table 
@@ -36,7 +36,7 @@
         border
         stripe
       >
-        <el-table-column type="expand" label="展开" width="60">
+        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">
             <div class="hero-detail-box">
               <div class="hero-rate detail-item">
@@ -60,21 +60,21 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="英雄名称" prop="name"></el-table-column>
-        <el-table-column label="英雄称号" prop="nickname"></el-table-column>
-        <el-table-column label="所属分类">
+        <el-table-column :label="$t(`tableH.heroName`)" prop="name"></el-table-column>
+        <el-table-column :label="$t(`tableH.heroNickName`)" prop="nickname"></el-table-column>
+        <el-table-column :label="$t(`tableH.category`)">
           <template #default="scope">
             <span>{{category(scope.row.cate)}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="头像">
+        <el-table-column :label="$t(`tableH.avatar`)">
           <template #default="scope">
             <div class="hero-avatar-box">
               <el-image lazy class="hero-avatar" :src="scope.row.avatar" />
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="150">
+        <el-table-column :label="$t(`tableH.operation`)" align="center" width="150">
           <template #default="scope">
             <div class="option">
               <el-button
@@ -83,7 +83,7 @@
                 plain
                 :icon="Edit"
                 @click="handleEdit(scope.row)"
-              >查看 / 编辑</el-button>
+              >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
               <el-button
                 size="small"
                 v-permission="['admin']"
@@ -91,7 +91,7 @@
                 plain
                 :icon="Delete"
                 @click="handleDelete(scope.row)"
-              >删除</el-button>
+              >{{$t(`btn.delete`)}}</el-button>
             </div>
           </template>
         </el-table-column>

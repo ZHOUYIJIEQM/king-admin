@@ -364,7 +364,7 @@
           </el-tab-pane> 
         </el-tabs>
         <div class="bottom">
-          <el-button v-permission="['admin']" class="save" type="primary" plain @click="saveHeroData">保存</el-button>
+          <el-button v-permission="['admin']" class="save" type="primary" plain @click="saveHeroData">{{$t(`btn.save`)}}</el-button>
         </div>
       </el-form>
     </el-card>

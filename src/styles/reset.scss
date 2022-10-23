@@ -59,6 +59,14 @@ html, body, #app {
 	overflow: hidden;	
 }
 
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
 // 滚动条
 ::-webkit-scrollbar {
 	width: 8px;

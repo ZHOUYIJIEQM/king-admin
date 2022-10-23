@@ -7,21 +7,21 @@
         class="save-btn"
         type="primary"
         plain
-        @click="createItem">新建用户</el-button>
+        @click="createItem">{{$t(`btn.addUser`)}}</el-button>
       <el-table
         v-loading="tableLoading"
         empty-text="暂无用户信息!"
         border
         :data="tableList"
       >
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column label="用户名称" prop="username" />
-        <el-table-column label="权限级别" prop="level" width="150">
+        <el-table-column type="index" :label="$t(`tableH.orderNum`)" width="70" />
+        <el-table-column :label="$t(`tableH.userName`)" prop="username" />
+        <el-table-column :label="$t(`tableH.permissionLevel`)" prop="level" width="150">
           <template #default="scope">
             <span>{{getRole(Number(scope.row.level))}}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="160">
+        <el-table-column :label="$t(`tableH.operation`)" align="center" width="160">
           <template #default="scope">
             <div class="option">
               <div style="margin-bottom: 6px;">
@@ -31,7 +31,7 @@
                   plain
                   :icon="Edit"
                   @click="handleEdit(scope.row)"
-                >修改</el-button>
+                >{{$t(`btn.modify`)}}</el-button>
               </div>
               <div>
                 <el-button
@@ -40,7 +40,7 @@
                   plain
                   :icon="Delete"
                   @click="handleDelete(scope.row)"
-                >删除</el-button>
+                >{{$t(`btn.delete`)}}</el-button>
               </div>
             </div>
           </template>
@@ -93,7 +93,7 @@
       </el-scrollbar>
       <template #footer>
         <div class="bottom">
-          <el-button class="save-btn" type="primary" plain @click="saveContent">保存</el-button>
+          <el-button class="save-btn" type="primary" plain @click="saveContent">{{$t(`btn.save`)}}</el-button>
         </div>
       </template>
     </el-dialog>
@@ -138,8 +138,6 @@ const handleEdit = (val: any) => {
   isAdd.value = false
   dialogVisible.value = true
   dialogData.value = deepClone(val)
-  // console.log('---', dialogData.value);
-  // deepClone(val)
 }
 /**
  * 点击删除
