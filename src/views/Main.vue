@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts" setup>
-import { markRaw, getCurrentInstance, reactive, ref, watch, onMounted, computed } from "vue";
+import { getCurrentInstance, reactive, ref, watch, onMounted, computed } from "vue";
 import { CaretBottom, Fold, Expand, List, Menu, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElNotification, ElMessageBox } from "element-plus";
@@ -172,8 +172,8 @@ watch(
   () => route.name,
   (newV, oldV) => {
     defaultActive.value = route.path
-    let heroIndex = menuList.data.findIndex(i => i.menu === '英雄管理')
-    let articleIndex = menuList.data.findIndex(i => i.menu === '文章管理')
+    let heroIndex = menuList.data.findIndex(i => i.menu === 'hero')
+    let articleIndex = menuList.data.findIndex(i => i.menu === 'article')
     // console.log(articleIndex);
     if (newV === 'heroCreate') {
       menuList.data[heroIndex].menuItem?.unshift({
@@ -287,6 +287,7 @@ const loginOut = () => {
     .el-header {
       display: flex;
       align-items: center;
+      box-shadow: 0 1px 4px hsl(209deg 100% 8% / 8%);
       .left {
         display: flex;
         align-items: center;

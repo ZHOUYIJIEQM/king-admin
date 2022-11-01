@@ -39,19 +39,19 @@ export const permissionStore = defineStore("permission", {
       // 左侧菜单
       menuList: [
         {
-          menu: '分类列表',
+          menu: 'category',
           i18n: "menu.category",
           index: '/category',
           icon: markRaw(Grid),
         },
         {
-          menu: '物品列表',
+          menu: 'goods',
           i18n: "menu.goods",
           index: '/goods',
           icon: markRaw(Menu),
         },
         {
-          menu: '英雄管理',
+          menu: 'hero',
           i18n: "menu.hero",
           icon: markRaw(Management),
           index: '3',
@@ -64,7 +64,7 @@ export const permissionStore = defineStore("permission", {
           ]
         },
         {
-          menu: '文章管理',
+          menu: 'article',
           i18n: "menu.article",
           icon: markRaw(List),
           index: '4',
@@ -77,7 +77,7 @@ export const permissionStore = defineStore("permission", {
           ]
         },
         {
-          menu: '广告列表',
+          menu: 'advertise',
           i18n: "menu.advertise",
           index: '/advertise',
           icon: markRaw(Ticket),
@@ -112,6 +112,7 @@ export const permissionStore = defineStore("permission", {
     },
     getAsyncRoutes(roles) {
       let filterRoutes = GenerateRoutes(asyncRoutes, roles);
+      console.log('异步', filterRoutes);
       return filterRoutes
     }
   },

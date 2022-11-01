@@ -46,7 +46,7 @@ export default {
 </script>
 
 <script lang="ts" setup>
-import { getCurrentInstance, ref, reactive, onMounted, nextTick } from "vue";
+import { getCurrentInstance, ref, reactive, onMounted } from "vue";
 import Vue3Tinymce from '@jsdawn/vue3-tinymce';
 import { useRoute, useRouter } from "vue-router";
 import loading from '@/utils/loading'
@@ -249,7 +249,7 @@ onMounted(async () => {
       clearInterval(intervalTimer)
       // console.log(app.proxy.$refs);
     } 
-  }, 100)
+  }, 300)
 })
 
 </script>

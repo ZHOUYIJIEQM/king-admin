@@ -152,7 +152,10 @@ export default defineConfig({
   plugins: [
     vue(),
     AutoImport({
+      // 配置后 <el-button> 就不用 import { ElButton } from 'element-plus'
       resolvers: [ElementPlusResolver()],
+      // 配置后就不用写 import { ref } from 'vue'
+      imports: ['vue', 'vue-router']
     }),
     Components({
       resolvers: [ElementPlusResolver()],

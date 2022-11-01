@@ -23,7 +23,8 @@
   </el-dropdown>
 </template>
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { commonStore } from '@/store/index'
+// import { reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 const i18n = useI18n()
 
@@ -42,15 +43,20 @@ let languageDownItem: languageItem [] = reactive([
     type: 'en'
   }
 ])
-let language = ref<string|undefined>()
-language.value = localStorage.language || 'zh'
+// let language = ref<string|undefined>()
+// language.value = localStorage.language || 'zh'
+
+let language = computed(() => {
+  return commonStore().languageType
+})
 
 const switchLanguage = (type: string) => {
   // 更换后执行操作
   if (i18n.locale.value !== type) {
     i18n.locale.value = type
     localStorage.language = type
-    language.value = type
+    // language.value = type
+    commonStore().languageType = type
   }
 }
 
