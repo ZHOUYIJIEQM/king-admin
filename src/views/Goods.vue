@@ -84,7 +84,7 @@
     </el-card>
     <!-- 装备弹出层 -->
     <el-dialog
-      custom-class="add-goods"
+      class="add-goods"
       v-model="dialogAddVisible"
       :title="isAddStatus ? '添加装备' : '编辑装备'"
       @close="dialogClosed"

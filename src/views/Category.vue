@@ -1,77 +1,51 @@
 <template>
   <div class="category-page">
     <el-card class="main-card">
-      <el-button class="add-cate" v-permission="['admin']" :icon="DocumentAdd" plain type="primary" @click="addCate">{{$t(`btn.addCate`)}}</el-button>
-      <el-table
-        class="table"
-        v-loading="isLoading"
-        :data="cateList"
-        row-key="_id"
-        border
-        empty-text="暂无分类!"
-      >
+      <el-button class="add-cate" v-permission="['admin']" :icon="DocumentAdd" plain type="primary" @click="addCate">
+        {{ $t(`btn.addCate`) }}</el-button>
+      <el-table class="table" v-loading="isLoading" :data="cateList" row-key="_id" border empty-text="暂无分类!">
         <!-- <el-table-column type="index" label="序列" width="100" align="center" /> -->
         <el-table-column prop="name" :label="$t(`tableH.category`)" min-width="200" />
         <el-table-column :label="$t(`tableH.edit`)" width="300" align="center">
           <template #default="scope">
-            <el-button
-              size="small"
-              type="primary"
-              :icon="Edit"
-              plain
-              @click="handleEdit(scope.$index, scope.row)"
-            >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
-            <el-button
-              size="small"
-              type="danger"
-              :icon="Delete"
-              plain
-              v-permission="['admin']"
-              @click="handleDelete(scope.$index, scope.row)"
-            >{{$t(`btn.delete`)}}</el-button>
+            <el-button size="small" type="primary" :icon="Edit" plain @click="handleEdit(scope.$index, scope.row)"> {{ $t(`btn.edit`) }} / {{ $t(`btn.view`) }}</el-button>
+            <el-button size="small" type="danger" :icon="Delete" plain v-permission="['admin']" @click="handleDelete(scope.$index, scope.row)">{{ $t(`btn.delete`) }}</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
-    <el-dialog v-model="dialogFormVisible" title="添加分类" @opened="dialogOpened" @closed="dialogClosed">
-      <el-form :model="form" ref="formEl">
-        <el-form-item label="分类名称">
-          <el-input v-model="form.name" ref="formName" />
+    <el-dialog v-model="dialogFormVisible" :title="$t(`btn.addCate`)" @opened="dialogOpened" @closed="dialogClosed">
+      <el-form :model="form" ref="formEl" :label-width="lableWidth">
+        <el-form-item :label="$t(`label.cateName`)">
+          <el-input :placeholder="$t(`label.cateName`)" v-model="form.name" ref="formName" />
         </el-form-item>
-        <el-form-item label="分类描述">
-          <el-input v-model="form.desc" />
+        <el-form-item :label="$t(`label.cateDes`)">
+          <el-input :placeholder="$t(`label.cateDes`)" v-model="form.desc" />
         </el-form-item>
-        <el-form-item label="选择分类">
-          <el-cascader 
-            placeholder="请选择分类"
-            :options="cateList" 
-            :props="props1" 
-            v-model="form.parent"
-            clearable 
-            @change="handleSelectClass"
-          />
+        <el-form-item :label="$t(`label.cateSelect`)">
+          <el-cascader :placeholder="$t(`label.cateSelect`)" :options="cateList" :props="props1" v-model="form.parent" clearable @change="handleSelectClass" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">{{$t(`btn.cancel`)}}</el-button>
-          <el-button type="primary" @click="confirmAddSelect">{{$t(`btn.confirm`)}}</el-button>
+          <el-button @click="dialogFormVisible = false">{{ $t(`btn.cancel`) }}</el-button>
+          <el-button type="primary" @click="confirmAddSelect">{{ $t(`btn.confirm`) }}</el-button>
         </span>
       </template>
     </el-dialog>
-    <el-dialog title="编辑分类" v-model="dialogEditVisible" @opened="dialogOpened" @closed="dialogClosed">
-      <el-form :model="editForm" ref="editFormEl">
-        <el-form-item label="分类名称">
+    <el-dialog :title="$t(`label.cateTitle`)" v-model="dialogEditVisible" @opened="dialogOpened" @closed="dialogClosed">
+      <el-form :model="editForm" ref="editFormEl" :label-width="lableWidth">
+        <el-form-item :label="$t(`label.cateName`)">
           <el-input v-model="editForm.name" ref="editFormName" />
         </el-form-item>
-        <el-form-item label="分类描述">
+        <el-form-item :label="$t(`label.cateDes`)">
           <el-input v-model="editForm.desc" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer" v-permission="['admin']">
-          <el-button @click="dialogEditVisible = false">{{$t(`btn.cancel`)}}</el-button>
-          <el-button type="primary" @click="confirmEdit">{{$t(`btn.confirm`)}}</el-button>
+          <el-button @click="dialogEditVisible = false">{{ $t(`btn.cancel`) }}</el-button>
+          <el-button type="primary" @click="confirmEdit">{{ $t(`btn.confirm`) }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -83,13 +57,20 @@ import { DocumentAdd, Delete, Edit, } from '@element-plus/icons-vue'
 import { ElNotification, ElMessageBox } from 'element-plus';
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
-import {saveScrollH} from '@/utils/saveScroll'
+import { saveScrollH } from '@/utils/saveScroll'
 saveScrollH()
 
 const app: any = getCurrentInstance()
 const { getCategoryList, getCateById, createCate, deleteCate, updateCate } = app.proxy.$CateApi
 
 let isLoading = ref<boolean>(false)
+
+let lableWidth = computed(() => {
+  if (commonStore().languageType === 'zh') {
+    return 90
+  }
+  return 120
+})
 
 // 获取分类
 let cateList = ref([])
@@ -114,7 +95,7 @@ let editForm = reactive({
   name: '',
   desc: '',
 })
-let updateId:string = ''
+let updateId: string = ''
 const handleEdit = async (index: number, row: any) => {
   updateId = row._id
   editForm.name = row.name
@@ -149,29 +130,29 @@ const handleDelete = async (index: number, row: any) => {
       type: 'warning',
     }
   )
-  .then(async res => {
-    try {
-      loading.openLoading()
-      const delRes = await deleteCate(row._id)
-      console.log(`删除${row._id}`);
-      if (delRes.status === 200) {
-        ElNotification({
-          duration: commonStore().tipDurationS,
-          title: 'Success',
-          message: `分类 ${row.name} 删除成功!`,
-          type: 'success',
-        })
-        getCateList()
+    .then(async res => {
+      try {
+        loading.openLoading()
+        const delRes = await deleteCate(row._id)
+        console.log(`删除${row._id}`);
+        if (delRes.status === 200) {
+          ElNotification({
+            duration: commonStore().tipDurationS,
+            title: 'Success',
+            message: `分类 ${row.name} 删除成功!`,
+            type: 'success',
+          })
+          getCateList()
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        loading.closeLoading()
       }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      loading.closeLoading()
-    }
-  })
-  .catch(err => {
-    // console.log('取消删除', err);
-  })
+    })
+    .catch(err => {
+      // console.log('取消删除', err);
+    })
 }
 
 // 添加分类
@@ -238,12 +219,12 @@ const dialogClosed = () => {
   form.parent = null
 
   editForm.name = '',
-  editForm.desc = ''
+    editForm.desc = ''
 }
 
 onMounted(async () => {
   await getCateList()
-  
+
 })
 
 </script>
@@ -254,12 +235,20 @@ onMounted(async () => {
       margin-bottom: 20px;
     }
   }
+
   :deep(.el-dialog) {
-    padding: 15px 20px;
+    // padding: 15px 20px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
   }
+
   :deep(.el-dialog__body) {
     padding-bottom: 0;
   }
+
   :deep(.cell .el-button:only-child) {
     width: 100%;
   }

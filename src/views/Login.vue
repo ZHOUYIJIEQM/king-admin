@@ -58,6 +58,9 @@ const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
 const { login } = app?.proxy.$LoginApi
 const router = useRouter()
+const route = useRoute()
+
+console.log(route);
 
 const checkUserName = (rule: any, value: any, callback: any) => {
   if (value.trim() === "") {
@@ -111,7 +114,12 @@ const submitForm = (formEl: FormInstance | undefined) => {
           sessionStorage.setItem('userName', loginRes.data.username)
           sessionStorage.setItem('userLevel', loginRes.data.level)
           sessionStorage.setItem('roles', JSON.stringify([(loginRes.data.level === 1 ? 'admin' : 'normal')]))
-          router.replace('/')
+          // console.log(route.query.redirect);
+          if (route.query.redirect) {
+            router.replace({ name: route.query.redirect })
+          } else {
+            router.replace('/')
+          }
           ElNotification({
             duration: commonStore().tipDurationS,
             title: 'Success',

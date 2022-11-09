@@ -1,7 +1,6 @@
 # 王者荣耀后台管理系统
 > 基于Vue3+TypeScript+Vite+Vue-Router+Axios+Pinia开发, 项目还包含了[Vue3仿王者荣耀移动端](https://github.com/ZHOUYIJIEQM/king-mobile), [node+express后端](https://github.com/ZHOUYIJIEQM/king-server)
 
-
 ## 记录一些问题
 #### 配置路径别名
 ##### 安装 ```@types/node```
@@ -49,7 +48,12 @@ export default defineConfig({
     }
   },
   "exclude": ["node_modules"],
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "include": [
+    "src/**/*.ts", 
+    "src/**/*.d.ts", 
+    "src/**/*.tsx", 
+    "src/**/*.vue",
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
 ```
@@ -162,6 +166,17 @@ export default defineConfig({
     }),
   ],
 });
+```
+```tsconfig.json```
+```json
+// include 这里加入 "./auto-imports.d.ts" 不然没有用 import 导入, 在 vscode 会报错提示
+  "include": [
+    "src/**/*.ts", 
+    "src/**/*.d.ts", 
+    "src/**/*.tsx", 
+    "src/**/*.vue",
+    "./auto-imports.d.ts"
+  ],
 ```
 
 #### 使用 ```sass```
@@ -311,7 +326,7 @@ server: {
   }
 </style>
 ```
-但这种做法在右侧内容区域使用表格后, 展开/收缩会很卡
+但这种写法测试时在右侧内容区域使用表格后, 展开/收缩会很卡
 ```html
 <el-aside :width="isCollapse ? '64px' : '200px'" class="aside-box">
   <el-menu
@@ -404,6 +419,18 @@ const app = getCurrentInstance()
 app.proxy.$refs.formName?.focus()
 ```
 
+#### 父组件里通过```ref```获取子组件
+```js
+<MenuList ref="menuListEl" :isCollapse="isCollapse" @clickMenu="selectMenu"></MenuList>
+let menuListEl = ref()
+// Proxy {__v_skip: true}, 不能得到子组件
+// 子组件
+<el-menu ref="menuEl"></el-menu>
+const menuEl = ref()
+// 需要暴露出来, 父组件通过 ref 才可以获取到需要的内容
+defineExpose({menuEl})
+```
+
 #### 关于使用```i18n```
 ```js
 // i18n怎么用
@@ -453,9 +480,9 @@ const { t } = useI18n();
 import i18n from '@/i18n';
 const { t } = i18n.global;
 // 只能退而求其次, 模板渲染处使用$t("属性名"), 如
-menuList: [{
+menuList = [{
   menu: '分类列表', // 期望的效果是i18n改变menu内容, 但不行
-  i18n: "menu.category", // 把这个作为$t()的参数
+  i18n: "menu.category", // 把这个作为$t()的参数, 在 template 模板使用 <div>{{$t(`menuList[0].i18n`)}}</div>
   index: '/category',
   icon: markRaw(Grid),
 }]

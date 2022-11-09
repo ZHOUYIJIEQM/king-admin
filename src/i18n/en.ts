@@ -10,10 +10,10 @@ const en = {
     goods: 'Goods List',
     hero: 'Hero',
     heroList: 'Hero List',
-    heroAdd: 'Add Hero',
+    heroCreate: 'Add Hero',
     heroEdit: 'Edit Hero',
     article: 'Article',
-    articleAdd: 'Add Article',
+    articleCreate: 'Add Article',
     articleList: 'Article List',
     articleEdit: 'Edit Article',
     advertise: 'Ads',
@@ -51,6 +51,12 @@ const en = {
     createDate: 'Create Date',
     permissionLevel: 'Permission Level',
     userName: 'User Name'
+  },
+  label: {
+    cateName: 'Category Name',
+    cateDes: 'Category Desc',
+    cateSelect: 'Select Category',
+    cateTitle: 'Edit Category',
   }
 };
 export default en

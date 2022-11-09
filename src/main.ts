@@ -1,12 +1,12 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
-import "@/styles/reset.scss";
-import api from "@/api/index";
 import { createPinia } from "pinia";
+import api from "@/api/index";
 import * as directives from "@/directives/index";
-import i18n from "./i18n/index"
+import i18n from "@/i18n/index"
 import "@/assets/js/iconfont.js"
+import "@/styles/reset.scss";
 
 const pinia = createPinia();
 const app = createApp(App);

@@ -10,10 +10,10 @@ const zh = {
     goods: '物品列表',
     hero: '英雄管理',
     heroList: '英雄列表',
-    heroAdd: '新增英雄',
+    heroCreate: '新增英雄',
     heroEdit: '编辑英雄',
     article: '文章管理',
-    articleAdd: '新增文章',
+    articleCreate: '新增文章',
     articleList: '文章列表',
     articleEdit: '编辑文章',
     advertise: '广告列表',
@@ -51,6 +51,12 @@ const zh = {
     createDate: '创建时间',
     permissionLevel: '权限级别',
     userName: '用户名称'
+  },
+  label: {
+    cateName: '分类名称',
+    cateDes: '分类描述',
+    cateSelect: '请选择分类',
+    cateTitle: '编辑分类',
   }
 };
 export default zh

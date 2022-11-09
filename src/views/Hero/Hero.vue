@@ -35,6 +35,7 @@
         empty-text="暂无英雄数据!"
         border
         stripe
+        default-expand-all
       >
         <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">
