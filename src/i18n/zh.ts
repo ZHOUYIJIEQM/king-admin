@@ -18,10 +18,14 @@ const zh = {
     articleEdit: '编辑文章',
     advertise: '广告列表',
     user: '用户管理',
+    inscription: '铭文列表',
+    summoner: '召唤师技能',
   },
   btn: {
     addCate: '添加分类',
     addGoods: '添加装备',
+    addInscription: '添加铭文',
+    addSummoner: '添加召唤师技能',
     search: '搜索',
     addHero: '添加新英雄',
     view: '查看',
@@ -50,13 +54,25 @@ const zh = {
     articleTitle: '文章标题',
     createDate: '创建时间',
     permissionLevel: '权限级别',
-    userName: '用户名称'
+    userName: '用户名称',
+    grade: '级别',
+    image: '图片',
+    type: '类型'
   },
   label: {
     cateName: '分类名称',
     cateDes: '分类描述',
     cateSelect: '请选择分类',
     cateTitle: '编辑分类',
+    adTitle: '编辑轮播',
+  },
+  placeholder: {
+    goodsName: "请输入装备名称!",
+    articleName: "请输入文章名称!",
+    heroName: "请输入英雄名称!",
+    userName: "请输入用户名!",
+    summonerInput: "请输入技能名称!",
+    inscriptionInput: "请输入铭文名称!",
   }
 };
 export default zh

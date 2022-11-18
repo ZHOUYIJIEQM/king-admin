@@ -1,5 +1,5 @@
 <template>
-  <div class="ad-page">
+  <div class="main-page">
     <el-card>
       <el-button 
         style="margin-bottom: 15px;" 
@@ -15,10 +15,10 @@
         :data="tableList"
       >
         <el-table-column type="index" :label="$t(`tableH.orderNum`)" width="70" />
-        <el-table-column :label="$t(`tableH.userName`)" prop="username" />
-        <el-table-column :label="$t(`tableH.permissionLevel`)" prop="level" width="150">
+        <el-table-column :label="$t(`tableH.userName`)" prop="userName" />
+        <el-table-column :label="$t(`tableH.permissionLevel`)" prop="role" width="150">
           <template #default="scope">
-            <span>{{getRole(Number(scope.row.level))}}</span>
+            <span>{{getRole(scope.row.role)}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t(`tableH.operation`)" align="center" width="160">
@@ -62,20 +62,19 @@
       v-model="dialogVisible"
       :title="isAdd ? '添加' : '编辑'"
       @close="dialogClosed"
+      top="20vh"
       draggable
     >
-      <el-scrollbar
-        max-height="55vh"
-      >
+      <el-scrollbar max-height="55vh">
         <div class="scroll-box">
           <el-form label-position="right">
             <el-form-item label="用户名称">
-              <el-input clearable v-model="dialogData.username" placeholder="请输入用户名!"></el-input>
+              <el-input clearable v-model="dialogData.userName" placeholder="请输入用户名!"></el-input>
             </el-form-item>
             <el-form-item label="权限级别">
-              <el-select v-model="dialogData.level" class="m-2" placeholder="请选择权限">
+              <el-select v-model="dialogData.role" class="m-2" placeholder="请选择权限">
                 <el-option
-                  v-for="item in 2"
+                  v-for="item in ['admin', 'normal']"
                   :key="item"
                   :label="getRole(item)"
                   :value="item"
@@ -83,7 +82,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="用户密码">
-              <el-input type="password" show-password v-model="dialogData.password" placeholder="请输入密码!"></el-input>
+              <el-input type="password" show-password v-model="dialogData.passWord" placeholder="请输入密码!"></el-input>
             </el-form-item>
             <!-- <el-form-item label="确认密码">
               <el-input type="password" show-password v-model="dialogData.checkPassword" placeholder="再次输入密码!"></el-input>
@@ -100,8 +99,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { DocumentAdd, Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { getCurrentInstance, reactive, ref, onMounted } from "vue"
+import { DocumentAdd, Edit, Delete } from '@element-plus/icons-vue'
 import { commonStore } from "@/store/index"
 import { ElNotification } from 'element-plus'
 import { deepClone } from "@/utils/func";
@@ -123,25 +121,18 @@ let pageParams: any = {
   pageSize: 5,
 }
 
-/**
- * 新建
- */
+// 新建
 const createItem = () => {
   isAdd.value = true
   dialogVisible.value = true
 }
-
-/**
- * 点击编辑
- */
+// 点击编辑
 const handleEdit = (val: any) => { 
   isAdd.value = false
   dialogVisible.value = true
   dialogData.value = deepClone(val)
 }
-/**
- * 点击删除
- */
+// 点击删除
 const handleDelete = async (val: any) => {
   try {
     let res = await deleteUser(val._id)
@@ -157,20 +148,18 @@ const handleDelete = async (val: any) => {
     console.log(error);
   }
 }
-/**
- * 弹出层关闭触发
- */
+// 弹出层关闭触发
 const dialogClosed = () => {
-  dialogData.value = {
-    username: "",
-    level: "",
-    password: "",
-    // checkPassword: ""
-  }
+  setTimeout(() => {
+    dialogData.value = {
+      username: "",
+      role: "",
+      password: "",
+      // checkPassword: ""
+    }
+  }, 300)
 }
-/**
- * 保存
- */
+// 保存
 const saveContent = async () => {
   try {
     if (isAdd.value) {
@@ -203,7 +192,6 @@ const saveContent = async () => {
     console.log(error);
   }
 }
-
 // 每页条数改变
 const handleSizeChange = async (val: number) => {
   pageParams.pageSize = val
@@ -214,10 +202,7 @@ const handleCurrentChange = async (val: number) => {
   pageParams.pageNum = val
   await getUser()
 }
-
-/**
- * 获取所有轮播
- */
+// 获取所有轮播
 const getUser = async () => {
   try {
     // loading.openLoading()
@@ -234,23 +219,21 @@ const getUser = async () => {
     tableLoading.value = false
   }
 }
-
-function getRole(val: number) {
-  if (val === 1) {
+// 转换角色
+function getRole(val: string) {
+  if (val === 'admin') {
     return '管理员'
   }
-  if (val === 2) {
+  if (val === 'normal') {
     return '普通用户'
   }
 }
-
 onMounted(async () => {
   await getUser()
 })
-
 </script>
 <style lang="scss" scoped>
-.ad-page {
+.main-page {
   :deep(.el-table) {
     .expand {
       padding: 10px 15px;

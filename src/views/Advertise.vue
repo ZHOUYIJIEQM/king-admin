@@ -1,5 +1,5 @@
 <template>
-  <div class="ad-page">
+  <div class="main-page">
     <el-card>
       <el-button 
         v-permission="['admin']"
@@ -8,7 +8,8 @@
         class="save-btn"
         type="primary"
         plain
-        @click="createItem">{{$t(`btn.addAds`)}}</el-button>
+        @click="createItem"
+      >{{$t(`btn.addAds`)}}</el-button>
       <el-table
         v-loading="tableLoading"
         empty-text="暂无轮播广告!"
@@ -20,13 +21,15 @@
             <div class="expand">
               <div class="expand-item" v-for="(item, index) in props.row.items">
                 <div style="font-size: 16px; font-weight: bold; margin-bottom: 18px;">{{`轮播图${index+1}`}}</div>
-                <el-form-item label="轮播图片:">
+                <el-form>
+                  <el-form-item label="轮播图片:">
                   <img class="banner-img" :src="item.img" alt="">
                 </el-form-item>
                 <el-form-item label="跳转地址:">
                   <a v-if="item.url.length" class="eli" target="_blank" :href="item.url">{{item.url}}</a>
                   <div v-else class="text eli">没有对应跳转地址!</div>
                 </el-form-item>
+                </el-form>
               </div>
             </div>
           </template>
@@ -73,7 +76,7 @@
     </el-card>
     <el-dialog
       v-model="dialogVisible"
-      :title="isAdd ? '添加' : '编辑'"
+      :title="isAdd ? $t(`btn.addAds`) : $t(`label.adTitle`)"
       @close="dialogClosed"
       draggable
     >
@@ -82,21 +85,21 @@
       >
         <div class="scroll-box">
           <el-input style="margin-bottom: 15px;" clearable ref="goodsName" v-model="adItemData.name" placeholder="请输入广告轮播名!"></el-input>
-          <CardItemVue
+          <CardItem
             class="card-item"
             v-for="(item, index) in adItemData.items"
             :key="index"
             :title="`轮播${index+1}`"
             @close-item="adItemData.items.splice(index, 1)"
           >
-            <UploadFileVue
+            <UploadFile
               class="hero-avatar"
               :actionUrl="actionUrl"
               :imageUrl="item.img"
               @uploadSuccess="uploadSuccess($event, item, 'img')"
-            ></UploadFileVue>
+            ></UploadFile>
             <el-input style="margin-top: 8px;" clearable class="eli" v-model="item.url" placeholder="请输入广告跳转地址!"></el-input>
-          </CardItemVue>
+          </CardItem>
           <div class="card-item">
             <el-button class="button" text @click="addPic(adItemData.items)">
               <el-icon :size="25" class="plus"><Plus /></el-icon>
@@ -115,19 +118,15 @@
 </template>
 <script lang="ts" setup>
 import { DocumentAdd, Plus, Edit, Delete } from '@element-plus/icons-vue'
-import { getCurrentInstance, reactive, ref, onMounted } from "vue"
-import CardItemVue from "@/components/CardItem.vue"
-import UploadFileVue from "@/components/UploadFile.vue"
 import { commonStore } from "@/store/index"
-import { ElNotification } from 'element-plus'
-import {saveScrollH} from '@/utils/saveScroll'
+import { saveScrollH } from '@/utils/saveScroll'
 saveScrollH()
 
 const app: any = getCurrentInstance()
 const { proxy } = app
 const { getAd, updateAd, createAd, deleteAd } = proxy.$AdApi
 const tableList = ref<any[]>([])
-const actionUrl = `${commonStore().uploadPath}advertisement`
+const actionUrl = `${commonStore().uploadPath}/advertisement`
 const tableLoading = ref<boolean>(true)
 const dialogVisible = ref<boolean>(false)
 const isAdd = ref<boolean>(false)
@@ -142,36 +141,25 @@ let pageParams: GetGoods = {
   pageNum: 1,
   pageSize: 5,
 }
-
-
-/**
- * 新建轮播
- */
+// 新建轮播
 const createItem = () => {
   isAdd.value = true
   dialogVisible.value = true
   adItemData.value = {
     name: "",
-    items: [
-      {
-        img: "",
-        url: ""
-      }
-    ]
+    items: [{
+      img: "",
+      url: ""
+    }]
   }
 }
-
-/**
- * 点击编辑
- */
+// 点击编辑
 const handleEdit = (val: any) => { 
   isAdd.value = false
   dialogVisible.value = true
   adItemData.value = val
 }
-/**
- * 点击删除
- */
+// 点击删除
 const handleDelete = async (val: any) => {
   let res = await deleteAd(val._id)
   if (res.status === 200) {
@@ -183,13 +171,17 @@ const handleDelete = async (val: any) => {
     await getAllAd()
   }
 }
-/**
- * 弹出层关闭触发
- */
-const dialogClosed = () => { }
-/**
- * 保存
- */
+// 弹出层关闭触发
+const dialogClosed = () => {
+  adItemData.value = {
+    name: "",
+    items: [{
+      img: "",
+      url: ""
+    }]
+  }
+}
+// 保存
 const saveContent = async () => {
   if (isAdd.value) {
     let res = await createAd(adItemData.value)
@@ -214,9 +206,7 @@ const saveContent = async () => {
   dialogVisible.value = false
   await getAllAd()
 }
-/**
- * 添加轮播图片
- */
+// 添加轮播图片
 const addPic = async (item: any) => {
   item.push({
     "img": "",
@@ -233,18 +223,12 @@ const handleCurrentChange = async (val: number) => {
   pageParams.pageNum = val
   await getAllAd()
 }
-
-/**
- * 上传后
- */
+// 上传后
 const uploadSuccess = (val: string, data: any, key: string) => {
   // console.log(val, data, key);
   data[key] = val
 }
-
-/**
- * 获取所有轮播
- */
+// 获取所有轮播
 const getAllAd = async () => {
   try {
     // loading.openLoading()
@@ -265,10 +249,9 @@ const getAllAd = async () => {
 onMounted(async () => {
   await getAllAd()
 })
-
 </script>
 <style lang="scss" scoped>
-.ad-page {
+.main-page {
   :deep(.el-table) {
     .expand {
       padding: 10px 15px;

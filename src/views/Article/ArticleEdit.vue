@@ -20,7 +20,7 @@
         <el-form-item label="文章标题">
           <el-input 
             clearable 
-            v-model="articleForm.title" 
+            v-model="articleForm.name" 
             placeholder="请输入文章标题!"
           />
         </el-form-item>
@@ -66,7 +66,7 @@ const cateList = ref<any[]>([])
  * 表单数据
  */
 const articleForm = reactive({
-  title: '',
+  name: '',
   cate: [],
   content: '',
   createdTime: ''
@@ -88,7 +88,7 @@ const juejin_setting = {
   // 自定义 图片上传模式
   custom_images_upload: true,
   custom_images_upload_header: commonStore().getToken,
-  images_upload_url: `${commonStore().uploadPath}aticles`,
+  images_upload_url: `${commonStore().uploadPath}/aticles`,
   custom_images_upload_callback: (res:any) => {
     // console.log('上传图片回调', res);
     return res.url
@@ -113,7 +113,7 @@ const saveContent = async () => {
     })
     return 
   }
-  if (!articleForm.title.trim().length) {
+  if (!articleForm.name.trim().length) {
     ElNotification({
       duration: commonStore().tipDurationM,
       type: 'warning',
@@ -195,7 +195,7 @@ const initAll = async () => {
       // console.log(res.data);
       if (res.status === 200) {
         articleForm.cate = res.data.cate
-        articleForm.title = res.data.title
+        articleForm.name = res.data.name
         articleForm.content = res.data.content
       }
     } else {

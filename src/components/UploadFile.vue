@@ -8,7 +8,8 @@
       :data="uploadData"
       :show-file-list="false"
       :before-upload="beforeAvatarUpload"
-      :on-success="handleAvatarSuccess"
+      :on-success="handleUploadSuccess"
+      :on-error="handleUploadError"
     >
       <img class="avatar" lazy v-if="imageUrl" :src="imageUrl" />
       <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
@@ -45,16 +46,24 @@ const emit = defineEmits<{
 }>()
 
 // 上传成功后
-const handleAvatarSuccess: UploadProps["onSuccess"] = (response, uploadFile) => {
+const handleUploadSuccess: UploadProps["onSuccess"] = (response, uploadFile) => {
   // emit('uploadSuccess', URL.createObjectURL(uploadFile.raw!))
   emit('uploadSuccess', response.url)
 };
 
+const handleUploadError = (error, uploadFile, uploadFiles) => {
+  console.log('上传失败!', error);
+  ElNotification({
+    duration: commonStore().tipDurationS,
+    title: 'Error',
+    message: `图片上传失败了!`,
+    type: 'error',
+  })
+}
+
 // 上传前
 const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
-  uploadData.value = {
-    name: rawFile.name,
-  };
+  uploadData.value = { name: rawFile.name };
   if (rawFile.size / 1024 / 1024 > props.maxFileSize) {
     ElNotification({
       duration: commonStore().tipDurationS,

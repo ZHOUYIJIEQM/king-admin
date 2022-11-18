@@ -1,12 +1,12 @@
 <template>
-  <div class="hero-page">
+  <div class="main-page">
     <el-card>
       <!-- 顶部搜索 -->
       <el-row>
         <el-col :span="8">
           <el-input 
             clearable 
-            placeholder="请输入英雄名称" 
+            :placeholder="$t('placeholder.heroName')"
             v-model="heroQuery"
             @keyup.enter="searchHero"
           ></el-input>
@@ -65,7 +65,7 @@
         <el-table-column :label="$t(`tableH.heroNickName`)" prop="nickname"></el-table-column>
         <el-table-column :label="$t(`tableH.category`)">
           <template #default="scope">
-            <span>{{category(scope.row.cate)}}</span>
+            <span>{{category(scope.row.category)}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t(`tableH.avatar`)">

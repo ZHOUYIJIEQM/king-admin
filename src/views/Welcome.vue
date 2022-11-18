@@ -1,5 +1,5 @@
 <template>
-  <div class="welcome">
+  <div class="main-page">
     <div class="content">
       <p class="title">
         <span class="text">王者荣耀后台管理系统</span>
@@ -23,7 +23,7 @@
 
 </script>
 <style lang="scss" scoped>
-.welcome {
+.main-page {
   .content {
     padding: 0 50px;
     .title {

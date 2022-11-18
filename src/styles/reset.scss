@@ -81,3 +81,15 @@ html, body, #app {
 	border-radius: 10px;
 }
 
+.main-page {
+  padding: 25px 25px 45px;
+}
+
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all .25s;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(30px);
+  opacity: 0;
+}

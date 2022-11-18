@@ -491,3 +491,15 @@ menuList = [{
 // 这样切换语言时可以变化
 ```
 
+#### 遇到切换路由后页面空白, 原因是template后加注释
+```html
+原先有问题的写法
+<template>
+  <!-- 召唤师技能 -->
+  <div class="info-page">
+
+应改为
+<template>
+  <div class="info-page">
+    <!-- 召唤师技能 -->
+```

@@ -97,6 +97,9 @@ const changeKey = (menu: string) => {
 watch(
   () => route.name,
   (newV) => {
+    // 退出登录后会清除菜单数组, 空数组时不用继续执行
+    if (!permissionStore().permissionMenu.length) return
+    
     // 激活的菜单
     activeMenu.value = newV as string
 

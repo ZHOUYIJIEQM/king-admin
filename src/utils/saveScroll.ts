@@ -1,19 +1,24 @@
-import { ref, onActivated } from "vue";
-import { onBeforeRouteLeave, useRoute } from "vue-router";
+// 保存容器滚动高度
+import { computed, onActivated } from "vue";
+import { onBeforeRouteLeave } from "vue-router";
 import { commonStore } from "@/store/index";
 
+const elScrollEl = computed<any>(() => {
+  return commonStore().elScrollEl
+})
+
 export function saveScrollH() {
-  const route = useRoute();
   let scrollH: number = 0;
   onActivated(() => {
-    let boxEl: any = commonStore().elScrollEl
-    boxEl && boxEl.setScrollTop(scrollH)
+    if (elScrollEl.value) {
+      elScrollEl.value.setScrollTop(scrollH)
+    }
   });
   
   onBeforeRouteLeave((to, from, next) => {
-    let boxEl: any = commonStore().elScrollEl
-    boxEl && (scrollH = boxEl.$refs.wrap$.scrollTop)
-    // console.log('离开', route.name, scrollH);
+    if (elScrollEl.value) {
+      scrollH = elScrollEl.value.wrap$.scrollTop
+    }
     next()
   });
 }

@@ -1,6 +1,8 @@
 <template>
   <el-container class="common-layout">
+    <!-- 菜单 -->
     <MenuList ref="menuListEl" :isCollapse="isCollapse" @clickMenu="selectMenu"></MenuList>
+    <!-- 内容 -->
     <el-container class="content">
       <el-header>
         <div class="left">
@@ -9,7 +11,7 @@
             <el-icon v-show="!isCollapse"><Fold /></el-icon>
           </div>
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item to="/" @click="toMain">{{$t(`menu.home`)}}</el-breadcrumb-item>
+            <!-- <el-breadcrumb-item to="/" @click="toMain">{{$t(`menu.home`)}}</el-breadcrumb-item> -->
             <el-breadcrumb-item v-for="(item, index) in breadCrumb" :key="index">{{$t(`menu.${item}`)}}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -30,26 +32,29 @@
           </el-dropdown>
         </div>
       </el-header>
-      <el-scrollbar ref="mainScroll">
-        <el-main>
-          <!-- <router-view></router-view> -->
+      <el-main class="main-content">
+        <el-scrollbar class="main-scroll" ref="mainScroll">
           <router-view v-slot="{ Component }">
-            <keep-alive :exclude="/^.*?Exclude/">
-              <component :is="Component" />
-            </keep-alive>
+            <transition name="slide-fade" mode="out-in">
+              <keep-alive :exclude="/^.*?Exclude/">
+                <component :is="Component" />
+              </keep-alive>
+            </transition>
           </router-view>
-        </el-main>
-      </el-scrollbar>
+        </el-scrollbar>
+      </el-main>
     </el-container>
   </el-container>
 </template>
 <script lang="ts" setup>
+import Cookies from 'js-cookie'
 import { Expand, Fold, CaretBottom } from "@element-plus/icons-vue";
 import { commonStore } from "@/store/index"
 import { permissionStore } from '@/store/permission'
 import adminAvatar from '@/assets/img/home/admin.png'
 import normalAvatar from '@/assets/img/home/normal.png'
 
+const mainScroll = ref()
 const route = useRoute()
 const router = useRouter()
 // 是否折叠
@@ -69,7 +74,7 @@ const userAuth = computed<string>(() => {
 })
 // 根据用户角色设置头像
 const avatar = computed(() => {
-  if (userAuth.value === '管理员') {
+  if (Cookies.get("userRole") === "admin") {
     return adminAvatar 
   }
   return normalAvatar
@@ -125,8 +130,12 @@ watch(
     }
     newV && setBreadCrumb(newV as string)
   }, 
-  { immediate: true}
+  { immediate: true }
 )
+
+onMounted(() => {
+  commonStore().setScrollEl(mainScroll.value)
+})
 
 // 退出
 const loginOut = () => {
@@ -146,7 +155,10 @@ const loginOut = () => {
       message: '退出成功!',
       type: 'success',
     })
-    sessionStorage.clear()
+    // 清除 cookie
+    Object.keys(Cookies.get()).forEach((item: string) => {
+      Cookies.remove(item)
+    })
     commonStore().$reset()
     permissionStore().$reset()
     router.push({ name: 'login' })
@@ -199,8 +211,11 @@ const loginOut = () => {
         }
       }
     }
-    .el-main {
-      padding: 20px 15px 80px;
+    .main-content {
+      overflow: hidden;
+    }
+    .main-scroll {
+
     }
   }
 }

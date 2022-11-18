@@ -1,6 +1,7 @@
 import axios, { type AxiosRequestConfig } from 'axios'
 import { ElNotification } from 'element-plus';
 import { commonStore } from "@/store/index"
+import Cookies from 'js-cookie'
 
 const apiInstance = axios.create({
   // baseURL: "https://app.yjsjyb.top/admin/api/resource",
@@ -10,9 +11,9 @@ const apiInstance = axios.create({
 })
 apiInstance.interceptors.request.use(
   (config: AxiosRequestConfig | any) => {
-    const token = sessionStorage.token
+    const token = Cookies.get('token')
     if (token) {
-      config.headers.Authorization = `Bear ${token}`
+      config.headers.Authorization = `${token}`
     }
     return config
   },
@@ -35,7 +36,7 @@ apiInstance.interceptors.response.use(
     // 用户名 密码 错误
     if (error.response.status === 422) {
       ElNotification({
-        title: 'Error',
+        title: '请求错误!',
         message: `${error.response.data.message}`,
         type: 'error',
       })
@@ -68,7 +69,7 @@ featureInstance.interceptors.response.use(
     // 用户名 密码 错误
     if (error.response.status === 422) {
       ElNotification({
-        title: 'Error',
+        title: '请求错误!',
         message: `${error.response.data.message}`,
         type: 'error',
       })

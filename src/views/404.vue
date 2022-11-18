@@ -1,5 +1,5 @@
 <template>
-  <div class="not-fount">
+  <div class="main-page not-fount">
     无法访问该页面!
   </div>
 </template>

@@ -1,10 +1,10 @@
 import { apiInstance } from "./instance";
 
 interface queryType {
-  pageNum?: number,
-  pageSize?: number,
+  pageNum?: number
+  pageSize?: number
   // 升/降序
-  orderType?: string,
+  orderType?: string
   // 根据哪一项排序
   sortItem?: string
 }
@@ -57,6 +57,17 @@ const GoodsApi = {
       method: 'delete'
     })
   },
+  /**
+   * 通过名称搜索
+   * @param data 
+   */
+  getGoodsByName(data: any) {
+    return apiInstance({
+      url: "/items/search",
+      method: "post",
+      data
+    })
+  }
 }
 
 export default GoodsApi

@@ -1,39 +1,25 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw, RouteLocationNormalized, } from "vue-router";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
-import { permissionStore } from '@/store/permission';
+import { createRouter, createWebHashHistory, RouteRecordRaw, } from "vue-router";
 
+// 所有角色都可以访问的路由
 export const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     name: "login",
     component: () => import("@/views/Login.vue"),
-    meta: { hidden: true }
+    meta: { hidden: true },
   },
   {
     path: "/",
     component: () => import("@/views/Main.vue"),
-    redirect: { name: "welcome" },
-    meta: { hidden: true },
+    redirect: { name: "home" },
     children: [
       {
-        path: "welcome",
-        name: "welcome",
+        path: "home",
+        name: "home",
         component: () => import("@/views/Welcome.vue"),
-      }
-    ]
-  },
-  {
-    path: "/category",
-    component: () => import("@/views/Main.vue"),
-    children: [
-      {
-        path: "index",
-        name: "category",
-        component: () => import("@/views/Category.vue"),
-        meta: { icon: 'Grid' }
-      }
-    ]
+        meta: { icon: "HomeFilled" },
+      },
+    ],
   },
   {
     path: "/goods",
@@ -43,15 +29,63 @@ export const routes: Array<RouteRecordRaw> = [
         path: "index",
         name: "goods",
         component: () => import("@/views/Goods.vue"),
-        meta: { icon: 'Menu' }
-      }
-    ]
+        meta: { icon: "Shop" },
+      },
+    ],
+  },
+  {
+    path: "/category",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "category",
+        component: () => import("@/views/Category.vue"),
+        meta: { icon: "Grid" },
+      },
+    ],
+  },
+  {
+    path: "/inscription",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "inscription",
+        component: () => import("@/views/Inscription.vue"),
+        meta: { icon: "Postcard" },
+      },
+    ],
+  },
+  {
+    path: "/summoner",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "summoner",
+        component: () => import("@/views/Summoner.vue"),
+        meta: { icon: "KnifeFork" },
+      },
+    ],
+  },
+  {
+    path: "/advertise",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "advertise",
+        component: () => import("@/views/Advertise.vue"),
+        meta: { icon: "Ticket" },
+      },
+    ],
   },
   {
     path: "/hero",
     name: "hero",
     component: () => import("@/views/Main.vue"),
-    meta: { icon: 'Management' },
+    meta: { icon: "Management" },
     children: [
       {
         path: "list",
@@ -68,13 +102,13 @@ export const routes: Array<RouteRecordRaw> = [
         name: "heroCreate",
         component: () => import("@/views/Hero/HeroEdit.vue"),
       },
-    ]
+    ],
   },
   {
     path: "/article",
     name: "article",
     component: () => import("@/views/Main.vue"),
-    meta: { icon: 'List' },
+    meta: { icon: "List" },
     children: [
       {
         path: "list",
@@ -94,18 +128,6 @@ export const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: "/advertise",
-    component: () => import("@/views/Main.vue"),
-    children: [
-      {
-        path: "index",
-        name: "advertise",
-        component: () => import("@/views/Advertise.vue"),
-        meta: { icon: 'Ticket' }
-      }
-    ]
-  },
-  {
     path: "/error",
     component: () => import("@/views/Main.vue"),
     meta: { hidden: true },
@@ -114,11 +136,12 @@ export const routes: Array<RouteRecordRaw> = [
         path: "404",
         name: "404",
         component: () => import("@/views/404.vue"),
-      }
-    ]
-  }
+      },
+    ],
+  },
 ];
 
+// 根据角色动态添加的路由
 export const asyncRoutes: Array<RouteRecordRaw> = [
   {
     path: "/user",
@@ -128,15 +151,21 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         path: "index",
         name: "user",
         component: () => import("@/views/User.vue"),
-        meta: { roles: ["admin"], parentRoute: 'main', icon: 'UserFilled' },
-      }
-    ]
+        meta: { 
+          // 可以访问到该路由的角色列表
+          roles: [ "admin" ], 
+          parentRoute: "main", 
+          icon: "UserFilled" 
+        },
+      },
+    ],
   },
+  // not found 要放到最后
   {
     path: "/:pathMatch(.*)*",
     redirect: { name: "404" },
-    name: 'NotFound',
-    meta: { hidden: true }
+    name: "NotFound",
+    meta: { hidden: true },
   },
 ];
 
@@ -152,49 +181,4 @@ const router = createRouter({
   },
 });
 
-// 白名单
-const whiteList = ['login', '404']
-
-router.beforeEach(
-  (to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
-    NProgress.start();
-
-    const token = sessionStorage.token
-    // 有token表示已登录
-    if (token) {
-      if (to.name === 'login') {
-        // 去登录页, 看有没有重定向路由名, 有就前往, 没有直接跳到首页
-        if (to.query.redirect) {
-          next({ name: to.query.redirect })
-        } else {
-          next({ name: 'welcome' })
-        }
-      } else {
-        // 如果pinia保存了用户角色,说明已经生成好了菜单, 可以直接进入目标路由页, 没有就要设置用户角色, 生成路由及菜单
-        if (permissionStore().roles?.length) {
-          next()
-        } else {
-          // 设置用户信息
-          permissionStore().setUserInfo()
-          // 生成路由及菜单
-          permissionStore().setAsyncRoutes()
-          next({ ...to, replace: true })
-        }
-      }
-    } else {
-      // 未登录
-      // 在白名单, 直接进入, 不是就跳转登录页并标记跳转前路由名
-      if (whiteList.includes(String(to.name))) {
-        next()
-      } else {
-        next(`/login?redirect=${String(to.name)}`)
-      }
-    }
-  }
-);
-
-router.afterEach((to: RouteLocationNormalized) => {
-  NProgress.done();
-});
-
-export default router
+export default router;

@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <div class="login-ruleForm">
+    <div class="login-rule-form">
       <h1 class="title">
         <div class="title-text">{{$t(`login.title`)}}</div>
         <div class="translate-btn">
@@ -8,36 +8,35 @@
         </div>
       </h1>
       <el-form
-        ref="ruleFormRef"
+        ref="ruleFormEl"
         :model="ruleForm"
         :rules="rules"
-        label-width="0"
         class="ruleForm"
       >
-        <el-form-item class="username" prop="username">
+        <el-form-item class="username" prop="userName">
           <el-input
             clearable
             size="large"
             :prefix-icon="UserFilled"
             placeholder="用户名"
-            v-model="ruleForm.username"
+            v-model="ruleForm.userName"
             type="text"
             autocomplete="off"
           />
         </el-form-item>
-        <el-form-item class="password" prop="password">
+        <el-form-item class="password" prop="passWord">
           <el-input
             show-password
             size="large"
             :prefix-icon="Lock"
             placeholder="密码"
-            v-model="ruleForm.password"
+            v-model="ruleForm.passWord"
             type="password"
             autocomplete="off"
           />
         </el-form-item>
         <el-form-item class="btns">
-          <el-button size="large" type="primary" @click="submitForm(ruleFormRef)">{{$t(`login.loginBtn`)}}</el-button>
+          <el-button size="large" type="primary" @click="submitForm(ruleFormEl)">{{$t(`login.loginBtn`)}}</el-button>
           <el-button size="large" @click="switchUser">{{$t(`login.switchBtn`)}}</el-button>
           <!-- <el-button size="large" @click="resetForm(ruleFormRef)">重置</el-button> -->
         </el-form-item>
@@ -45,23 +44,25 @@
     </div>
   </div>
 </template>
-
 <script lang="ts" setup>
-import { getCurrentInstance, reactive, ref } from "vue";
+import Cookies from 'js-cookie'
 import { UserFilled, Lock } from "@element-plus/icons-vue";
-import { ElNotification, FormInstance } from "element-plus";
-import { useRouter } from "vue-router";
+import type { FormInstance, FormRules } from 'element-plus'
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
 
-const ruleFormRef = ref<FormInstance>();
 const app: any = getCurrentInstance()
 const { login } = app?.proxy.$LoginApi
-const router = useRouter()
 const route = useRoute()
+const router = useRouter()
+// 绑定到表单的用户名,密码
+const ruleForm = reactive({
+  userName: "admin",
+  passWord: "123456",
+});
+const ruleFormEl = ref<FormInstance>();
 
-console.log(route);
-
+// 校验用户名
 const checkUserName = (rule: any, value: any, callback: any) => {
   if (value.trim() === "") {
     return callback(new Error("请输入用户名!"));
@@ -73,7 +74,7 @@ const checkUserName = (rule: any, value: any, callback: any) => {
     }
   }
 };
-
+// 校验密码
 const validatePass = (rule: any, value: any, callback: any) => {
   if (value.trim() === "") {
     callback(new Error("请输入密码!"));
@@ -85,55 +86,51 @@ const validatePass = (rule: any, value: any, callback: any) => {
     }
   }
 };
-
-const ruleForm = reactive({
-  username: "admin",
-  password: "123456",
+// 表单验证规则
+const rules = reactive<FormRules>({
+  userName: [{ validator: checkUserName, trigger: "blur" }],
+  passWord: [{ validator: validatePass, trigger: "blur" }],
 });
 
-const rules = reactive({
-  username: [{ validator: checkUserName, trigger: "blur" }],
-  password: [{ validator: validatePass, trigger: "blur" }],
-});
+// 切换用户
+const switchUser = () => {
+  if(ruleForm.userName === 'admin') {
+    ruleForm.userName = 'xiaoming'
+  } else {
+    ruleForm.userName = 'admin'
+  }
+}
 
-/**
- * 登录
- */
+// 重置表单
+const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  formEl.resetFields();
+};
+
+// 登录
 const submitForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   formEl.validate(async (valid: any) => {
     if (valid) {
-      //  登录操作
       loading.openLoading()
       try {
         const loginRes = await login(ruleForm)
-        // console.log('登录', loginRes);
         if (loginRes?.status === 200) {
           // console.log(loginRes.data);
-          sessionStorage.setItem('token', loginRes.data.token)
-          sessionStorage.setItem('userName', loginRes.data.username)
-          sessionStorage.setItem('userLevel', loginRes.data.level)
-          sessionStorage.setItem('roles', JSON.stringify([(loginRes.data.level === 1 ? 'admin' : 'normal')]))
-          // console.log(route.query.redirect);
-          if (route.query.redirect) {
-            router.replace({ name: route.query.redirect })
-          } else {
-            router.replace('/')
-          }
+          const { token, userName, userRole } = loginRes.data
+          // https://github.com/js-cookie/js-cookie
+          // 设置过期时间 https://github.com/js-cookie/js-cookie/wiki/Frequently-Asked-Questions#expire-cookies-in-less-than-a-day 
+          const ExpiredTime = new Date(Date.now() + commonStore().expiredTime)
+          // 记录当前登录时间戳
+          Cookies.set('loginTime', Date.now())
+          Cookies.set('token', token, { expires: ExpiredTime })
+          Cookies.set('userName', userName, { expires: ExpiredTime })
+          Cookies.set('userRole', userRole, { expires: ExpiredTime })
+          route.query.redirect ? router.replace({ name: String(route.query.redirect) }) : router.replace({ name: "welcome" })
           ElNotification({
             duration: commonStore().tipDurationS,
-            title: 'Success',
             message: '登录成功!',
             type: 'success',
-          })
-        } else if (loginRes) {
-          // 失败
-          // ElMessage(loginRes.data?.message)
-          ElNotification({
-            duration: commonStore().tipDurationS,
-            title: 'Error',
-            message: loginRes.data?.message,
-            type: 'error',
           })
         }
         loading.closeLoading()
@@ -143,8 +140,6 @@ const submitForm = (formEl: FormInstance | undefined) => {
         loading.closeLoading()
       }
     } else {
-      // 不能提交
-      // console.log("error submit!");
       ElNotification({
         duration: commonStore().tipDurationM,
         title: 'Warning',
@@ -153,31 +148,32 @@ const submitForm = (formEl: FormInstance | undefined) => {
       })
       return false;
     }
-  });
-};
+  })
+}
 
-const switchUser = () => {
-  if(ruleForm.username === 'admin') {
-    ruleForm.username = 'xiaoming'
-  } else {
-    ruleForm.username = 'admin'
+// 回车触发登录
+const keydown = (e: any) => {
+  if ((e.key as string).toLowerCase() === 'enter') {
+    submitForm(ruleFormEl.value)
   }
 }
 
-const resetForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return;
-  formEl.resetFields();
-};
+onMounted(() => {
+  window.addEventListener('keydown', keydown, false)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', keydown, false)
+})
 
 </script>
-
 <style lang="scss" scoped>
 .login-page {
   height: 100%;
   background: url(../assets/img/login/login-bg.jpg) no-repeat;
   background-size: cover;
 
-  .login-ruleForm {
+  .login-rule-form {
     position: absolute;
     left: 50%;
     top: 50%;
@@ -193,15 +189,18 @@ const resetForm = (formEl: FormInstance | undefined) => {
     justify-content: center;
     border-radius: 5px;
     box-shadow: 0 2px 12px 0 rgb(0 0 0 / 50%);
+    animation: fadeUp ease-out .5s;
 
     .title {
       font-size: 30px;
       font-weight: bold;
       margin-bottom: 30px;
       position: relative;
+
       .title-text {
         text-align: center;
       }
+
       .translate-btn {
         position: absolute;
         top: 50%;
@@ -209,11 +208,6 @@ const resetForm = (formEl: FormInstance | undefined) => {
         font-size: 0;
         transform: translateY(-50%);
         cursor: pointer;
-        .icon {
-          width: 24px;
-          height: 24px;
-          color: #525252;
-        }
       }
     }
 
@@ -228,6 +222,22 @@ const resetForm = (formEl: FormInstance | undefined) => {
         justify-content: flex-end;
       }
     }
+  }
+
+  :deep(.el-icon.el-input__icon) {
+    font-size: 18px;
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -35%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
   }
 }
 </style>

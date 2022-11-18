@@ -1,13 +1,13 @@
 <template>
-  <div class="article-page">
+  <div class="main-page">
     <el-card>
       <el-row>
         <el-col :span="8">
-          <el-input 
-            clearable 
-            placeholder="请输入文章名称" 
-            v-model="articleQuery"
-            @keyup.enter="searchArticle"
+          <el-input
+            clearable
+            :placeholder="$t('placeholder.articleName')"
+            v-model="searchQuery"
+            @keyup.enter="handleSearch"
           ></el-input>
         </el-col>
         <el-col :span="10">
@@ -16,7 +16,7 @@
             plain
             :icon="Search" 
             style="margin-left: 15px;"
-            @click="searchArticle"
+            @click="handleSearch"
           >{{$t(`btn.search`)}}</el-button>
           <el-button 
             v-permission="['admin']"
@@ -24,7 +24,7 @@
             plain
             :icon="DocumentAdd" 
             style="margin-left: 15px;"
-            @click="addArticle"
+            @click="addData"
           >{{$t(`btn.addArticle`)}}</el-button>
         </el-col>
       </el-row>
@@ -34,14 +34,13 @@
         v-loading="tableLoading"
         empty-text="暂无英雄数据!"
         border
-        stripe
       >
         <el-table-column min-width="5%" type="index" :label="$t(`tableH.orderNum`)" width="70"></el-table-column>
-        <el-table-column min-width="45%" :label="$t(`tableH.articleTitle`)" prop="title"></el-table-column>
-        <el-table-column min-width="20" :label="$t(`tableH.category`)" prop="cate"></el-table-column>
+        <el-table-column min-width="45%" :label="$t(`tableH.articleTitle`)" prop="name"></el-table-column>
+        <el-table-column min-width="20" :label="$t(`tableH.category`)" prop="category"></el-table-column>
         <el-table-column min-width="20%" :label="$t(`tableH.createDate`)">
           <template #default="scope">
-            <div>{{ scope.row.createdTime?.split(' ').at(0) }}</div>
+            <div>{{ formatDate(scope.row.createdTime) }}</div>
           </template>
         </el-table-column>
         <el-table-column min-width="10%" :label="$t(`tableH.operation`)" align="center" width="150">
@@ -66,7 +65,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination-box" v-show="!isQuery">
+      <div class="pagination-box">
         <el-pagination
           v-model:currentPage="queryObj.pageNum"
           v-model:page-size="queryObj.pageSize"
@@ -81,10 +80,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, reactive, watch, getCurrentInstance, onMounted } from "vue";
 import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
-import { useRouter } from "vue-router";
-import { ElNotification, ElMessageBox } from 'element-plus';
 import { commonStore } from "@/store/index"
 import {saveScrollH} from '@/utils/saveScroll'
 saveScrollH()
@@ -92,24 +88,24 @@ saveScrollH()
 const app: any = getCurrentInstance();
 const { getArticleList, articleSearch, deleteArticle } = app.proxy.$ArticleApi;
 const router = useRouter()
-
-const queryObj = reactive({
-  pageNum: 1,
-  pageSize: 10,
-})
-const articleQuery = ref<string>('')
-const articleList = ref<any[]>([])
+// 请求参数
+const queryObj = reactive({ pageNum: 1, pageSize: 10 })
+// 搜索词
+const searchQuery = ref<string>('')
+// 文章列表
+const articleList = ref<any []>([])
+// 表格是否加载中
 const tableLoading = ref<boolean>(true)
+// 符合的文章共有多少
 const totalArticle = ref<number>(0)
-const isQuery = ref<boolean>(false)
-const searchArticle = async ($event: any) => {
-  isQuery.value = true
+// 处理搜索
+const handleSearch = async ($event: any) => {
   $event.target.blur()
   try {
     tableLoading.value = true
-    let res = await articleSearch({'title': articleQuery.value})
+    let res = await articleSearch({'name': searchQuery.value})
     res.data.forEach((item: any) => {
-      item.cate = item.cate.map((i: any) => i.name).join('/')
+      item.category = item.category.map((i: any) => i.name).join('/')
     })
     articleList.value = res.data
     queryObj.pageNum = 1
@@ -119,9 +115,11 @@ const searchArticle = async ($event: any) => {
     tableLoading.value = false
   }
 }
-const addArticle = () => {
+// 添加
+const addData = () => {
   router.push({ name: 'articleCreate' })
 }
+// 修改
 const handleEdit = (row: any) => {
   router.push({
     name: 'articleEdit',
@@ -152,7 +150,7 @@ const handleDelete = async (row: any) => {
       ElNotification({
         duration: commonStore().tipDurationS,
         type: 'success',
-        message: `${row.title} ${res.data.message}`
+        message: `${row.name} ${res.data.message}`
       })
     } else {
       ElNotification({
@@ -181,11 +179,16 @@ const handleCurrentChange = async (val: number) => {
   tableLoading.value = false
 }
 
+// 时间戳 转格式为 2021-1-26 17:35:26
+const formatDate = (time: number) => {
+  const d = new Date(time)
+  return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getDate()}`
+}
+
 watch(
-  articleQuery,
+  searchQuery,
   async (newV) => {
     if (!newV.trim().length) {
-      isQuery.value = false
       await getArticle()
     }
   }
@@ -196,7 +199,7 @@ const getArticle = async () => {
   let res = await getArticleList(queryObj)
   totalArticle.value = res.data.total
   res.data.data.forEach((item: any) => {
-    item.cate = item.cate.map((i: any) => i.name).join('/')
+    item.category = item.category.map((i: any) => i.name).join('/')
   })
   articleList.value = res.data.data
   tableLoading.value = false
@@ -216,7 +219,7 @@ onMounted(async () => {
 
 </script>
 <style lang="scss" scoped>
-.article-page {
+.main-page {
   min-width: 780px;
   :deep(.el-table) {
     .option {

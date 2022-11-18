@@ -5,7 +5,7 @@ const en = {
     switchBtn: "switch",
   },
   menu: {
-    home: 'Home Page',
+    home: 'Home',
     category: 'Category List',
     goods: 'Goods List',
     hero: 'Hero',
@@ -16,12 +16,16 @@ const en = {
     articleCreate: 'Add Article',
     articleList: 'Article List',
     articleEdit: 'Edit Article',
-    advertise: 'Ads',
+    advertise: 'Ads List',
     user: 'User List',
+    inscription: 'Inscription List',
+    summoner: 'Summoner List',
   },
   btn: {
     addCate: 'Add Category',
     addGoods: 'Add Goods',
+    addInscription: 'Add Inscription',
+    addSummoner: 'Add Summoner',
     search: 'Search',
     addHero: 'Add Hero',
     view: 'view',
@@ -50,13 +54,25 @@ const en = {
     articleTitle: 'Article Title',
     createDate: 'Create Date',
     permissionLevel: 'Permission Level',
-    userName: 'User Name'
+    userName: 'User Name',
+    grade: 'Grade',
+    image: 'Image',
+    type: 'Type'
   },
   label: {
     cateName: 'Category Name',
     cateDes: 'Category Desc',
     cateSelect: 'Select Category',
     cateTitle: 'Edit Category',
+    adTitle: 'Edit Ads',
+  },
+  placeholder: {
+    goodsName: "please input goods name!",
+    articleName: "please input article name!",
+    heroName: "please input hero name!",
+    userName: "please input user name!",
+    summonerInput: "please input summoner skill!",
+    inscriptionInput: "please input inscription!",
   }
 };
 export default en
