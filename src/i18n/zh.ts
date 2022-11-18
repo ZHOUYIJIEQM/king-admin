@@ -60,7 +60,8 @@ const zh = {
     userName: '用户名称',
     grade: '级别',
     image: '图片',
-    type: '类型'
+    type: '类型',
+    desc: '描述'
   },
   label: {
     cateName: '分类名称',

@@ -51,14 +51,14 @@
           </template>
         </el-table-column>
         <el-table-column :label="$t(`tableH.name`)" prop="name" />
+        <el-table-column sortable="custom" :label="$t(`tableH.grade`)" prop="grade" />
         <el-table-column :label="$t(`tableH.type`)" prop="type" />
         <!-- <el-table-column :label="$t(`tableH.type`)" prop="type">
           <template #default="scope">
             <span :style="{ display: 'inline-block', padding: '5px', color: 'black', background: scope.row.type }">{{scope.row.type}}</span>
           </template>
         </el-table-column> -->
-        <el-table-column sortable="custom" :label="$t(`tableH.grade`)" prop="grade" />
-        <el-table-column :label="$t(`tableH.image`)" prop="name">
+        <el-table-column :label="$t(`tableH.image`)" prop="img">
           <template #default="scope">
             <div class="icon-box">
               <el-image lazy class="item-icon" :src="scope.row.img" />
@@ -170,7 +170,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { getInscription, createInscription, getInscriptionById, updateInscription, deleteInscription, searchInscriptionByName } from '@/api/inscription'
+import { getInscription, createInscription, updateInscription, deleteInscription, searchInscriptionByName } from '@/api/inscription'
 import { Search, DocumentAdd, Delete, Edit, Plus, CloseBold } from '@element-plus/icons-vue'
 import { deepClone } from "@/utils/func"
 import { commonStore } from "@/store/index"
@@ -224,7 +224,7 @@ const addData = async () => {
 // 表格数据
 const tableData = ref<any []>([])
 // 表格空白提示
-const emptyText = "暂无装备!"
+const emptyText = "暂无铭文!"
 // 共有多少条数据
 const totalDataNum = ref<number>(0)
 // 表格是否加载中
@@ -286,7 +286,7 @@ const handleDelete = async (row: any) => {
 }
 // 每页数量改变
 const handleSizeChange = async (size: number) => {
-  searchParams.pageNum = size
+  searchParams.pageSize = size
   await getTableData(searchParams)
 }
 // 页数切换

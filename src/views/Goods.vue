@@ -339,7 +339,7 @@ const handleDelete = async (row: any) => {
 }
 // 每页数量改变
 const handleSizeChange = async (size: number) => {
-  searchParams.pageNum = size
+  searchParams.pageSize = size
   await getTableData(searchParams)
 }
 // 页数切换

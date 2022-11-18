@@ -60,7 +60,8 @@ const en = {
     userName: 'User Name',
     grade: 'Grade',
     image: 'Image',
-    type: 'Type'
+    type: 'Type',
+    desc: 'description'
   },
   label: {
     cateName: 'Category Name',
