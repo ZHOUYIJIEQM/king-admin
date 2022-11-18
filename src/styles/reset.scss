@@ -47,6 +47,8 @@ table {
 	border-spacing: 0;
 }
 
+// 全局样式
+
 html, body, #app {
   height: 100%;
 	// min-width: 800px;
@@ -92,4 +94,19 @@ html, body, #app {
 .slide-fade-leave-to {
   transform: translateX(30px);
   opacity: 0;
+}
+
+.el-overlay-dialog {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .el-dialog {
+    margin: 0;
+  }
+}
+
+.pagination-box {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
 }

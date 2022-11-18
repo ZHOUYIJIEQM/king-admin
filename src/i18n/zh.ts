@@ -24,8 +24,11 @@ const zh = {
   btn: {
     addCate: '添加分类',
     addGoods: '添加装备',
+    editGoods: '编辑装备',
     addInscription: '添加铭文',
+    editInscription: '编辑铭文',
     addSummoner: '添加召唤师技能',
+    editSummoner: '编辑召唤师技能',
     search: '搜索',
     addHero: '添加新英雄',
     view: '查看',

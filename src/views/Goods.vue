@@ -115,11 +115,11 @@
     <el-dialog
       class="add-goods"
       v-model="dialogVisible"
-      :title="isAdd ? '添加装备' : '编辑装备'"
+      :title="isAdd ? $t(`btn.addGoods`) : $t(`btn.editGoods`)"
       @close="dialogClosed"
       draggable
     >
-    <el-scrollbar 
+      <el-scrollbar 
         class="dialog-scrollbar"
         ref="dialogScrollbar"
         max-height="60vh"
@@ -132,7 +132,7 @@
           label-position="left"
         >
           <el-form-item label="装备名称">
-            <el-input ref="goodsName" v-model="goodsForm.name" placeholder="请输入装备名!"></el-input>
+            <el-input clearable ref="goodsName" v-model="goodsForm.name" placeholder="请输入装备名!"></el-input>
           </el-form-item>
           <el-form-item label="装备图标">
             <UploadFile
@@ -146,7 +146,7 @@
             <el-rate class="rate" :max="3" v-model="goodsForm.star"></el-rate>
           </el-form-item>
           <el-form-item label="价格" class="property-box">
-            <el-input class="input-item" v-model="goodsForm.price" placeholder="请输入价格!" />
+            <el-input clearable class="input-item" v-model="goodsForm.price" placeholder="请输入价格!" />
           </el-form-item>
           <el-form-item label="装备属性" class="property-box">
             <div class="property-item" ref="descItem" v-for="(item, index) in goodsForm.desc" :key="index">
@@ -156,7 +156,7 @@
                 </template>
               </el-input>
             </div>
-            <el-button class="add-new-button" type="primary" plain @click="addNewItem(goodsForm.desc, '1')">
+            <el-button class="add-new-button" type="primary" plain @click="addNewItem(goodsForm.desc)">
               新增属性<el-icon class="el-icon--right"><Plus /></el-icon>
             </el-button>
           </el-form-item>
@@ -168,7 +168,7 @@
                 </template>
               </el-input>
             </div>
-            <el-button class="add-new-button" type="primary" plain @click="addNewItem(goodsForm.passive, '2')">
+            <el-button class="add-new-button" type="primary" plain @click="addNewItem(goodsForm.passive)">
               新增被动<el-icon class="el-icon--right"><Plus /></el-icon>
             </el-button>
           </el-form-item>
@@ -239,7 +239,7 @@ const oGoodsForm: any = {
 const goodsForm = ref<any>(deepClone(oGoodsForm))
 // 搜索请求定时器
 let timer: null | number = null
-// 记录上一次的页数
+// 记录搜索前的页数
 let lastPageNum: number = 0
 // 上传接口
 const actionUrl = computed<string>(() => {
@@ -368,7 +368,7 @@ const deleteProperty = (arr: any, index: number) => {
   }
 }
 // 新增属性
-const addNewItem = async (arr: any, type: string) => {
+const addNewItem = async (arr: any) => {
   arr.push('')
   // await nextTick()
   setTimeout(() => {
@@ -492,11 +492,6 @@ onMounted(async () => {
       }
     }
   }
-}
-.pagination-box {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
 }
 :deep(.el-overlay-dialog) {
   display: flex;
