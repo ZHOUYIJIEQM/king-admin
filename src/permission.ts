@@ -5,52 +5,46 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { ElMessage } from 'element-plus'
 import { permissionStore } from '@/store/permission';
-import { commonStore } from "./store";
+import { commonStore } from "@/store";
 
 // 路由名 白名单
 const whiteList = ['login', '404']
 
-router.beforeEach((to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
+router.beforeEach(async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: any) => {
   NProgress.start();
-  const token = Cookies.get('token')
-  // 根据上次登录的时间判断是否会话是否已过期
-  if (Cookies.get("loginTime") && Date.now() - Number(Cookies.get("loginTime")) > commonStore().expiredTime) {
-    ElMessage({ message: '会话已过期!', type: 'warning', duration: 3000 })
+  
+  // 登录过期
+  if (Cookies.get("loginTime") && (Date.now() - Number(Cookies.get("loginTime")) > commonStore().expiredTime)) {
+    ElMessage({ message: '登录已过期!', type: 'warning', duration: 3000 })
     Cookies.remove("loginTime");
-    return next(`/login?redirect=${String(to.name)}`)
+    return next(`/login?redirect=${to.path}`)
   }
-  // 有token表示已登录
+
+  const token = Cookies.get('token')
+  // 有 token 表示已登录
   if (token) {
-    if (to.name === 'login') {
-      // 已登录未退出, 不能进入登录页, 看有无重定向路由名, 有就前往, 没有直接跳到首页
-      if (to.query.redirect) {
-        next({ name: to.query.redirect })
-      } else {
-        next({ name: 'welcome' })
-      }
+    // 登录后不要再前往登录页, 跳转到其他页面
+    if (to.path === '/login') {
+      // 如果存在重定向字符串
+      let path = to.query.redirect || '/'
+      return next({ path })
     } else {
-      // 如果pinia保存了用户角色,说明已经生成好了菜单, 可以直接进入目标路由页, 没有就要设置用户角色, 生成路由及菜单
-      if (permissionStore().userRole) {
-        next()
+      // 有用户角色, 表示路由已配置好
+      if (permissionStore().userRoles.length) {
+        return next()
       } else {
-        // 设置用户信息
-        permissionStore().setUserInfo()
         // 生成路由及菜单
         permissionStore().setAsyncRoutes()
-        next({ ...to, replace: true })
+        return next({ ...to, replace: true })
       }
     }
   } else {
-    // 未登录
-    // 在白名单, 直接进入, 不是就跳转登录页并标记跳转前路由名
+    // 在白名单就直接进入
     if (whiteList.includes(String(to.name))) {
-      next()
+      return next()
     } else {
-      if (to.name) {
-        next(`/login?redirect=${String(to.name)}`)
-      } else {
-        next({ name: 'login', replace: true })
-      }
+      // 不在白名单就跳到登录页并记录前往的路由路径
+      return next(`/login?redirect=${to.path}`)
     }
   }
 })

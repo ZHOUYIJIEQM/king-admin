@@ -1,41 +1,20 @@
 <template>
-  <div class="main-page">
-    <el-card>
-      <!-- 顶部搜索 -->
-      <el-row>
-        <el-col :span="8">
-          <el-input 
-            clearable 
-            :placeholder="$t('placeholder.heroName')"
-            v-model="heroQuery"
-            @keyup.enter="searchHero"
-          ></el-input>
-        </el-col>
-        <el-col :span="10">
-          <el-button 
-            type="primary" 
-            plain
-            :icon="Search" 
-            style="margin-left: 15px;"
-            @click="searchHero"
-          >{{$t(`btn.search`)}}</el-button>
-          <el-button 
-            v-permission="['admin']"
-            type="primary" 
-            plain
-            :icon="DocumentAdd" 
-            style="margin-left: 15px;"
-            @click="addHero"
-          >{{$t(`btn.addHero`)}}</el-button>
-        </el-col>
-      </el-row>
-      <el-table 
-        :data="heroList"
-        v-loading="isLoading"
-        empty-text="暂无英雄数据!"
+  <TableCard
+    showSearch
+    v-model:pagination="paginationData"
+    v-model:visible="dialogVisible"
+    :totalNum="totalNum"
+    :btnAdd="$t('btn.addHero')"
+    @reloadData="reloadData"
+    @addDataItem="addDataItem"
+  >
+    <template #table>
+      <el-table
+        :data="tableData"
+        v-loading="tableLoading"
+        empty-text="暂无英雄!"
         border
-        stripe
-        default-expand-all
+        @sort-change="sortChange"
       >
         <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">
@@ -46,34 +25,17 @@
                   <NightingaleChart :chartOption="getOption(props.row.scores)"></NightingaleChart>
                 </div>
               </div>
-              <!-- <div class="skills-box detail-item">
-                <div class="title">查看技能:</div>
-                <div class="skill-item" v-for="item in props.row.skills" :key="item._id">
-                  <div class="left">
-                    <el-image class="skill-icon" :src="item.icon" />
-                  </div>
-                  <div class="right">
-                    <h3>{{item.name}}</h3>
-                    <p>{{item.desc}}</p>
-                  </div>
-                </div>
-              </div> -->
             </div>
           </template>
         </el-table-column>
-        <el-table-column :label="$t(`tableH.heroName`)" prop="name"></el-table-column>
-        <el-table-column :label="$t(`tableH.heroNickName`)" prop="nickname"></el-table-column>
-        <el-table-column :label="$t(`tableH.category`)">
+        <el-table-column min-width="85px" :label="$t(`tableH.heroName`)" prop="name"></el-table-column>
+        <el-table-column align="center" width="110px" class-name='hero-avatar-box' :label="$t(`tableH.avatar`)">
           <template #default="scope">
-            <span>{{category(scope.row.category)}}</span>
+            <el-image lazy class="hero-avatar" :src="scope.row.avatar" />
           </template>
         </el-table-column>
-        <el-table-column :label="$t(`tableH.avatar`)">
-          <template #default="scope">
-            <div class="hero-avatar-box">
-              <el-image lazy class="hero-avatar" :src="scope.row.avatar" />
-            </div>
-          </template>
+        <el-table-column min-width="85px" :label="$t(`tableH.heroNickName`)" prop="nickname"></el-table-column>
+        <el-table-column min-width="100px" :label="$t(`tableH.category`)" prop="category">
         </el-table-column>
         <el-table-column :label="$t(`tableH.operation`)" align="center" width="150">
           <template #default="scope">
@@ -87,6 +49,7 @@
               >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
               <el-button
                 size="small"
+                :style="{ 'margin-top': permissionStore().valueHasPermission(['admin']) ? '10px' : '' }"
                 v-permission="['admin']"
                 type="danger"
                 plain
@@ -97,39 +60,18 @@
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination-box">
-        <el-pagination
-          v-model:currentPage="pageParams.pageNum"
-          v-model:page-size="pageParams.pageSize"
-          :page-sizes="[10, 15, 20]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-  </div>
+    </template>
+  </TableCard>
 </template>
 <script lang="ts" setup>
-import loading from '@/utils/loading'
-import { getCurrentInstance, ref, onMounted } from 'vue';
-import { DocumentAdd, Search, Edit, Delete } from '@element-plus/icons-vue'
-import { ElNotification, ElMessageBox } from 'element-plus';
-import { useRouter } from 'vue-router';
-import NightingaleChart from '@/components/NightingaleChart.vue'
+import { Delete, Edit } from '@element-plus/icons-vue'
+import { getHeroList, deleteHero, heroSearch } from "@/api/hero"
 import { commonStore } from "@/store/index"
-import {saveScrollH} from '@/utils/saveScroll'
-saveScrollH()
+import { permissionStore } from "@/store/permission"
 
+const route = useRoute()
 const router = useRouter()
-const app: any = getCurrentInstance()
-const { getHeroList, deleteHero, heroSearch } = app?.proxy.$HeroApi
-
-const category = (data:any) => {
-  return data.map((item:any) => item.name).join('/')
-}
-
+// 图表配置
 const getOption = (obj: any) => {
   // obj = { difficulty: 3, skill: 4, attack: 3, survive: 10 };
   let cn = { skill: '技能', attack: '攻击', survive: '生存', difficulty: '难度', }
@@ -167,81 +109,60 @@ const getOption = (obj: any) => {
   }
   return option
 }
-
-// input 查询词
-const heroQuery = ref<string>('')
-// 英雄列表
-let heroList = ref([])
-let total = ref(0)
-// 请求页参数
-interface GetGoods {
-  pageNum: number,
-  pageSize: number,
-}
-let pageParams: GetGoods = {
+// 是否显示弹出框
+const dialogVisible = ref<boolean>(false)
+// 表格数据
+const tableData = ref<any[]>([])
+// 表格加载提示
+const tableLoading = ref<boolean>(false)
+// 分页
+const paginationData = reactive<any>({
   pageNum: 1,
   pageSize: 10,
+})
+// 分页, 总计
+const totalNum = ref<number>(0)
+// 请求搜索参数
+let queryObj: any = {
+  pageNum: 1,
+  pageSize: 10,
+  sortItem: 'createdTime',
 }
-// 加载提示
-let isLoading = ref<boolean>(false)
-// 获取英雄列表
-const getHeroData = async () => {
-  isLoading.value = true
+
+// 添加
+const addDataItem = () => {
+  router.push({ name: 'heroCreate' })
+}
+// 更新
+const reloadData = async (queryParams: any) => {
+  queryObj = Object.assign({}, queryObj, queryParams)
+  await getTableData(queryParams)
+}
+// 获取表格数据
+const getTableData = async (params) => {
   try {
-    let res = await getHeroList(pageParams)
-    // console.log(res.data.data);
-    if (res.status === 200) {
-      heroList.value = res.data.data
-      total.value = res.data.total
+    tableLoading.value = true
+    let res: any = {}
+    if (params?.name) {
+      res = await heroSearch(params)
+    } else {
+      res = await getHeroList(params)
     }
-  } catch (error) {
-    console.log(error);
+    tableData.value = res?.data.data
+    totalNum.value = res?.data.total
+  } catch (error: any) {
     ElNotification({
       duration: commonStore().tipDurationS,
       type: 'error',
-      message: '获取英雄列表出错!'
+      message: error.message
     })
   } finally {
     setTimeout(() => {
-      isLoading.value = false
+      tableLoading.value = false
     }, 300)
   }
 }
-
-// 每页条数改变
-const handleSizeChange = (val: number) => {
-  pageParams.pageSize = val
-  getHeroData()
-}
-// 页数改变
-const handleCurrentChange = (val: number) => {
-  pageParams.pageNum = val
-  getHeroData()
-}
-// 搜索
-const searchHero = async (event:any) => {
-  event.target.blur()
-  pageParams.pageNum = 1
-  // todo: 根据名称搜索英雄
-  // console.log(heroQuery.value);
-  try {
-    // loading.openLoading()
-    let res = await heroSearch({name: heroQuery.value})
-    // console.log(res.data);
-    heroList.value = res.data
-  } catch (error) {
-    console.log(error);
-  } finally {
-    // loading.closeLoading()
-  }
-}
-// 添加英雄
-const addHero = () => {
-  router.push({
-    name: 'heroCreate'
-  })
-}
-// 编辑
+// 点击编辑
 const handleEdit = (row: any) => {
   router.push({
     name: 'heroEdit',
@@ -251,10 +172,10 @@ const handleEdit = (row: any) => {
   })
 }
 // 删除
-const handleDelete = (row: any) => {
+const handleDelete = async (row: any) => {
   ElMessageBox.confirm(
-    '确定要删除该英雄吗?',
-    '删除英雄',
+    '确定要删除该文章吗?',
+    '删除文章',
     {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -262,42 +183,55 @@ const handleDelete = (row: any) => {
     }
   )
   .then(async response => {
-    // console.log(response);
     const res = await deleteHero(row._id)
     if (res.status === 200) {
-      getHeroData()
+      await getHeroList(queryObj)
       ElNotification({
         duration: commonStore().tipDurationS,
         type: 'success',
-        message: `${row.name} ${res.data.message}`,
-      })
-    } else {
-      ElNotification({
-        duration: commonStore().tipDurationS,
-        type: 'error',
-        message: res.data.message,
+        message: `${row.name} ${res.data.message}`
       })
     }
+    await getTableData(queryObj)
   })
   .catch(err => {
-    // console.log(err);
+    console.log(err);
   })
 }
+// 排序
+const sortChange = async (sortType: any) => {
+  queryObj.orderType = sortType.order
+  await getTableData(queryObj)
+}
 
-onMounted(async() => {
-  try {
-    // loading.openLoading()
-    await getHeroData()
-  } catch (error) {
-    console.log(error);
-  } finally {
-    // loading.closeLoading()
+onMounted(async () => {
+  await getTableData(queryObj)
+})
+
+// 刷新
+onActivated(async () => {
+  if (route.query.reload === 'true') {
+    await getTableData(queryObj)
   }
 })
 
 </script>
-
 <style lang="scss" scoped>
+@import '@/styles/tableCard.scss';
+:deep(td.hero-avatar-box) {
+  padding: 0;
+  .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+  }
+  .hero-avatar {
+    min-width: 50px;
+    aspect-ratio: 1;
+    max-width: 80px;
+  }
+}
 .hero-detail-box {
   padding: 15px 0 0;
   .title {
@@ -315,94 +249,5 @@ onMounted(async() => {
       // border-bottom: 1px solid #ebeef5;
     }
   }
-  .skills-box {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    margin-top: 15px;
-    .skill-item {
-      display: flex;
-      // align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid #ebeef5;
-      &:first-child {
-        padding-top: 0;
-      }
-      &:last-child {
-        border-bottom: 0;
-      }
-      .left {
-        .skill-icon {
-          border-radius: 50%;
-          width: 60px;
-          aspect-ratio: 1;
-        }
-        margin-right: 15px;
-      }
-      .right {
-        h3 {
-          font-size: 14px;
-          margin-bottom: 8px;
-        }
-        p {
-          font-size: 13px;
-          line-height: 1.4;
-        }
-      }
-    }
-  }
-}
-
-:deep(.el-table__cell.el-table__expanded-cell) {
-  padding: 0;
-}
-
-:deep(.el-card) {
-  min-width: 650px;
-  .pagination-box {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-}
-:deep(.el-table) {
-  margin-top: 20px;
-}
-.hero-avatar-box {
-  display: flex;
-  align-items: center;
-  .hero-avatar {
-    min-width: 50px;
-    aspect-ratio: 1;
-    max-width: 80px;
-  }
-}
-
-.option {
-  display: flex;
-  flex-wrap: wrap;
-  .el-button {
-    width: 100%;
-    margin-left: 0;
-    &:nth-child(2){
-      margin-top: 10px;
-    }
-    // transition: all .2s;
-  }
-}
-
-@media screen and (max-width: 1180px) {
-  // .option {
-  //   display: flex;
-  //   align-items: center;
-  //   flex-direction: column;
-  //   .el-button {
-  //     width: 80%;
-  //   }
-  //   .el-button:last-child {
-  //     margin-left: 0;
-  //     margin-top: 10px;
-  //   }
-  // }
 }
 </style>

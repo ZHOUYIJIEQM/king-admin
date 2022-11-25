@@ -1,7 +1,7 @@
 import { apiInstance } from "./instance";
 import type { tableQueryType } from "@/models/api"
 
-export function getSummoner(params: tableQueryType) {
+export function getSummoner(params?: tableQueryType) {
   return apiInstance({
     url: "/summoner",
     params

@@ -1,9 +1,7 @@
 <template>
   <div class="main-page">
     <div class="content">
-      <p class="title">
-        <span class="text">王者荣耀后台管理系统</span>
-      </p>
+      <span class="title spotlight" :data-text="$t(`text.kingBg`)">{{$t(`text.kingBg`)}}</span>
       <!-- <p class="feature">介绍:</p>
       <p class="list">管理员: 具有所有权限</p>
       <p class="list">普通用户: 仅可读权限, 无法修改后台数据</p>
@@ -25,25 +23,14 @@
 <style lang="scss" scoped>
 .main-page {
   .content {
-    padding: 0 50px;
     .title {
-      display: flex;
-      justify-content: center;
-      font-size: 30px;
-      font-weight: bold;
-      .text {
-        background: linear-gradient(90deg, #f29914 25%, #0c3b9a 75%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        color: transparent;
-      }
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #9d7c4d 25%, #0a3281 75%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 4rem;
     }
-    p {
-      line-height: 3;
-      &.list {
-        line-height: 2;
-      }
-    }
-  }  
+  }
 }
 </style>

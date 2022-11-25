@@ -1,31 +1,31 @@
 <template>
-  <div class="main-page">
-    <el-card>
-      <el-row style="min-width: 630px;">
-        <el-col :span="8">
-          <el-input clearable :placeholder="$t('placeholder.summonerInput')" v-model="searchQuery" @keyup.enter="handleSearch"></el-input>
-        </el-col>
-        <el-col :span="10">
-          <el-button type="primary" plain :icon="Search" style="margin-left: 15px;" @click="handleSearch">{{$t(`btn.search`)}}</el-button>
-          <el-button v-permission="['admin']" type="primary" plain :icon="DocumentAdd" style="margin-left: 15px;" @click="addData">{{$t(`btn.addSummoner`)}}</el-button>
-        </el-col>
-      </el-row>
+  <TableCard
+    showSearch
+    v-model:pagination="paginationData"
+    v-model:visible="dialogVisible"
+    :isAdd="isAdd"
+    :totalNum="totalNum"
+    :btnAdd="$t('btn.addSummoner')"
+    :dialogTitle="isAdd ? $t('btn.addSummoner') : $t('btn.editSummoner')"
+    @reloadData="reloadData"
+    @addDataItem="addDataItem"
+    @saveContent="saveContent"
+  >
+    <template #table>
       <el-table
-        class="table"
         border
         v-loading="tableLoading"
-        :empty-text="emptyText!"
+        empty-text="暂无召唤师技能!"
         :data="tableData"
         :default-sort="{ prop: 'rank', order: 'ascending' }"
         @sort-change="sortChange"
       >
-        <el-table-column width="80px" :label="$t(`tableH.name`)" prop="name" />
-        <el-table-column width="90px" sortable="custom" :label="$t(`tableH.grade`)" prop="rank" />
-        <el-table-column width="90px" :label="$t(`tableH.image`)" prop="img">
+      <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
+        <el-table-column align="center" width="80px" :label="$t(`tableH.name`)" prop="name" />
+        <el-table-column width="90px" sortable="custom" :label="$t(`tableH.grade`)" align="center" prop="rank" />
+        <el-table-column class-name="img-box" width="100px" :label="$t(`tableH.image`)" align="center" prop="img">
           <template #default="scope">
-            <div class="icon-box">
-              <el-image lazy class="item-icon" :src="scope.row.img" />
-            </div>
+            <el-image lazy class="item-icon" :src="scope.row.img" />
           </template>
         </el-table-column>
         <el-table-column min-width="250px" :label="$t(`tableH.desc`)" prop="description">
@@ -39,181 +39,177 @@
         <el-table-column :label="$t(`tableH.operation`)" align="center" width="150">
           <template #default="scope">
             <div class="option">
-              <div>
-                <el-button
-                  size="small"
-                  type="primary"
-                  plain
-                  :icon="Edit"
-                  @click="handleEdit(scope.row)"
-                >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
-              </div>
-              <div v-permission="['admin']">
-                <el-button
-                  size="small"
-                  type="danger"
-                  plain
-                  :icon="Delete"
-                  @click="handleDelete(scope.row)"
-                >{{$t(`btn.delete`)}}</el-button>
-              </div>
+              <el-button
+                size="small"
+                type="primary"
+                plain
+                :icon="Edit"
+                @click="handleEdit(scope.row)"
+              >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
+              <el-button
+                v-permission="['admin']"
+                :style="{ 'margin-top': permissionStore().valueHasPermission(['admin']) ? '10px' : '' }"
+                size="small"
+                type="danger"
+                plain
+                :icon="Delete"
+                @click="handleDelete(scope.row)"
+              >{{$t(`btn.delete`)}}</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
-      <!-- 分页 -->
-      <div class="pagination-box">
-        <el-pagination
-          v-model:currentPage="searchParams.pageNum"
-          v-model:page-size="searchParams.pageSize"
-          :page-sizes="[5, 10, 20]"
-          layout="total, sizes, prev, pager, next, jumper"
-          small
-          :total="totalDataNum"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-    <!-- 弹出框 -->
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isAdd ? $t(`btn.addSummoner`) : $t(`btn.editSummoner`)"
-      draggable
-    >
-      <el-scrollbar 
-        class="dialog-scrollbar"
-        ref="dialogScrollbar"
-        max-height="50vh"
+    </template>
+    <template #dialog>
+      <el-form
+        class="dialog-from"
+        :model="formData" 
+        label-width="70px"
+        label-position="left"
       >
-        <el-form
-          class="dialog-from"
-          :model="formData" 
-          label-width="80px"
-          label-position="left"
-        >
-          <el-form-item label="技能名称">
-            <el-input clearable ref="nameEl" v-model="formData.name" placeholder="请输入技能名称!"></el-input>
-          </el-form-item>
-          <el-form-item label="技能图标">
-            <UploadFile
-              class="icon-upload"
-              :actionUrl="actionUrl"
-              :imageUrl="imageUrl"
-              @uploadSuccess="uploadSuccess"
-            ></UploadFile>
-          </el-form-item>
-          <el-form-item label="解锁等级">
-            <el-select v-model="formData.rank" placeholder="Select">
-              <el-option
-                v-for="item in 30"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="技能说明">
-            <el-input clearable type="textarea" v-model="formData.description" placeholder="请输入技能描述!"></el-input>
-          </el-form-item>
-        </el-form>
-      </el-scrollbar>
-      <template #footer>
-        <span class="dialog-footer" v-permission="['admin']">
-          <el-button plain @click="dialogVisible = false">{{$t(`btn.cancel`)}}</el-button>
-          <el-button type="primary" plain @click="confirmAdd">{{$t(`btn.confirm`)}}</el-button>
-        </span>
-      </template>
-    </el-dialog>
-  </div>
+        <el-form-item label="技能名称">
+          <el-input clearable ref="nameEl" v-model="formData.name" placeholder="请输入技能名称!"></el-input>
+        </el-form-item>
+        <el-form-item label="技能图标">
+          <UploadFile
+            class="icon-upload"
+            :actionUrl="actionUrl"
+            :imageUrl="imageUrl"
+            @uploadSuccess="uploadSuccess"
+          ></UploadFile>
+        </el-form-item>
+        <el-form-item label="解锁等级">
+          <el-select v-model="formData.rank" placeholder="Select">
+            <el-option
+              v-for="item in 30"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="技能说明">
+          <el-input clearable type="textarea" v-model="formData.description" placeholder="请输入技能描述!"></el-input>
+        </el-form-item>
+      </el-form>
+    </template>
+  </TableCard>
 </template>
 <script lang="ts" setup>
-import { getSummoner, createSummoner, updateSummoner, deleteSummoner, searchSummonerByName } from '@/api/summoner'
-import { Search, DocumentAdd, Delete, Edit, Plus, CloseBold } from '@element-plus/icons-vue'
+import { getSummoner, createSummoner, updateSummoner, deleteSummoner, searchSummonerByName } from "@/api/summoner"
+import { Delete, Edit } from '@element-plus/icons-vue'
 import { commonStore } from "@/store/index"
-import { saveScrollH } from '@/utils/saveScroll'
-// 保存/恢复滚动高度
-saveScrollH();
+import { permissionStore } from "@/store/permission"
 
-const app: any = getCurrentInstance()
-const { proxy } = app
-const searchQuery = ref<string>('')
-const searchParams = reactive({
-  pageNum: 1,
-  pageSize: 5,
-  orderType: 'ascending',
-  sortItem: 'rank'
-})
+const { proxy }: any = getCurrentInstance()
+const { $lodash } = proxy
+// 是否显示弹出框
+const dialogVisible = ref<boolean>(false)
+// 是否添加
+const isAdd = ref<boolean>(false)
 // 表格数据
 const tableData = ref<any []>([])
-// 表格空白提示
-const emptyText = "暂无技能!"
-// 共有多少条数据
-const totalDataNum = ref<number>(0)
-// 表格是否加载中
-const tableLoading = ref<boolean>(true)
-// 搜索请求定时器
-let timer: null | number = null
-// 记录搜索前的页数
-let lastPageNum: number = 0
-// 搜索词变化处理函数
-const watchSearchQuery = async (newV, oldV) => {
-  !lastPageNum && (lastPageNum = searchParams.pageNum || 1)
-  // 恢复页数
-  if (oldV.length && !newV.length) {
-    searchParams.pageNum = lastPageNum
-    lastPageNum = 0
-  }
-  // 防抖
-  timer && clearTimeout(timer)
-  timer = setTimeout(async () => {
-    // 有搜索词时, 每次触发搜索函数, 页数跳回第一页
-    lastPageNum && (searchParams.pageNum = 1)
-    await getTableData(searchParams);
-  }, 500)
+// 表格加载提示
+const tableLoading = ref<boolean>(false)
+// 分页
+const paginationData = reactive<any>({
+  pageNum: 1,
+  pageSize: 10,
+})
+// 分页, 总计
+const totalNum = ref<number>(0)
+// 请求搜索参数
+let queryObj: any = {
+  pageNum: 1,
+  pageSize: 10,
+  sortItem: 'rank',
+  orderType: 'ascending'
 }
-// 监听搜索词变化
-watch(searchQuery, watchSearchQuery)
-// 弹出框
-const dialogVisible = ref<boolean>(false)
-// 表单默认数据
-const oFormData = {
-  name: '',
-  rank: 1,
-  img: '',
-  description: '',
-}
-const formData = ref<any>(Object.assign({}, oFormData))
+// 表单数据
+const formData = ref<any>({})
+// 上传的图片地址
+const imageUrl = ref<string>('')
 // 上传接口
 const actionUrl = computed<string>(() => {
   return `${commonStore().uploadPath}/inscription`
 })
-const imageUrl = ref<string>('')
-const isAdd = ref<boolean>(false)
-
-// 搜索函数
-const handleSearch = async () => {}
-// 添加数据
-const addData = async () => {
-  dialogVisible.value = true
+// 上传成功
+const uploadSuccess = (val: string) => {
+  imageUrl.value = val
+  formData.value.icon = val
+}
+// 更新
+const reloadData = async (queryParams: any) => {
+  queryObj = Object.assign({}, queryObj, queryParams)
+  await getTableData(queryObj)
+}
+// 点击添加
+const addDataItem = async (val: any) => {
   isAdd.value = true
+  dialogVisible.value = true
   imageUrl.value = ''
-  formData.value = Object.assign({}, oFormData)
-  setTimeout(() => {
-    proxy.$refs.nameEl.focus()
-  }, 50)
+  formData.value = {
+    desc: [""]
+  }
+}
+// 保存
+const saveContent = async () => {
+  try {
+    tableLoading.value = true
+    let res: any = {}
+    if (isAdd.value) {
+      res = await createSummoner(formData.value)
+    } else {
+      res = await updateSummoner(formData.value._id, formData.value)
+    }
+    if (res.status === 200) {
+      ElNotification({
+        duration: commonStore().tipDurationS,
+        type: 'success',
+        message: res.data.message
+      })
+    }
+    dialogVisible.value = false
+    await getTableData(queryObj)
+  } catch (error: any) {
+    console.log(error);
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      type: 'success',
+      message: error.message
+    })
+  } finally {
+    tableLoading.value = false
+  }
+}
+// 排序
+const sortChange = async (sortType: any) => {
+  queryObj.orderType = sortType.order
+  await getTableData(queryObj)
 }
 // 编辑
 const handleEdit = async (row: any) => {
   dialogVisible.value = true
   isAdd.value = false
   imageUrl.value = row.img
-  formData.value = Object.assign({}, row)
+  formData.value = $lodash.cloneDeep(row)
   await nextTick()
   // note: 有坑, 在 nextTick 后 el-input 没有获取焦点, 但用setTimeout可以。不加 nextTick, 只用 setTimeout 获取焦点时, 光标出现在字符串第一位
   setTimeout(() => {
     proxy.$refs.nameEl.focus()
   }, 50)
+}
+// 删除属性
+const deleteProperty = (arr: any, index: number) => {
+  if (arr.length > 1) {
+    arr.splice(index, 1)
+  } else {
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      type: 'warning',
+      message: '至少需有一个!'
+    })
+  }
 }
 // 删除
 const handleDelete = async (row: any) => {
@@ -233,7 +229,7 @@ const handleDelete = async (row: any) => {
         type: 'success',
         message: `${row.name} ${res.data.message}`
       })
-      await getTableData(searchParams)
+      await getTableData(queryObj)
     } else {
       ElNotification({
         duration: commonStore().tipDurationS,
@@ -246,64 +242,26 @@ const handleDelete = async (row: any) => {
     console.log(err);
   })
 }
-// 上传成功
-const uploadSuccess = (val: string) => {
-  imageUrl.value = val
-  formData.value.img = val
-}
-// 每页数量改变
-const handleSizeChange = async (size: number) => {
-  searchParams.pageSize = size
-  await getTableData(searchParams)
-}
-// 页数切换
-const handleCurrentChange = async (current: number) => {
-  searchParams.pageNum = current
-  await getTableData(searchParams)
-}
-// 修改排序
-const sortChange = async (sortType: any) => {
-  searchParams.orderType = sortType.order
-  await getTableData(searchParams)
-}
-// 保存
-const confirmAdd = async () => {
-  tableLoading.value = true
-  let res: any = {}
-  if (isAdd.value) {
-    res = await createSummoner(formData.value)
-  } else {
-    res = await updateSummoner(formData.value._id, formData.value)
-  }
-  if (res.status === 200) {
-    ElNotification({
-      duration: commonStore().tipDurationS,
-      type: 'success',
-      message: res.data.message
-    })
-  }
-  dialogVisible.value = false
-  tableLoading.value = false
-  await getTableData(searchParams)
-}
-
-// 获取数据
-const getTableData = async (params) => {
-  tableLoading.value = true
+// 获取表格数据
+const getTableData = async (params: any) => {
   try {
+    tableLoading.value = true
     let res: any = {}
-    if (searchQuery.value.length) {
-      res = await searchSummonerByName({ name: searchQuery.value, ...params })
+    // console.log('请求参数', params);
+    // 存在搜索名称, 使用搜索接口
+    if (params?.name) {
+      res = await searchSummonerByName(params)
     } else {
       res = await getSummoner(params)
     }
-    tableData.value = res.data.data
-    totalDataNum.value = res.data.total
-  } catch (error) {
+    // console.log(res.data);
+    tableData.value = res?.data.data
+    totalNum.value = res?.data.total
+  } catch (error: any) {
     ElNotification({
       duration: commonStore().tipDurationS,
       type: 'error',
-      message: '获取装备失败!'
+      message: error.message
     })
   } finally {
     setTimeout(() => {
@@ -313,34 +271,34 @@ const getTableData = async (params) => {
 }
 
 onMounted(async () => {
-  await getTableData(searchParams)
+  await getTableData(queryObj)
 })
-
 </script>
 <style lang="scss" scoped>
-:deep(.table) {
-  margin: 20px auto;
-  .item-icon {
-    border-radius: 50%;
-    width: 50px;
-    aspect-ratio: 1;
-  }
-  .option {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    &>div {
-      margin-left: 0;
-      flex: 1;
-      transition: all .3s;
-      padding: 5px;
-      &>.el-button {
-        width: 100%;
+@import '@/styles/tableCard.scss';
+:deep(.el-table) {
+  td.img-box {
+    padding: 0;
+    .cell {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      aspect-ratio: 1;
+      img {
+        border-radius: 50%;
       }
     }
   }
 }
-:deep(.icon-upload) {
+.expand {
+  padding: 0 15px;
+  div {
+    line-height: 1.8;
+  }
+}
+:deep(.el-form) {
   .el-upload {
     width: 50px !important;
     max-height: 60px !important;

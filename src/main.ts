@@ -2,11 +2,11 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import { createPinia } from "pinia";
-import api from "@/api/index";
+import lodash from 'lodash';
 import * as directives from "@/directives/index";
-import i18n from "@/i18n/index"
-import "./permission"
-import "@/assets/js/iconfont.js"
+import i18n from "@/i18n/index";
+import "./permission";
+import "@/assets/js/iconfont.js";
 import "@/styles/reset.scss";
 
 const pinia = createPinia();
@@ -17,8 +17,9 @@ Object.keys(directives).forEach((key) => {
   app.directive(key, directives[key]);
 });
 
+app.config.globalProperties.$lodash = lodash
+
 app.use(router);
-app.use(api);
 app.use(pinia);
 app.use(i18n);
 app.mount("#app");

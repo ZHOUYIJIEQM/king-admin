@@ -1,0 +1,35 @@
+:deep(.el-table) {
+  .goods-img {
+    width: 65px;
+    aspect-ratio: 1;
+    img {
+      object-fit: contain;
+    }
+  }
+  .inscription-img {
+    width: 45px;
+    min-height: 45px;
+  }
+  .option {
+    display: flex;
+    flex-wrap: wrap;
+    .el-button {
+      margin-left: 0;
+      width: 100%;
+      // &:last-child {
+      //   margin-top: 10px;
+      // }
+    }
+  }
+  .el-table__empty-text {
+    line-height: 250px;
+  }
+}
+:deep(.el-form) {
+  padding: 0 20px;
+  .el-form-item {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

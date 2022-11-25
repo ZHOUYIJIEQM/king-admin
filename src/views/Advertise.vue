@@ -1,20 +1,19 @@
 <template>
-  <div class="main-page">
-    <el-card>
-      <el-button 
-        v-permission="['admin']"
-        style="margin-bottom: 15px;" 
-        :icon="DocumentAdd"
-        class="save-btn"
-        type="primary"
-        plain
-        @click="createItem"
-      >{{$t(`btn.addAds`)}}</el-button>
+  <TableCard
+    :isAdd="isAdd"
+    :btnAdd="$t('btn.addAds')"
+    :dialogTitle="isAdd ? $t('btn.addAds') : $t('btn.editAds')"
+    v-model:visible="dialogVisible"
+    @addDataItem="addDataItem"
+    @saveContent="saveContent"
+    @dialogClosed="dialogClosed"
+  >
+    <template #table>
       <el-table
         v-loading="tableLoading"
-        empty-text="暂无轮播广告!"
+        empty-text="暂无广告!"
         border
-        :data="tableList"
+        :data="tableData"
       >
         <el-table-column type="expand" :label="$t(`tableH.expand`)" width="75">
           <template #default="props">
@@ -34,130 +33,94 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column type="index" :label="$t(`tableH.orderNum`)" width="70" />
-        <el-table-column :label="$t(`tableH.category`)" prop="name" />
-        <el-table-column :label="$t(`tableH.operation`)" align="center" width="160">
+        <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
+        <el-table-column min-width="180px" :label="$t(`tableH.category`)" prop="name" />
+        <el-table-column :label="$t(`tableH.operation`)" align="center" width="180">
           <template #default="scope">
             <div class="option">
-              <div style="margin-bottom: 6px;">
-                <el-button
-                  size="small"
-                  type="primary"
-                  plain
-                  :icon="Edit"
-                  @click="handleEdit(scope.row)"
-                >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
-              </div>
-              <div>
-                <el-button
-                  size="small"
-                  v-permission="['admin']"
-                  type="danger"
-                  plain
-                  :icon="Delete"
-                  @click="handleDelete(scope.row)"
-                >{{$t(`btn.delete`)}}</el-button>
-              </div>
+              <el-button
+                size="small"
+                type="primary"
+                plain
+                :icon="Edit"
+                @click="handleEdit(scope.row)"
+              >{{$t(`btn.edit`)}} / {{$t(`btn.view`)}}</el-button>
+              <el-button
+                size="small"
+                :style="{ 'margin-top': permissionStore().valueHasPermission(['admin']) ? '10px' : '' }"
+                v-permission="['admin']"
+                type="danger"
+                plain
+                :icon="Delete"
+                @click="handleDelete(scope.row)"
+              >{{$t(`btn.delete`)}}</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination-box">
-        <el-pagination
-          v-model:currentPage="pageParams.pageNum"
-          v-model:page-size="pageParams.pageSize"
-          :page-sizes="[5, 10, 15]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+    </template>
+    <template #dialog>
+      <div class="scroll-box">
+        <el-input style="margin-bottom: 15px;" clearable ref="nameEl" v-model="formData.name" placeholder="请输入广告轮播名!"></el-input>
+        <CardItem
+          class="card-item"
+          v-for="(item, index) in formData.items"
+          :key="index"
+          :title="`轮播${index+1}`"
+          @close-item="formData.items.splice(index, 1)"
+        >
+          <UploadFile
+            class="hero-avatar"
+            :actionUrl="actionUrl"
+            :imageUrl="item.img"
+            @uploadSuccess="uploadSuccess($event, item, 'img')"
+          ></UploadFile>
+          <el-input style="margin-top: 8px;" clearable class="eli" v-model="item.url" placeholder="请输入广告跳转地址!"></el-input>
+        </CardItem>
+        <div class="card-item">
+          <el-button class="button" text @click="addPic(formData.items)">
+            <el-icon :size="25" class="plus"><Plus /></el-icon>
+            <div style="margin-top: 10px;">添加一个轮播图</div>
+          </el-button>
+        </div>
       </div>
-    </el-card>
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isAdd ? $t(`btn.addAds`) : $t(`label.adTitle`)"
-      @close="dialogClosed"
-      draggable
-    >
-      <el-scrollbar
-        max-height="55vh"
-      >
-        <div class="scroll-box">
-          <el-input style="margin-bottom: 15px;" clearable ref="goodsName" v-model="adItemData.name" placeholder="请输入广告轮播名!"></el-input>
-          <CardItem
-            class="card-item"
-            v-for="(item, index) in adItemData.items"
-            :key="index"
-            :title="`轮播${index+1}`"
-            @close-item="adItemData.items.splice(index, 1)"
-          >
-            <UploadFile
-              class="hero-avatar"
-              :actionUrl="actionUrl"
-              :imageUrl="item.img"
-              @uploadSuccess="uploadSuccess($event, item, 'img')"
-            ></UploadFile>
-            <el-input style="margin-top: 8px;" clearable class="eli" v-model="item.url" placeholder="请输入广告跳转地址!"></el-input>
-          </CardItem>
-          <div class="card-item">
-            <el-button class="button" text @click="addPic(adItemData.items)">
-              <el-icon :size="25" class="plus"><Plus /></el-icon>
-              <div style="margin-top: 10px;">添加一个轮播图</div>
-            </el-button>
-          </div>
-        </div>
-      </el-scrollbar>
-      <template #footer>
-        <div class="bottom">
-          <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">{{$t(`btn.save`)}}</el-button>
-        </div>
-      </template>
-    </el-dialog>
-  </div>
+    </template>
+  </TableCard>
 </template>
 <script lang="ts" setup>
-import { DocumentAdd, Plus, Edit, Delete } from '@element-plus/icons-vue'
+import { getAd, createAd, updateAd, deleteAd } from '@/api/ad'
+import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import { commonStore } from "@/store/index"
-import { saveScrollH } from '@/utils/saveScroll'
-saveScrollH()
+import { permissionStore } from "@/store/permission"
 
-const app: any = getCurrentInstance()
-const { proxy } = app
-const { getAd, updateAd, createAd, deleteAd } = proxy.$AdApi
-const tableList = ref<any[]>([])
-const actionUrl = `${commonStore().uploadPath}/advertisement`
-const tableLoading = ref<boolean>(true)
+const { proxy }: any = getCurrentInstance()
+const { $lodash } = proxy
+// 是否显示弹出框
 const dialogVisible = ref<boolean>(false)
+// 是否添加
 const isAdd = ref<boolean>(false)
-const adItemData: any = ref()
-const total = ref<number>(0)
-// 请求页参数
-interface GetGoods {
-  pageNum: number,
-  pageSize: number,
-}
-let pageParams: GetGoods = {
-  pageNum: 1,
-  pageSize: 5,
-}
-// 新建轮播
-const createItem = () => {
-  isAdd.value = true
-  dialogVisible.value = true
-  adItemData.value = {
-    name: "",
-    items: [{
-      img: "",
-      url: ""
-    }]
-  }
+// 表格数据
+const tableData = ref<any []>([])
+// 表格加载提示
+const tableLoading = ref<boolean>(false)
+// 表单数据
+const formData = ref<any>({})
+// 上传接口
+const actionUrl = `${commonStore().uploadPath}/advertisement`
+// 上传后
+const uploadSuccess = (val: string, data: any, key: string) => {
+  // console.log(val, data, key);
+  data[key] = val
 }
 // 点击编辑
-const handleEdit = (val: any) => { 
+const handleEdit = async (val: any) => { 
   isAdd.value = false
   dialogVisible.value = true
-  adItemData.value = val
+  formData.value = $lodash.cloneDeep(val)
+  await nextTick()
+  setTimeout(() => {
+    proxy.$refs.nameEl.focus()
+  }, 100)
 }
 // 点击删除
 const handleDelete = async (val: any) => {
@@ -168,43 +131,47 @@ const handleDelete = async (val: any) => {
       type: 'success',
       message: '删除成功!'
     })
-    await getAllAd()
   }
+  await getTableData()
 }
-// 弹出层关闭触发
-const dialogClosed = () => {
-  adItemData.value = {
-    name: "",
-    items: [{
-      img: "",
-      url: ""
-    }]
+// 添加
+const addDataItem = async () => {
+  isAdd.value = true
+  dialogVisible.value = true
+  formData.value = {
+    items: []
   }
+  setTimeout(() => {
+    proxy.$refs.nameEl.focus()
+  }, 100)
 }
 // 保存
 const saveContent = async () => {
+  tableLoading.value = true
+  dialogVisible.value = false
+  let res: any = {}
   if (isAdd.value) {
-    let res = await createAd(adItemData.value)
+    res = await createAd(formData.value)
     if (res.status === 200) {
       ElNotification({
         duration: commonStore().tipDurationS,
+        title: 'Success',
+        message: '添加分类成功!',
         type: 'success',
-        message: '新增成功!'
       })
     }
   } else {
-    // console.log('保存', adItemData);
-    let res = await updateAd(adItemData.value._id, adItemData.value)
+    res = await updateAd(formData.value._id, formData.value)
     if (res.status === 200) {
       ElNotification({
         duration: commonStore().tipDurationS,
+        title: 'Success',
+        message: '更新成功!',
         type: 'success',
-        message: '更新成功!'
       })
     }
   }
-  dialogVisible.value = false
-  await getAllAd()
+  await getTableData()
 }
 // 添加轮播图片
 const addPic = async (item: any) => {
@@ -213,124 +180,98 @@ const addPic = async (item: any) => {
     "url": ""
   })
 }
-// 每页条数改变
-const handleSizeChange = async (val: number) => {
-  pageParams.pageSize = val
-  await getAllAd()
+// 获取表格数据
+const getTableData = async () => {
+  tableLoading.value = true
+  const res = await getAd()
+  tableData.value = res.data
+  tableLoading.value = false
 }
-// 页数改变
-const handleCurrentChange = async (val: number) => {
-  pageParams.pageNum = val
-  await getAllAd()
-}
-// 上传后
-const uploadSuccess = (val: string, data: any, key: string) => {
-  // console.log(val, data, key);
-  data[key] = val
-}
-// 获取所有轮播
-const getAllAd = async () => {
-  try {
-    // loading.openLoading()
-    tableLoading.value = true
-    let res = await getAd(pageParams)
-    // console.log(res);
-    tableList.value = res.data.data
-    total.value = res.data.total
-    // console.log(tableList.value);
-  } catch (error) {
-    console.log(error); 
-  } finally {
-    // loading.closeLoading()
-    tableLoading.value = false
-  }
+// 弹出框关闭时
+const dialogClosed = async () => {
+  setTimeout(() => {
+    formData.value = {}
+  }, 500);
 }
 
 onMounted(async () => {
-  await getAllAd()
+  await getTableData()
 })
 </script>
 <style lang="scss" scoped>
-.main-page {
-  :deep(.el-table) {
-    .expand {
-      padding: 10px 15px;
-      overflow: hidden;
-      .expand-item {
-        &:last-child {
-          margin-bottom: 0;
-        }
-        margin-bottom: 18px;
-        .el-form-item {
-          margin-bottom: 0;
-        }
-        .banner-img {
-          width: 60%;
-          max-width: 500px;
-          min-height: 50px;
-          border-radius: 6px;
-        }
-        a {
-          text-decoration: none;
-          color: #6f8fcf;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .text {
-          color: #6f8fcf;
-          cursor: pointer;
-        }
-      }
-    }
-    .option {
-      .el-button {
-        width: 100%;
-      }
-    }
-  }
-  :deep(.el-dialog) {
-    max-width: 700px;
-    min-width: 400px;
-    .el-dialog__body {
+@import '@/styles/tableCard.scss';
+
+:deep(.el-table) {
+  .expand {
+    padding: 10px 15px;
+    overflow: hidden;
+    .el-form {
       padding: 0;
     }
-    .el-dialog__footer {
-      padding: 10px 15px 15px;
+    .expand-item {
+      &:last-child {
+        margin-bottom: 0;
+      }
+      margin-bottom: 18px;
+      .el-form-item {
+        margin-bottom: 0;
+      }
+      .banner-img {
+        width: 60%;
+        max-width: 500px;
+        min-height: 50px;
+        border-radius: 6px;
+      }
+      a {
+        text-decoration: none;
+        color: #6f8fcf;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .text {
+        color: #6f8fcf;
+        cursor: pointer;
+      }
     }
-    .scroll-box {
-      padding: 15px;
-      .card-item {
-        .button {
-          border: 2px dashed #e4e7ed;
-          min-height: 100px;
-          width: 100%;
-          &>span {
-            flex-direction: column;
-          }
-        }
-        &:hover {
-          border-color: #aaa;
-        }
-        .el-upload {
-          width: 100%;
-        }
-        .el-input {
-          width: 100%;
-          .el-input__wrapper {
-            width: 100%;
-            box-sizing: border-box;
-            input {
-              text-overflow: ellipsis;
-            }
-          }
+  }
+  .option {
+    .el-button {
+      width: 100%;
+    }
+  }
+}
+.scroll-box {
+  padding: 15px;
+  .card-item {
+    .button {
+      border: 2px dashed #e4e7ed;
+      min-height: 100px;
+      width: 100%;
+      &>span {
+        flex-direction: column;
+      }
+    }
+    &:hover {
+      border-color: #aaa;
+    }
+    .el-upload {
+      width: 100%;
+    }
+    .el-input {
+      width: 100%;
+      .el-input__wrapper {
+        width: 100%;
+        box-sizing: border-box;
+        input {
+          text-overflow: ellipsis;
         }
       }
     }
   }
-  .pagination-box {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
+}
+:deep(.avatar-uploader) {
+  .el-upload {
+    width: 70% !important;
   }
 }
 </style>

@@ -1,318 +1,263 @@
 <template>
-  <div class="main-page">
-    <el-card>
-      <el-button 
-        style="margin-bottom: 15px;" 
-        :icon="DocumentAdd"
-        class="save-btn"
-        type="primary"
-        plain
-        @click="createItem">{{$t(`btn.addUser`)}}</el-button>
+  <TableCard
+    showSearch
+    v-model:pagination="paginationData"
+    v-model:visible="dialogVisible"
+    :isAdd="isAdd"
+    :totalNum="totalNum"
+    :btnAdd="$t('btn.addUser')"
+    :dialogTitle="isAdd ? $t('btn.addUser') : $t('btn.editUser')"
+    @reloadData="reloadData"
+    @addDataItem="addDataItem"
+    @saveContent="saveContent"
+  >
+    <template #table>
       <el-table
         v-loading="tableLoading"
-        empty-text="暂无用户信息!"
+        :data="tableData"
+        empty-text="暂无用户!"
         border
-        :data="tableList"
+        @sort-change="sortChange"
       >
-        <el-table-column type="index" :label="$t(`tableH.orderNum`)" width="70" />
-        <el-table-column :label="$t(`tableH.userName`)" prop="userName" />
-        <el-table-column :label="$t(`tableH.permissionLevel`)" prop="role" width="150">
+        <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
+        <el-table-column min-width="100px" :label="$t(`tableH.userName`)" prop="userName" />
+        <el-table-column width="140px" :label="$t(`tableH.permissionLevel`)" prop="role">
           <template #default="scope">
-            <span>{{getRole(scope.row.role)}}</span>
+            <span>{{getRole(scope.row.roles)}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column width="100px" align="center" :label="$t(`tableH.status`)" prop="status">
+          <template #default="scope">
+            <el-switch @change="statusChange($event, scope.row)" v-model="scope.row.status" style="--el-switch-on-color: #409eff; --el-switch-off-color: #f56c6c" />
+          </template>
+        </el-table-column>
+        <el-table-column sortable="custom" width="165px" :label="$t(`tableH.updateDate`)" prop="updatedAt">
+          <template #default="scope">
+            <div>{{formatDate(scope.row.updatedAt)}}</div>
           </template>
         </el-table-column>
         <el-table-column :label="$t(`tableH.operation`)" align="center" width="160">
           <template #default="scope">
-            <div class="option">
-              <div style="margin-bottom: 6px;">
-                <el-button
-                  size="small"
-                  type="primary"
-                  plain
-                  :icon="Edit"
-                  @click="handleEdit(scope.row)"
-                >{{$t(`btn.modify`)}}</el-button>
-              </div>
-              <div>
-                <el-button
-                  size="small"
-                  type="danger"
-                  plain
-                  :icon="Delete"
-                  @click="handleDelete(scope.row)"
-                >{{$t(`btn.delete`)}}</el-button>
-              </div>
+            <div class="option" style="padding: 5px 0;">
+              <el-button
+                size="small"
+                type="primary"
+                plain
+                :icon="Edit"
+                @click="handleEdit(scope.row)"
+              >{{$t(`btn.modify`)}}</el-button>
+              <el-button
+                v-permission="['admin']"
+                :style="{ 'margin-top': permissionStore().valueHasPermission(['admin']) ? '10px' : '' }"
+                size="small"
+                type="danger"
+                plain
+                :icon="Delete"
+                @click="handleDelete(scope.row)"
+              >{{$t(`btn.delete`)}}</el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
-      <div class="pagination-box">
-        <el-pagination
-          v-model:currentPage="pageParams.pageNum"
-          v-model:page-size="pageParams.pageSize"
-          :page-sizes="[5, 10, 15]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
-    <el-dialog
-      v-model="dialogVisible"
-      :title="isAdd ? '添加' : '编辑'"
-      @close="dialogClosed"
-      top="20vh"
-      draggable
-    >
-      <el-scrollbar max-height="55vh">
-        <div class="scroll-box">
-          <el-form label-position="right">
-            <el-form-item label="用户名称">
-              <el-input clearable v-model="dialogData.userName" placeholder="请输入用户名!"></el-input>
-            </el-form-item>
-            <el-form-item label="权限级别">
-              <el-select v-model="dialogData.role" class="m-2" placeholder="请选择权限">
-                <el-option
-                  v-for="item in ['admin', 'normal']"
-                  :key="item"
-                  :label="getRole(item)"
-                  :value="item"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="用户密码">
-              <el-input type="password" show-password v-model="dialogData.passWord" placeholder="请输入密码!"></el-input>
-            </el-form-item>
-            <!-- <el-form-item label="确认密码">
-              <el-input type="password" show-password v-model="dialogData.checkPassword" placeholder="再次输入密码!"></el-input>
-            </el-form-item> -->
-          </el-form>
-        </div>
-      </el-scrollbar>
-      <template #footer>
-        <div class="bottom">
-          <el-button class="save-btn" type="primary" plain @click="saveContent">{{$t(`btn.save`)}}</el-button>
-        </div>
-      </template>
-    </el-dialog>
-  </div>
+    </template>
+    <template #dialog>
+      <el-form label-position="right">
+        <el-form-item label="用户名称">
+          <el-input clearable v-model="formData.userName" placeholder="请输入用户名!"></el-input>
+        </el-form-item>
+        <el-form-item label="权限级别">
+          <el-select multiple v-model="formData.roles" placeholder="请选择权限">
+            <el-option
+              v-for="item in ['admin', 'normal']"
+              :key="item"
+              :label="item === 'admin' ? '管理员' : '普通用户'"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="账号状态">
+          <el-switch v-model="formData.status" style="--el-switch-on-color: #409eff; --el-switch-off-color: #f56c6c" />
+        </el-form-item>
+        <el-form-item label="用户密码">
+          <el-input type="password" show-password v-model="formData.passWord" placeholder="请输入密码!"></el-input>
+        </el-form-item>
+      </el-form>
+    </template>
+  </TableCard>
 </template>
 <script lang="ts" setup>
-import { DocumentAdd, Edit, Delete } from '@element-plus/icons-vue'
-import { commonStore } from "@/store/index"
-import { ElNotification } from 'element-plus'
-import { deepClone } from "@/utils/func";
-import {saveScrollH} from '@/utils/saveScroll'
-saveScrollH()
+import { Delete, Edit } from '@element-plus/icons-vue'
+import { getUsers, createUser, updateUser, deleteUser, getUserByName } from '@/api/adminUser'
+import { commonStore } from '@/store/index'
+import { permissionStore } from "@/store/permission"
+import { formatDate } from "@/utils/func"
 
-const app: any = getCurrentInstance()
-const { proxy } = app
-const { getUsers, createUser, updateUser, deleteUser } = proxy.$UserApiApi
-const tableList = ref<any[]>([])
-const tableLoading = ref<boolean>(true)
+const { proxy: { $lodash } }: any = getCurrentInstance()
+// 是否显示弹出框
 const dialogVisible = ref<boolean>(false)
+// 是否添加
 const isAdd = ref<boolean>(false)
-const total = ref<number>(0)
-const dialogData: any = ref({})
-// 请求页参数
-let pageParams: any = {
+// 表格数据
+const tableData = ref<any[]>([])
+// 表格加载提示
+const tableLoading = ref<boolean>(false)
+// 分页
+const paginationData = reactive<any>({
   pageNum: 1,
-  pageSize: 5,
+  pageSize: 10,
+})
+// 分页, 总计
+const totalNum = ref<number>(0)
+// 请求搜索参数
+let queryObj: any = {
+  pageNum: 1,
+  pageSize: 10,
+  sortItem: 'updatedAt',
 }
+// 表单数据
+const formData = ref<any>({})
 
-// 新建
-const createItem = () => {
-  isAdd.value = true
-  dialogVisible.value = true
-}
 // 点击编辑
-const handleEdit = (val: any) => { 
+const handleEdit = async (row: any) => {
   isAdd.value = false
   dialogVisible.value = true
-  dialogData.value = deepClone(val)
+  formData.value = $lodash.cloneDeep(row)
 }
 // 点击删除
-const handleDelete = async (val: any) => {
-  try {
-    let res = await deleteUser(val._id)
+const handleDelete = async (row: any) => {
+  ElMessageBox.confirm(
+    '确定要删除该物品吗?',
+    '删除物品',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
+  ).then(async response => {
+    const res = await deleteUser(row._id)
     if (res.status === 200) {
       ElNotification({
         duration: commonStore().tipDurationS,
         type: 'success',
-        message: '删除成功!'
+        message: `${row.userName} ${res.data.message}`
       })
-      await getUser()
+      await getTableData(queryObj)
+    } else {
+      ElNotification({
+        duration: commonStore().tipDurationS,
+        type: 'error',
+        message: res.data.message
+      })
     }
-  } catch (error) {
-    console.log(error);
+  })
+  .catch(err => {
+    console.log(err);
+  })
+}
+// 转换角色
+const getRole = (roles: string[]) => {
+  return roles.map(i => i === 'admin' ? '管理员' : '普通用户').join(' / ')
+}
+// 获取表格数据
+const getTableData = async (params: any) => {
+  try {
+    tableLoading.value = true
+    let res: any = {}
+    // console.log('请求参数', params);
+    // 存在搜索名称, 使用搜索接口
+    if (params?.name) {
+      res = await getUserByName(params)
+    } else {
+      res = await getUsers(params)
+    }
+    // console.log(res.data);
+    tableData.value = res?.data.data
+    totalNum.value = res?.data.total
+  } catch (error: any) {
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      type: 'error',
+      message: error.message
+    })
+  } finally {
+    setTimeout(() => {
+      tableLoading.value = false
+    }, 300)
   }
 }
-// 弹出层关闭触发
-const dialogClosed = () => {
-  setTimeout(() => {
-    dialogData.value = {
-      username: "",
-      role: "",
-      password: "",
-      // checkPassword: ""
-    }
-  }, 300)
+// 更新
+const reloadData = async (queryParams: any) => {
+  queryObj = Object.assign({}, queryObj, queryParams)
+  await getTableData(queryObj)
+}
+// 点击添加
+const addDataItem = async (val: any) => {
+  isAdd.value = true
+  dialogVisible.value = true
+  formData.value = { status: true }
 }
 // 保存
 const saveContent = async () => {
   try {
+    tableLoading.value = true
+    let res: any = {}
     if (isAdd.value) {
-      // todo: 添加
-      let res = await createUser(dialogData.value)
-      // console.log('添加', res);
-      if (res.status === 200) {
-        ElNotification({
-          duration: commonStore().tipDurationS,
-          type: 'success',
-          message: '新增成功!'
-        })
-      }
+      res = await createUser(formData.value)
     } else {
-      // todo: 更新
-      // console.log('保存', adItemData);
-      let res = await updateUser(dialogData.value._id, dialogData.value)
-      // console.log('更新', res);
-      if (res.status === 200) {
-        ElNotification({
-          duration: commonStore().tipDurationS,
-          type: 'success',
-          message: '更新成功!'
-        })
-      }
+      res = await updateUser(formData.value._id, formData.value)
+    }
+    if (res.status === 200) {
+      ElNotification({
+        duration: commonStore().tipDurationS,
+        type: 'success',
+        message: res.data.message
+      })
     }
     dialogVisible.value = false
-    await getUser()
+    await getTableData(queryObj)
+  } catch (error: any) {
+    console.log(error);
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      type: 'success',
+      message: error.message
+    })
+  } finally {
+    tableLoading.value = false
+  }
+}
+// 状态改变
+const statusChange = async (status: boolean, row: any) => {
+  try {
+    const res = await updateUser(row._id, row)
+    if (res.status === 200) {
+      ElNotification({
+        duration: commonStore().tipDurationS,
+        type: 'success',
+        message: res.data.message
+      })
+    } else {
+      ElNotification({
+        duration: commonStore().tipDurationS,
+        type: 'success',
+        message: '更新失败!'
+      })
+    }
+    await getTableData(queryObj)
   } catch (error) {
     console.log(error);
   }
 }
-// 每页条数改变
-const handleSizeChange = async (val: number) => {
-  pageParams.pageSize = val
-  await getUser()
+// 排序
+const sortChange = async (sortType: any) => {
+  queryObj.orderType = sortType.order
+  await getTableData(queryObj)
 }
-// 页数改变
-const handleCurrentChange = async (val: number) => {
-  pageParams.pageNum = val
-  await getUser()
-}
-// 获取所有轮播
-const getUser = async () => {
-  try {
-    // loading.openLoading()
-    tableLoading.value = true
-    let res = await getUsers(pageParams)
-    // console.log(res);
-    tableList.value = res.data.data
-    total.value = res.data.total
-    // console.log(tableList.value);
-  } catch (error) {
-    console.log(error); 
-  } finally {
-    // loading.closeLoading()
-    tableLoading.value = false
-  }
-}
-// 转换角色
-function getRole(val: string) {
-  if (val === 'admin') {
-    return '管理员'
-  }
-  if (val === 'normal') {
-    return '普通用户'
-  }
-}
+
 onMounted(async () => {
-  await getUser()
+  await getTableData(queryObj)
 })
 </script>
 <style lang="scss" scoped>
-.main-page {
-  :deep(.el-table) {
-    .expand {
-      padding: 10px 15px;
-      overflow: hidden;
-      .expand-item {
-        &:last-child {
-          margin-bottom: 0;
-        }
-        margin-bottom: 18px;
-        .el-form-item {
-          margin-bottom: 0;
-        }
-        .banner-img {
-          width: 60%;
-          max-width: 500px;
-          min-height: 50px;
-          border-radius: 6px;
-        }
-        a {
-          text-decoration: none;
-          color: #6f8fcf;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .text {
-          color: #6f8fcf;
-          cursor: pointer;
-        }
-      }
-    }
-    .option {
-      .el-button {
-        width: 100%;
-      }
-    }
-  }
-  :deep(.el-dialog) {
-    max-width: 700px;
-    min-width: 400px;
-    .el-dialog__body {
-      padding: 0;
-    }
-    .el-dialog__footer {
-      padding: 10px 15px 15px;
-    }
-    .scroll-box {
-      padding: 15px;
-      .card-item {
-        .button {
-          border: 2px dashed #e4e7ed;
-          min-height: 100px;
-          width: 100%;
-          &>span {
-            flex-direction: column;
-          }
-        }
-        &:hover {
-          border-color: #aaa;
-        }
-        .el-upload {
-          width: 100%;
-        }
-        .el-input {
-          width: 100%;
-          .el-input__wrapper {
-            width: 100%;
-            box-sizing: border-box;
-            input {
-              text-overflow: ellipsis;
-            }
-          }
-        }
-      }
-    }
-  }
-  .pagination-box {
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-  }
-}
+@import '@/styles/tableCard.scss';
 </style>

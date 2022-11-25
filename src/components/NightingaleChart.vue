@@ -21,7 +21,7 @@ const props = withDefaults(
 
 // 获取元素
 const chartEl = ref()
-let myChart = null
+let myChart: any = null
 
 /**
  * 初始化图表

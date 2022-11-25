@@ -46,42 +46,6 @@ export const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: "/inscription",
-    component: () => import("@/views/Main.vue"),
-    children: [
-      {
-        path: "index",
-        name: "inscription",
-        component: () => import("@/views/Inscription.vue"),
-        meta: { icon: "Postcard" },
-      },
-    ],
-  },
-  {
-    path: "/summoner",
-    component: () => import("@/views/Main.vue"),
-    children: [
-      {
-        path: "index",
-        name: "summoner",
-        component: () => import("@/views/Summoner.vue"),
-        meta: { icon: "KnifeFork" },
-      },
-    ],
-  },
-  {
-    path: "/advertise",
-    component: () => import("@/views/Main.vue"),
-    children: [
-      {
-        path: "index",
-        name: "advertise",
-        component: () => import("@/views/Advertise.vue"),
-        meta: { icon: "Ticket" },
-      },
-    ],
-  },
-  {
     path: "/hero",
     name: "hero",
     component: () => import("@/views/Main.vue"),
@@ -128,6 +92,42 @@ export const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/inscription",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "inscription",
+        component: () => import("@/views/Inscription.vue"),
+        meta: { icon: "Postcard" },
+      },
+    ],
+  },
+  {
+    path: "/summoner",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "summoner",
+        component: () => import("@/views/Summoner.vue"),
+        meta: { icon: "KnifeFork" },
+      },
+    ],
+  },
+  {
+    path: "/advertise",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "advertise",
+        component: () => import("@/views/Advertise.vue"),
+        meta: { icon: "Ticket" },
+      },
+    ],
+  },
+  {
     path: "/error",
     component: () => import("@/views/Main.vue"),
     meta: { hidden: true },
@@ -154,7 +154,6 @@ export const asyncRoutes: Array<RouteRecordRaw> = [
         meta: { 
           // 可以访问到该路由的角色列表
           roles: [ "admin" ], 
-          parentRoute: "main", 
           icon: "UserFilled" 
         },
       },

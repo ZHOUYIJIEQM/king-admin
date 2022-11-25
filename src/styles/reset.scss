@@ -83,10 +83,6 @@ html, body, #app {
 	border-radius: 10px;
 }
 
-.main-page {
-  padding: 25px 25px 45px;
-}
-
 .slide-fade-enter-active, .slide-fade-leave-active {
   transition: all .25s;
 }
@@ -96,17 +92,47 @@ html, body, #app {
   opacity: 0;
 }
 
-.el-overlay-dialog {
+.edit-page {
+  padding: 25px 25px 45px;
+}
+
+$circleW: 5.6rem;
+.spotlight {
+  padding: 50px 0;
+  font-family: sans-serif;
+  text-transform: lowercase;
+  // font-size: 4rem;
+  font-weight: bold;
+  text-align: center;
   display: flex;
-  justify-content: center;
   align-items: center;
-  .el-dialog {
-    margin: 0;
+  justify-content: center;
+  margin: 0;
+  position: relative;
+  // color: #000;
+
+  &:before {
+    content: attr(data-text);
+    position: absolute;
+    background: linear-gradient(#003fff, #00f5d4, #8ed033, #00bbf9);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 100% 100%;
+    line-height: 1.2;
+    clip-path: ellipse($circleW $circleW at -10% -45%);
+    animation: swing 3s infinite alternate;
   }
 }
 
-.pagination-box {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
+@keyframes swing {
+  0% {
+    clip-path: ellipse($circleW $circleW at -10% -45%);
+  }
+  50% {
+    clip-path: ellipse($circleW $circleW at 49.66% 64.36%);
+  }
+  100% {
+    clip-path: ellipse($circleW $circleW at 102.62% -1.61%);
+  }
 }

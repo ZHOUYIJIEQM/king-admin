@@ -1,7 +1,7 @@
 import { apiInstance } from "./instance";
 import type { tableQueryType } from "@/models/api"
 
-export function getInscription(params: tableQueryType) {
+export function getInscription(params?: tableQueryType) {
   return apiInstance({
     url: "/inscription",
     params

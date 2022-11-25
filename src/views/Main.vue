@@ -47,7 +47,6 @@
   </el-container>
 </template>
 <script lang="ts" setup>
-import Cookies from 'js-cookie'
 import { Expand, Fold, CaretBottom } from "@element-plus/icons-vue";
 import { commonStore } from "@/store/index"
 import { permissionStore } from '@/store/permission'
@@ -70,11 +69,11 @@ const userName = computed<string>(() => {
 })
 // 用户角色
 const userAuth = computed<string>(() => {
-  return permissionStore().getAuth
+  return permissionStore().getAuth()
 })
 // 根据用户角色设置头像
 const avatar = computed(() => {
-  if (Cookies.get("userRole") === "admin") {
+  if (permissionStore().userRoles.includes("admin")) {
     return adminAvatar 
   }
   return normalAvatar
@@ -92,7 +91,10 @@ const selectMenu = (val:any) => {
 }
 
 // 生成面包屑导航
-const setBreadCrumb = (val: string) => {
+const setBreadCrumb = async (val: string) => {
+  // console.log('传入值', val, JSON.stringify(menuList.value, null, '  '));
+  // 等待重新获取menuList.value的值
+  await nextTick()
   firstLoop:
   for (let index = 0; index < menuList.value.length; index++) {
     breadCrumb.value = []
@@ -115,7 +117,7 @@ const setBreadCrumb = (val: string) => {
 
 // 点击折叠按钮旁边的首页
 const toMain = () => {
-  router.push({ name: 'welcome' })
+  router.push({ name: 'home' })
   breadCrumb.value = []
   // 闭合打开的菜单
   menuListEl.value.closeSubMenu()
@@ -125,9 +127,6 @@ const toMain = () => {
 watch(
   () => route.name, 
   (newV) => {
-    if (newV === 'welcome') {
-      breadCrumb.value = []
-    }
     newV && setBreadCrumb(newV as string)
   }, 
   { immediate: true }
@@ -139,30 +138,22 @@ onMounted(() => {
 
 // 退出
 const loginOut = () => {
-  ElMessageBox.confirm(
-    '确定要退出登录吗?',
-    '退出',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  )
+  ElMessageBox.confirm( '确定要退出登录吗?', '退出',
+  {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
   .then(() => {
+    commonStore().logout()
     ElNotification({
       duration: commonStore().tipDurationS,
       title: 'Success',
       message: '退出成功!',
       type: 'success',
     })
-    // 清除 cookie
-    Object.keys(Cookies.get()).forEach((item: string) => {
-      Cookies.remove(item)
-    })
-    commonStore().$reset()
-    permissionStore().$reset()
     router.push({ name: 'login' })
-  })
+  }).catch(() => {})
 };
 </script>
 <style lang="scss" scoped>
@@ -177,6 +168,7 @@ const loginOut = () => {
       display: flex;
       align-items: center;
       box-shadow: 0 1px 4px hsl(209deg 100% 8% / 8%);
+      z-index: 10;
       .left {
         display: flex;
         align-items: center;
@@ -206,6 +198,7 @@ const loginOut = () => {
           cursor: pointer;
           .avatarPic {
             width: 35px;
+            aspect-ratio: 1;
             border-radius: 50%;
           }
         }

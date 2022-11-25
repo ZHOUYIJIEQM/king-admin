@@ -1,12 +1,16 @@
 <template>
-  <div class="article-edit-page">
+  <div class="edit-page">
     <el-card>
-      <el-form>
-        <el-form-item label="文章分类">
+      <el-form label-position="top">
+        <el-form-item label="文章标题:">
+          <el-input clearable v-model="articleForm.name" placeholder="请输入文章标题!" />
+        </el-form-item>
+        <el-form-item label="文章分类:">
           <el-select
             class="cate-select"
-            v-model="articleForm.cate"
+            v-model="articleForm.category"
             multiple
+            clearable
             placeholder="选择分类"
           >
             <el-option
@@ -17,64 +21,54 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="文章标题">
-          <el-input 
-            clearable 
-            v-model="articleForm.name" 
-            placeholder="请输入文章标题!"
-          />
+        <el-form-item label="文章内容:">
+          <div class="editor-box">
+            <vue3-tinymce 
+              ref="tinymceEditor" 
+              v-model="articleForm.content" 
+              :setting="juejin_setting"
+            ></vue3-tinymce>
+          </div>
         </el-form-item>
-        <div class="editor-title">文章内容</div>
-        <div class="editor-box">
-          <vue3-tinymce 
-            ref="tinymceEditor" 
-            v-model="articleForm.content" 
-            :setting="juejin_setting"
-          ></vue3-tinymce>
-        </div>
       </el-form>
       <div class="bottom">
-        <el-button v-permission="['admin']" class="save-btn" type="primary" plain @click="saveContent">{{$t(`btn.save`)}}</el-button>
+        <el-button 
+          v-permission="['admin']" 
+          class="save-btn" 
+          type="primary" 
+          plain 
+          @click="saveContent"
+        >{{$t(`btn.save`)}}</el-button>
       </div>
-    </el-card>    
+    </el-card>
   </div>
 </template>
 <script lang="ts">
-export default {
-  name: 'ArticleEditExclude'
-}
+export default { name: 'ArticleEditExclude' }
 </script>
-
 <script lang="ts" setup>
-import { getCurrentInstance, ref, reactive, onMounted } from "vue";
-import Vue3Tinymce from '@jsdawn/vue3-tinymce';
-import { useRoute, useRouter } from "vue-router";
+import { getCategoryList } from "@/api/category"
+import { updateArticle, getArticleById, createArticle } from "@/api/article"
+import Vue3Tinymce from '@jsdawn/vue3-tinymce'
 import loading from '@/utils/loading'
-import { commonStore } from "@/store/index";
-import { ElNotification } from "element-plus";
+import { commonStore } from "@/store/index"
 
+const route = useRoute()
+const router = useRouter()
+const { proxy: { $lodash } }: any = getCurrentInstance()
 
-const editType = ref<string>('')
-const $route = useRoute()
-const $router = useRouter()
-const app: any = getCurrentInstance();
-const { getCategoryList } = app.proxy.$CateApi
-const { updateArticle, getArticleById, createArticle } = app.proxy.$ArticleApi;
-const cateList = ref<any[]>([])
-
-/**
- * 表单数据
- */
-const articleForm = reactive({
+// 原始
+const oFormData = {
   name: '',
-  cate: [],
+  category: [],
   content: '',
-  createdTime: ''
-})
-
-/**
- * 富文本编辑器设置
- */
+  createdTime: 0
+}
+// 表单
+const articleForm = ref<any>($lodash.cloneDeep(oFormData))
+// 分类
+const cateList = ref<any[]>([])
+// 富文本编辑器设置
 const juejin_setting = {
   height: 400,
   toolbar: 'undo redo | fullscreen | formatselect alignleft aligncenter alignright alignjustify | link unlink | numlist bullist | image media table | fontsizeselect forecolor backcolor | bold italic underline strikethrough | indent outdent | superscript subscript | removeformat |',
@@ -88,24 +82,52 @@ const juejin_setting = {
   // 自定义 图片上传模式
   custom_images_upload: true,
   custom_images_upload_header: commonStore().getToken,
-  images_upload_url: `${commonStore().uploadPath}/aticles`,
+  images_upload_url: `${commonStore().uploadPath}/articles`,
   custom_images_upload_callback: (res:any) => {
     // console.log('上传图片回调', res);
     return res.url
   },
-  custom_images_upload_param: 'aaaaaa.png',
+  // custom_images_upload_param: 'aaaaaa.png',
   // 以中文简体为例
   language: 'zh_CN',
+  // language_url: "../../utils/tinymceZh.ts",
   language_url: 'https://unpkg.com/@jsdawn/vue3-tinymce@1.1.6/dist/tinymce/langs/zh_CN.js',
 };
 
-/**
- * 保存并提交
- */
+// 设置分类
+const setCateList = async () => {
+  let res = await getCategoryList()
+  // 只保留 "新闻资讯" "赛事中心"
+  let index = res.data.findIndex((i: any) => i.name === "新闻资讯")
+  cateList.value.push(res.data[index].children)
+  index = res.data.findIndex((i: any) => i.name === "赛事中心")
+  cateList.value.push(res.data[index].children)
+  cateList.value = cateList.value.flat()
+}
+// 如果是编辑, 获取文章信息
+const getArticle = async () => {
+  try {
+    if (route.params.id) {
+      const res = await getArticleById((route.params.id as string))
+      if (res.status === 200) {
+        articleForm.value.category = res.data.category
+        articleForm.value.name = res.data.name
+        articleForm.value.content = res.data.content
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      title: 'Error',
+      message: '获取文章数据失败了!',
+      type: 'error',
+    })
+  }
+}
+// 保存
 const saveContent = async () => {
-  articleForm.createdTime = getCurrentTime(new Date())
-  // console.log('保存', articleForm);
-  if (!articleForm.cate.length) {
+  if (!articleForm.value.category.length) {
     ElNotification({
       duration: commonStore().tipDurationM,
       type: 'warning',
@@ -113,7 +135,7 @@ const saveContent = async () => {
     })
     return 
   }
-  if (!articleForm.name.trim().length) {
+  if (!articleForm.value.name.trim().length) {
     ElNotification({
       duration: commonStore().tipDurationM,
       type: 'warning',
@@ -121,7 +143,7 @@ const saveContent = async () => {
     })
     return
   }
-  if (!articleForm.content.trim().length) {
+  if (!articleForm.value.content.trim().length) {
     ElNotification({
       duration: commonStore().tipDurationM,
       type: 'warning',
@@ -129,9 +151,11 @@ const saveContent = async () => {
     })
     return
   }
-  if (editType.value === 'edit') {
-    // todo: 更新
-    let res = await updateArticle($route.params?.id, articleForm)
+
+  articleForm.value.createdTime = Date.now()
+  if (route.params.id) {
+    // 更新
+    let res = await updateArticle((route.params?.id as string), articleForm.value)
     if (res.status === 200) {
       ElNotification({
         duration: commonStore().tipDurationM,
@@ -141,130 +165,47 @@ const saveContent = async () => {
     }
   } else {
     // 新增
-    let res = await createArticle(articleForm)
+    let res = await createArticle(articleForm.value)
     if (res.status === 200) {
       ElNotification({
         duration: commonStore().tipDurationM,
         type: 'success',
-        message: '上传成功!'
+        message: '文章添加成功!'
       })
     }
   }
+  router.push({name: 'articleList', query: { reload: 'true' }})
 }
 
-const formatTime = (num: number) => {
-  return num > 10 ? num : `0${num}`
-}
-
-/**
- * 获取提交时间
- */
-const getCurrentTime = (d: any) => {
-  let year = d.getFullYear()
-  let month = formatTime(d.getMonth() + 1)
-  let date = formatTime(d.getDate())
-  let hour = formatTime(d.getHours())
-  let min = formatTime(d.getMinutes())
-  let sec = formatTime(d.getSeconds())
-  return `${year}-${month}-${date} ${hour}:${min}:${sec}`
-}
-
-/**
- * 获取分类
- */
-const getCate = async () => {
-  let res = await getCategoryList()
-  let index = res.data.findIndex((i: any) => i.name === "新闻资讯")
-  cateList.value.push(res.data[index].children)
-  index = res.data.findIndex((i: any) => i.name === "赛事中心")
-  cateList.value.push(res.data[index].children)
-  cateList.value = cateList.value.flat()
-  // console.log('分类', cateList.value);
-}
-
-/**
- * 获取数据
- */
-const initAll = async () => {
+onMounted(async () => {
   try {
     loading.openLoading()
-    await getCate()
-    if ($route.params?.id) {
-      editType.value = 'edit'
-      let res = await getArticleById($route.params?.id)
-      // console.log(res.data);
-      if (res.status === 200) {
-        articleForm.cate = res.data.cate
-        articleForm.name = res.data.name
-        articleForm.content = res.data.content
-      }
-    } else {
-      editType.value = 'add'
-    }
+    await setCateList()
+    await getArticle()
   } catch (error) {
-    console.log('获取文章错误', error);
-    ElNotification({
-      duration: commonStore().tipDurationS,
-      title: 'Error',
-      message: '获取文章数据失败了!',
-      type: 'error',
-    })
+    console.log(error);
   } finally {
     loading.closeLoading()
   }
-}
-
-/**
- * 给iframe 设置滚动条样式
- */
-const setScroll = () => {
-  let i:any = document.querySelector('iframe')
-  let h = i.contentWindow.document.querySelector('head')
-  let s = document.createElement('style')
-  s.innerText = `
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background-color: hsl(0deg 0% 42% / 20%);
-    border-radius: 10px;
-    transition: all .2s ease-in-out;
-  }
-  ::-webkit-scrollbar-track {
-    border-radius: 10px;
-  }
-  `
-  h.appendChild(s)
-}
-
-
-
-onMounted(async () => {
-  await initAll()
-  let intervalTimer: any = null
-  intervalTimer = setInterval(() => {
-    if (app.proxy.$refs.tinymceEditor) {
-      setScroll()
-      clearInterval(intervalTimer)
-      // console.log(app.proxy.$refs);
-    } 
-  }, 300)
 })
-
 </script>
 <style lang="scss" scoped>
-.article-edit-page {
+.edit-page {
   :deep(.el-form-item) {
-    margin-bottom: 30px;
+    .el-form-item__label {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
   }
   .cate-select {
-    width: 60%;
+    width: 80%;
+    max-width: 500px;
   }
   .editor-title {
-    margin: 25px 0 15px;
+    margin: 0 0 30px;
     color: #606266;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
   }
   .editor-box {

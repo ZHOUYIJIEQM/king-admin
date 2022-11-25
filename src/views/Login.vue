@@ -48,11 +48,11 @@
 import Cookies from 'js-cookie'
 import { UserFilled, Lock } from "@element-plus/icons-vue";
 import type { FormInstance, FormRules } from 'element-plus'
+import { login } from '@/api/login';
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
 
-const app: any = getCurrentInstance()
-const { login } = app?.proxy.$LoginApi
+const { proxy: { $lodash } }: any = getCurrentInstance()
 const route = useRoute()
 const router = useRouter()
 // 绑定到表单的用户名,密码
@@ -117,7 +117,7 @@ const submitForm = (formEl: FormInstance | undefined) => {
         const loginRes = await login(ruleForm)
         if (loginRes?.status === 200) {
           // console.log(loginRes.data);
-          const { token, userName, userRole } = loginRes.data
+          const { token, userName, userRoles } = loginRes.data
           // https://github.com/js-cookie/js-cookie
           // 设置过期时间 https://github.com/js-cookie/js-cookie/wiki/Frequently-Asked-Questions#expire-cookies-in-less-than-a-day 
           const ExpiredTime = new Date(Date.now() + commonStore().expiredTime)
@@ -125,8 +125,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
           Cookies.set('loginTime', Date.now())
           Cookies.set('token', token, { expires: ExpiredTime })
           Cookies.set('userName', userName, { expires: ExpiredTime })
-          Cookies.set('userRole', userRole, { expires: ExpiredTime })
-          route.query.redirect ? router.replace({ name: String(route.query.redirect) }) : router.replace({ name: "welcome" })
+          Cookies.set('userRoles', JSON.stringify(userRoles), { expires: ExpiredTime })
+          route.query.redirect ? router.replace({ path: String(route.query.redirect) }) : router.replace({ name: "home" })
           ElNotification({
             duration: commonStore().tipDurationS,
             message: '登录成功!',
@@ -151,21 +151,22 @@ const submitForm = (formEl: FormInstance | undefined) => {
   })
 }
 
-// 回车触发登录
-const keydown = (e: any) => {
-  if ((e.key as string).toLowerCase() === 'enter') {
-    submitForm(ruleFormEl.value)
-  }
+const keyDown = (e: any) => {
+  if ((e.key as string).toLowerCase() === 'enter') { submitForm(ruleFormEl.value) }
 }
+// 回车触发登录, 防抖
+const debounceKeyDown = $lodash.debounce(keyDown, 300)
 
 onMounted(() => {
-  window.addEventListener('keydown', keydown, false)
+  // 点击退出按钮, 按回车, 跳转到登录页, 回去触发这里绑定的事件, 所以设置延迟
+  setTimeout(() => {
+    window.addEventListener('keydown', debounceKeyDown)
+  }, 300)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', keydown, false)
+  window.removeEventListener('keydown', debounceKeyDown)
 })
-
 </script>
 <style lang="scss" scoped>
 .login-page {

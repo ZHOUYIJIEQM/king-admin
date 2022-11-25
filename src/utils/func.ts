@@ -17,6 +17,15 @@ function deepClone(obj: any) {
   return objClone;
 }
 
+// 格式化时间
+function formatDate (time: number) {
+  const d = new Date(time)
+  const f = (num: number) => {
+    return num < 10 ? `0${num}` : num;
+  }
+  return `${d.getFullYear()}-${f(d.getMonth()+1)}-${f(d.getDate())} ${f(d.getHours())}:${f(d.getMinutes())}:${f(d.getSeconds())}`
+}
 export {
-  deepClone
+  deepClone,
+  formatDate
 }

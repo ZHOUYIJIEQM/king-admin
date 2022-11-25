@@ -1,7 +1,8 @@
 <template>
-  <!-- 上传组件 -->
   <div class="upload-file-comp">
+    <!-- 上传组件 -->
     <el-upload
+      :style="{ width: `${width} !important`, height: `${height || 'auto'} !important` }"
       class="avatar-uploader"
       :action="actionUrl"
       :headers="token"
@@ -18,26 +19,28 @@
 </template>
 <script lang="ts" setup>
 import { Plus } from "@element-plus/icons-vue";
-import { ref } from "vue";
 import { ElNotification } from "element-plus";
 import type { UploadProps } from "element-plus";
 import { commonStore } from "../store/index";
 
-const token = commonStore().getToken
-
 // 保存上传文件名
 const uploadData = ref({});
+const token = commonStore().getToken
 
 const props = withDefaults(
   defineProps<{
     actionUrl: string;
     imageUrl?: string;
     maxFileSize?: number;
+    width?: string;
+    height?: string;
   }>(),
   {
     actionUrl: "",
     imageUrl: "",
     maxFileSize: 2,
+    width: '200px',
+    height: '',
   }
 );
 
@@ -74,18 +77,21 @@ const beforeAvatarUpload: UploadProps["beforeUpload"] = (rawFile) => {
     return false;
   }
   return true;
-};
+}
 </script>
 <style lang="scss" scoped>
 .upload-file-comp {
+  width: 100%;
   :deep(.avatar-uploader) {
     $elIconWidth: 200px;
     .avatar {
       width: 100%;
     }
     .el-upload {
+      width: 100%;
+      height: 100%;
+      display: flex;
       box-sizing: border-box;
-      width: $elIconWidth;
       border: 1px dashed var(--el-border-color);
       border-radius: 6px;
       cursor: pointer;
