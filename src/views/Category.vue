@@ -138,10 +138,15 @@ const saveContent = async () => {
 }
 // 获取表格数据
 const getTableData = async () => {
-  tableLoading.value = true
-  const res = await getCategoryList()
-  tableData.value = res.data
-  tableLoading.value = false
+  try {
+    tableLoading.value = true
+    const res = await getCategoryList()
+    tableData.value = res.data
+  } catch (error) {
+    console.log(error);
+  } finally {
+    tableLoading.value = false
+  }
 }
 // 点击编辑
 const handleEdit = async (index: number, row: any) => {
@@ -169,17 +174,22 @@ const handleDelete = async (index: number, row: any) => {
       type: 'warning',
     }
   ).then(async res => {
-    tableLoading.value = true
-    const delRes = await deleteCate(row._id)
-    if (delRes.status === 200) {
-      ElNotification({
-        duration: commonStore().tipDurationS,
-        title: 'Success',
-        message: `分类删除成功!`,
-        type: 'success',
-      })
+    try {
+      tableLoading.value = true
+      const delRes = await deleteCate(row._id)
+      if (delRes.status === 200) {
+        ElNotification({
+          duration: commonStore().tipDurationS,
+          title: 'Success',
+          message: `分类删除成功!`,
+          type: 'success',
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await getTableData()
     }
-    await getTableData()
   })
   .catch(err => {
     console.log('取消删除', err);
