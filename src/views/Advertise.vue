@@ -15,19 +15,19 @@
         border
         :data="tableData"
       >
-        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="75">
+        <el-table-column class-name="expand" type="expand" :label="$t(`tableH.expand`)" width="85">
           <template #default="props">
             <div class="expand">
               <div class="expand-item" v-for="(item, index) in props.row.items">
                 <div style="font-size: 16px; font-weight: bold; margin-bottom: 18px;">{{`轮播图${index+1}`}}</div>
                 <el-form>
                   <el-form-item label="轮播图片:">
-                  <img class="banner-img" :src="item.img" alt="">
-                </el-form-item>
-                <el-form-item label="跳转地址:">
-                  <a v-if="item.url.length" class="eli" target="_blank" :href="item.url">{{item.url}}</a>
-                  <div v-else class="text eli">没有对应跳转地址!</div>
-                </el-form-item>
+                    <img class="banner-img" :src="item.img" alt="">
+                  </el-form-item>
+                  <el-form-item label="跳转地址:">
+                    <a v-if="item.url.length" class="eli" target="_blank" :href="item.url">{{item.url}}</a>
+                    <div v-else class="text eli">没有对应跳转地址!</div>
+                  </el-form-item>
                 </el-form>
               </div>
             </div>

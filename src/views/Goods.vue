@@ -22,7 +22,7 @@
         :default-sort="{ prop: 'price', order: 'ascending' }"
         @sort-change="sortChange"
       >
-        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
+        <el-table-column class-name="expand" type="expand" :label="$t(`tableH.expand`)" width="85">
           <template #default="props">
             <div class="expand">
               <div class="goods-name">

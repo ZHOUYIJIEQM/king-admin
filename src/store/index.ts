@@ -18,10 +18,14 @@ export const commonStore = defineStore("common", {
       // 右侧提示停留时间
       tipDurationS: 1500,
       tipDurationM: 3000,
-      // 语言
-      languageType: localStorage.language || "zh",
       // 过期时长(5小时) ms
       expiredTime: 5 * 60 * 60 * 1000,
+      // 语言
+      languageType: localStorage.language || "zh",
+      // 桌面/移动端
+      device: 'mobile',
+      // 菜单栏是否展开
+      isCollapse: false
     };
   },
   getters: {

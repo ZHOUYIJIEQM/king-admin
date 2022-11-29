@@ -22,7 +22,7 @@
         :default-sort="{ prop: 'grade', order: 'ascending' }"
         @sort-change="sortChange"
       >
-        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
+        <el-table-column class-name="expand" type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">
             <div class="expand">
               <div style="font-weight: bold;">铭文说明:</div>

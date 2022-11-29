@@ -1,4 +1,14 @@
 :deep(.el-table) {
+  td.expand {
+    padding: 0;
+    .cell {
+      line-height: 60px;
+      height: 60px;
+      .el-table__expand-icon {
+        height: 100%;
+      }
+    }
+  }
   .goods-img {
     width: 65px;
     aspect-ratio: 1;

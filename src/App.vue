@@ -1,5 +1,5 @@
 <template>
-  <!-- element-plus 设置为语言 -->
+  <!-- element-plus 设置默认语言 -->
   <el-config-provider :locale="locale">
     <router-view></router-view>
   </el-config-provider>

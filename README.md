@@ -8,9 +8,9 @@ yarn create vite
 # 按需选择
 ```
 
-### 为方便开发需要做些配置, 如: 自动导入, 设置路径别名 (当前vite版本: 2.9.9) [element plus 按需导入](http://element-plus.org/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5)
+### 为方便开发, 需要做些配置, 如: 自动导入, 设置路径别名 (当前vite版本: 2.9.9) [element plus 按需导入](http://element-plus.org/zh-CN/guide/quickstart.html#%E6%8C%89%E9%9C%80%E5%AF%BC%E5%85%A5)
 ```js
-yarn -D @types/node unplugin-vue-components unplugin-auto-import unplugin-element-plus
+yarn add -D @types/node unplugin-vue-components unplugin-auto-import unplugin-element-plus
 // @types/node 路径别名
 // unplugin-vue-components unplugin-auto-import vue自动导入, 配置后可以不用手动import组件
 // unplugin-element-plus element plus 按需导入
@@ -239,3 +239,20 @@ NProgress.done()
 
 #### note: 有坑, 写过来
 
+#### vue3 watch 新写法
+```ts
+watch(
+  () => route.name, 
+  (newV) => {
+    // 设置面包屑
+    newV && setBreadCrumb(newV)
+  }, 
+  { immediate: true }
+)
+// 可简化为
+watchEffect(() => {
+  // 设置面包屑
+  setBreadCrumb(route.name)
+})
+```
+```vue``` 会自动追踪 ```route.name``` 作为依赖。每当 ```route.name``` 变化时，回调会再次执行。

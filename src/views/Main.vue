@@ -1,9 +1,15 @@
 <template>
-  <el-container class="common-layout">
+  <el-container class="app-wrapper" :class="wrapperObj">
+    <!-- <div class="drawer-bg" v-if="device==='mobile'" @click="handleClickOutside" /> -->
     <!-- 菜单 -->
-    <MenuList ref="menuListEl" :isCollapse="isCollapse" @clickMenu="selectMenu"></MenuList>
-    <!-- 内容 -->
-    <el-container class="content">
+    <MenuList
+      ref="menuListEl"
+      class="sidebar-container"
+      :isCollapse="isCollapse"
+      @clickMenu="selectMenu"
+    ></MenuList>
+   <!-- 内容 -->
+    <el-container class="main-content">
       <el-header>
         <div class="left">
           <div class="tag-icon" @click="isCollapse = !isCollapse">
@@ -52,16 +58,25 @@ import { commonStore } from "@/store/index"
 import { permissionStore } from '@/store/permission'
 import adminAvatar from '@/assets/img/home/admin.png'
 import normalAvatar from '@/assets/img/home/normal.png'
+import { storeToRefs } from "pinia";
 
 const mainScroll = ref()
-const route = useRoute()
+const route: any = useRoute()
 const router = useRouter()
 // 是否折叠
-const isCollapse = ref(false);
+const { device, isCollapse } = storeToRefs(commonStore())
 // 面包屑内容
 let breadCrumb = ref<string[]>([])
 // 菜单dom
 let menuListEl = ref<any>()
+// 外层类名
+let wrapperObj = computed<any>(() => {
+  return {
+    'mobile': device.value === 'mobile',
+    'hideSidebar': isCollapse.value,
+    'openSidebar': !isCollapse.value,
+  }
+})
 
 // 用户名
 const userName = computed<string>(() => {
@@ -123,14 +138,21 @@ const toMain = () => {
   menuListEl.value.closeSubMenu()
 }
 
+const handleClickOutside = () => {
+
+}
+
 // 监听路由, 设置面包屑
-watch(
-  () => route.name, 
-  (newV) => {
-    newV && setBreadCrumb(newV as string)
-  }, 
-  { immediate: true }
-)
+// watch(
+//   () => route.name, 
+//   (newV) => {
+//     newV && setBreadCrumb(newV as string)
+//   }, 
+//   { immediate: true }
+// )
+watchEffect(() => {
+  setBreadCrumb(route.name)
+})
 
 onMounted(() => {
   commonStore().setScrollEl(mainScroll.value)
@@ -157,9 +179,38 @@ const loginOut = () => {
 };
 </script>
 <style lang="scss" scoped>
-.common-layout {
+.app-wrapper {
   height: 100%;
-  .content {
+  &.hideSidebar {
+    .main-content {
+      margin-left: 64px;
+    }
+    .sidebar-container {
+      width: 64px;
+    }
+  }
+  &.openSidebar {
+    .main-content  {
+      margin-left: 200px;
+    }
+    .sidebar-container {
+      width: 200px;
+    }
+  }
+  .sidebar-container {
+    transition: width .25s;
+  }
+  .drawer-bg {
+    background: #000;
+    opacity: 0.3;
+    width: 100%;
+    top: 0;
+    height: 100%;
+    position: absolute;
+    z-index: 999;
+  }
+  .main-content {
+    transition: margin-left .25s;
     .el-header, .el-main {
       padding: 0;
       margin: 0;
@@ -203,12 +254,6 @@ const loginOut = () => {
           }
         }
       }
-    }
-    .main-content {
-      overflow: hidden;
-    }
-    .main-scroll {
-
     }
   }
 }

@@ -16,7 +16,7 @@
         border
         @sort-change="sortChange"
       >
-        <el-table-column type="expand" :label="$t(`tableH.expand`)" width="80">
+        <el-table-column class-name="expand" type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">
             <div class="hero-detail-box">
               <div class="hero-rate detail-item">
@@ -97,11 +97,11 @@ const getOption = (obj: any) => {
       {
         name: '英雄评估',
         type: 'pie',
-        radius: [15, 60],
+        radius: [10, 60],
         center: ['50%', '50%'],
         roseType: 'area',
         itemStyle: {
-          borderRadius: 2
+          borderRadius: 1
         },
         data: seriesData
       }
@@ -243,7 +243,7 @@ onActivated(async () => {
   }
   .hero-rate {
     .chart-box {
-      height: 200px;
+      height: 210px;
       box-sizing: content-box;
       padding: 15px 0;
       // border-bottom: 1px solid #ebeef5;

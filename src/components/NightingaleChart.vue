@@ -27,10 +27,7 @@ let myChart: any = null
  * 初始化图表
  */
 const initChart = () => {
-  myChart = echarts.init(chartEl.value, null, {
-    renderer: 'canvas',
-    useDirtyRect: false
-  });
+  myChart = echarts.init(chartEl.value);
   myChart.setOption(props.chartOption);
   window.addEventListener('resize', myChart.resize);
 }

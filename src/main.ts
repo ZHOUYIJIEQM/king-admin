@@ -1,12 +1,11 @@
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
-import { createPinia } from "pinia";
 import lodash from 'lodash';
 import * as directives from "@/directives/index";
 import i18n from "@/i18n/index";
 import "./permission";
-import "@/assets/js/iconfont.js";
 import "@/styles/reset.scss";
 
 const pinia = createPinia();

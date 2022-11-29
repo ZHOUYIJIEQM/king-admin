@@ -29,6 +29,6 @@ export default defineConfig({
   server: {			
     // 设置后可以通过局域网访问
     host: '0.0.0.0',
-    // port: 3000,  // 端口号，一般情况下为8080
+    port: 3000,  // 端口号
   }
 });

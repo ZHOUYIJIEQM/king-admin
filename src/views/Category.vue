@@ -66,7 +66,6 @@
 import { Delete, Edit, } from '@element-plus/icons-vue'
 import { getCategoryList, createCate, deleteCate, updateCate } from '@/api/category'
 import { commonStore } from '@/store/index'
-import { permissionStore } from "@/store/permission"
 
 const { proxy }: any = getCurrentInstance()
 const { $lodash } = proxy
@@ -105,7 +104,7 @@ const addDataItem = async () => {
   formData.value = {}
   showCascader.value = true
   setTimeout(() => {
-    proxy.$refs.formName.focus()
+    proxy.$refs.nameEl.focus()
   }, 50)
 }
 // 保存
@@ -158,10 +157,10 @@ const handleEdit = async (index: number, row: any) => {
   } else {
     showCascader.value = false
   }
-  await nextTick()
-  setTimeout(() => {
+  setTimeout(async () => {
+    await nextTick()
     proxy.$refs.nameEl.focus()
-  }, 50)
+  }, 100)
 }
 // 点击删除
 const handleDelete = async (index: number, row: any) => {

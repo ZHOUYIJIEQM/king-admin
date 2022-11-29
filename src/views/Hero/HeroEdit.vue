@@ -242,7 +242,6 @@ import { getHeroById, updateHero, getHeroList, createHero } from "@/api/hero"
 import { getInscription } from '@/api/inscription'
 import { getSummoner } from '@/api/summoner'
 import { getGoodsList } from '@/api/goods'
-import { fa } from 'element-plus/es/locale'
 
 const route = useRoute()
 const router = useRouter()

@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-container" :class="{hideSidebar: isCollapse}">
+  <div class="sidebar-container">
     <el-scrollbar>
       <div :class="['logo-title', isCollapse ? 'collapse' : 'expand']">
         <img src="../assets/img/home/logo.png" alt="王者荣耀" />
@@ -133,12 +133,20 @@ watch(
   }
 }
 .sidebar-container {
-  width: 200px;
+  // width: 200px;
+  height: 100%;
+  position: fixed;
+  font-size: 0px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1001;
+  overflow: hidden;
   transition: width .25s;
   background-color: #343843;
-  &.hideSidebar {
-    width: 64px;
-  }
+  // &.hideSidebar {
+  //   width: 64px;
+  // }
   .logo-title {
     padding: 5px 0;
     display: flex;

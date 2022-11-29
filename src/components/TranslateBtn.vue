@@ -23,8 +23,9 @@
   </el-dropdown>
 </template>
 <script setup lang="ts">
+// 图标
+import "@/assets/js/iconfont.js";
 import { commonStore } from '@/store/index'
-// import { reactive, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 const i18n = useI18n()
 
