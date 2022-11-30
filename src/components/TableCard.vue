@@ -3,6 +3,7 @@
     <el-card ref="elCardEl">
       <div class="topbar" style="margin-bottom: 20px; min-width: 520px;" v-if="isShow(['admin'])">
         <el-input
+          v-if="showSearch"
           class="search-input"
           :style="{
             'width': mobile ? '100%' : '50%',
@@ -14,8 +15,8 @@
           @keyup.enter="handleSearch" 
         />
         <div :style="{
-          'margin-left': mobile ? '0px' : '15px',
-          'margin-top': mobile ? '15px' : '0px',
+          'margin-left': (mobile || !showSearch) ? '0px' : '15px',
+          'margin-top': (mobile && showSearch) ? '15px' : '0px',
           'display': mobile ? 'block' : 'inline-block'
         }">
           <el-button 
@@ -248,6 +249,7 @@ onBeforeUnmount(() => {
     justify-content: center;
   }
   :deep(.el-card) {
+    transition: none;
     .el-card__body {
       display: flex;
       flex-direction: column;

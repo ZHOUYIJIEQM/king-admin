@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@jsdawn/vue3-tinymce": "^1.1.7",
+    "@tinymce/tinymce-vue": "^4",
     "axios": "^0.27.2",
     "echarts": "^5.3.3",
     "element-plus": "^2.2.19",

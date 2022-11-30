@@ -137,7 +137,8 @@ import { commonStore } from '@/store/index'
 import { permissionStore } from '@/store/permission'
 
 const TableCardEl = ref<any>()
-const { proxy: { $lodash } }: any = getCurrentInstance()
+const { proxy }: any = getCurrentInstance()
+const { $lodash } = proxy
 // 是否显示弹出框
 const dialogVisible = ref<boolean>(false)
 // 是否添加
@@ -179,6 +180,10 @@ const handleEdit = async (row: any) => {
   dialogVisible.value = true
   imageUrl.value = row.icon
   formData.value = $lodash.cloneDeep(row)
+  await nextTick()
+  setTimeout(() => {
+    proxy.$refs.nameEl.focus()
+  }, 200)
 }
 // 点击删除
 const handleDelete = async (row: any) => {
@@ -249,12 +254,13 @@ const addDataItem = async (val: any) => {
     passive: [""],
     desc: [""]
   }
-  // setTimeout(() => {
-    await nextTick()
-    TableCardEl.value.dialogScrollbarEl.scrollTo({
-      top: 0
-    })
-  // }, 0)
+  await nextTick()
+  TableCardEl.value.dialogScrollbarEl.scrollTo({
+    top: 0
+  })
+  setTimeout(() => {
+    proxy.$refs.nameEl.focus()
+  }, 100)
 }
 // 删除属性
 const deleteProperty = (arr: any, index: number) => {

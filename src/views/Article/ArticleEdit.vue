@@ -23,11 +23,10 @@
         </el-form-item>
         <el-form-item label="文章内容:">
           <div class="editor-box">
-            <vue3-tinymce 
-              ref="tinymceEditor" 
-              v-model="articleForm.content" 
-              :setting="juejin_setting"
-            ></vue3-tinymce>
+            <TinyMceEditor 
+              v-model:editorContent="articleForm.content" 
+              :setting="tinymceSetting"
+            />
           </div>
         </el-form-item>
       </el-form>
@@ -49,7 +48,6 @@ export default { name: 'ArticleEditExclude' }
 <script lang="ts" setup>
 import { getCategoryList } from "@/api/category"
 import { updateArticle, getArticleById, createArticle } from "@/api/article"
-import Vue3Tinymce from '@jsdawn/vue3-tinymce'
 import loading from '@/utils/loading'
 import { commonStore } from "@/store/index"
 
@@ -69,7 +67,7 @@ const articleForm = ref<any>($lodash.cloneDeep(oFormData))
 // 分类
 const cateList = ref<any[]>([])
 // 富文本编辑器设置
-const juejin_setting = {
+const tinymceSetting = {
   height: 400,
   toolbar: 'undo redo | fullscreen | formatselect alignleft aligncenter alignright alignjustify | link unlink | numlist bullist | image media table | fontsizeselect forecolor backcolor | bold italic underline strikethrough | indent outdent | superscript subscript | removeformat |',
   plugins: 'codesample link image table lists fullscreen',
@@ -81,17 +79,17 @@ const juejin_setting = {
   placeholder: '请输入文章内容!',
   // 自定义 图片上传模式
   custom_images_upload: true,
+  // 设置请求头
   custom_images_upload_header: commonStore().getToken,
+  // 上传路径
   images_upload_url: `${commonStore().uploadPath}/articles`,
-  custom_images_upload_callback: (res:any) => {
-    // console.log('上传图片回调', res);
+  // 上传图片回调
+  custom_images_upload_callback: (res: any) => {
+    // console.log(res.url);
     return res.url
   },
-  // custom_images_upload_param: 'aaaaaa.png',
   // 以中文简体为例
   language: 'zh_CN',
-  // language_url: "../../utils/tinymceZh.ts",
-  language_url: 'https://unpkg.com/@jsdawn/vue3-tinymce@1.1.6/dist/tinymce/langs/zh_CN.js',
 };
 
 // 设置分类
@@ -211,6 +209,12 @@ onMounted(async () => {
   .editor-box {
     width: 100%;
     min-height: 300px;
+    .editor {
+      width: 100%;
+      height: 400px;
+      display: inline-block;
+      border: none;
+    }
   }
   
   .bottom {
