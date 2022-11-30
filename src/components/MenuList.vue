@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar-container">
     <el-scrollbar>
-      <div :class="['logo-title', isCollapse ? 'collapse' : 'expand']">
+      <div :class="['logo-title', isOpen ? 'collapse' : 'expand']">
         <img src="../assets/img/home/logo.png" alt="王者荣耀" />
       </div>
       <el-menu
@@ -10,7 +10,7 @@
         background-color="#343843"
         text-color="#fff"
         active-text-color="#ffd04b"
-        :collapse="isCollapse"
+        :collapse="isOpen"
         :default-active="activeMenu"
         :unique-opened="false"
         :collapse-transition="false"
@@ -47,15 +47,16 @@
 </template>
 <script lang="ts" setup>
 import { permissionStore } from "@/store/permission"
-interface Props {
-  isCollapse: Boolean
-}
-const props = defineProps<Props>()
+import { commonStore } from "@/store/index"
 const route = useRoute()
 // 菜单
 const menuEl = ref()
 // 需要暴露出来, 父组件通过 ref 才可以获取到子组件内容
 // defineExpose({menuEl})
+
+const isOpen = computed(() => {
+  return !commonStore().sidebar.opened
+})
 
 // 折叠菜单
 const closeSubMenu = () => {
@@ -86,6 +87,7 @@ let menuList = computed<any []>(() => {
 // 点击菜单
 const selectMenu = (item: any) => {
   activeMenu.value = item.menu
+  commonStore().sidebar.opened = false
   emit('clickMenu', item)
 }
 

@@ -17,9 +17,6 @@
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-
-</script>
 <style lang="scss" scoped>
 .main-page {
   .content {
@@ -29,7 +26,8 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      font-size: 4rem;
+      font-size: 4.5rem;
+      padding: 60px 0;
     }
   }
 }

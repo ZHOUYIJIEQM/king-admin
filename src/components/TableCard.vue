@@ -1,24 +1,28 @@
 <template>
   <div class="main-page">
     <el-card ref="elCardEl">
-      <!-- 顶部 input 搜索,添加 -->
-      <el-row style="min-width: 520px; margin-bottom: 20px;" v-if="isShow(['admin'])">
-        <el-col :span="8" v-if="showSearch">
-          <el-input
-            class="search-input"
-            clearable
-            :placeholder="$t(searchPlaceholder)"
-            v-model="searchQuery"
-            @keyup.enter="handleSearch" 
-          ></el-input>
-        </el-col>
-        <el-col :span="16">
+      <div class="topbar" style="margin-bottom: 20px;" v-if="isShow(['admin'])">
+        <el-input
+          class="search-input"
+          :style="{
+            'width': mobile ? '100%' : '50%',
+            'max-width': mobile ? '' : '400px'
+          }"
+          clearable
+          :placeholder="$t(searchPlaceholder)"
+          v-model="searchQuery"
+          @keyup.enter="handleSearch" 
+        />
+        <div :style="{
+          'margin-left': mobile ? '0px' : '15px',
+          'margin-top': mobile ? '15px' : '0px',
+          'display': mobile ? 'block' : 'inline-block'
+        }">
           <el-button 
             v-if="showSearch"
             type="primary" 
             plain
             :icon="Search" 
-            style="margin-left: 15px;"
             @click="handleSearch"
           >{{$t(`btn.search`)}}</el-button>
           <el-button 
@@ -29,8 +33,8 @@
             :style="{ 'margin-left': showSearch? '15px' : '0px' }"
             @click="addData"
           >{{btnAdd}}</el-button>
-        </el-col>
-      </el-row>
+        </div>
+      </div>
       <!-- 表格插槽 -->
       <slot name="table"></slot>
       <!-- 分页 -->
@@ -40,7 +44,7 @@
           v-model:currentPage="pagination.pageNum"
           v-model:page-size="pagination.pageSize"
           :page-sizes="[10, 20, 30]"
-          layout="total, sizes, prev, pager, next, jumper"
+          :layout="mobile ? 'pager' : 'total, sizes, prev, pager, next, jumper'"
           :total="totalNum"
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -77,6 +81,8 @@ import { Search, DocumentAdd } from '@element-plus/icons-vue'
 import { commonStore } from '@/store/index'
 import { permissionStore } from '@/store/permission'
 import { saveScrollH } from '@/utils/saveScroll'
+// 保存/恢复滚动高度
+saveScrollH();
 
 interface Props {
   // 是否显示搜索 input
@@ -200,30 +206,39 @@ watch(
 const boxEl = computed<any>(() => {
   return commonStore().elScrollEl
 })
+const mobile = computed<boolean>(() => {
+  return commonStore().device === 'mobile'
+})
 
-// watch(
-//   boxEl,
-//   async (newV) => {
-//     if (newV) {
-//       // console.log(newV.wrap$.offsetHeight, elCardEl.value.$el.querySelector('.el-card__body'));
-//       console.log(elCardEl.value);
-//       await nextTick()
-//       setTimeout(() => {
-//         elCardEl.value.$el.querySelector('.el-card__body').style = `min-height: ${newV.wrap$.offsetHeight - 120}px;`
-//       }, 500)
-//     }
-//   },
-//   { deep: true }
-// )
+// 窗口大小调整
+let t: any = null
+const resizeCardBody = () => {
+  elCardEl.value.$el.querySelector('.el-card__body').style = `min-height: ${boxEl.value.wrap$.offsetHeight - (mobile.value ? 0 : 60) }px;`
+}
+const resizeHandler = () => {
+  t && clearTimeout(t)
+  t = setTimeout(() => {
+    resizeCardBody()
+  }, 250);  
+}
 
 onMounted(async () => {
-  // 保存/恢复滚动高度
-  saveScrollH();
   await nextTick()
-  elCardEl.value.$el.querySelector('.el-card__body').style = `min-height: ${boxEl.value.wrap$.offsetHeight - 120}px;`
+  resizeCardBody()
+  window.addEventListener('resize', resizeHandler)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resizeHandler)
 })
 </script>
 <style lang="scss" scoped>
+.mobile .main-page {
+  padding: 0;
+  :deep(.el-card) {
+    box-shadow: none;
+    border: none;
+  }
+}
 .main-page {
   padding: 25px 25px 45px;
   .pagination-box {
@@ -236,6 +251,7 @@ onMounted(async () => {
     .el-card__body {
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
   }
   :deep(.el-overlay-dialog) {

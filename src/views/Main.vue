@@ -1,20 +1,19 @@
 <template>
   <el-container class="app-wrapper" :class="wrapperObj">
-    <!-- <div class="drawer-bg" v-if="device==='mobile'" @click="handleClickOutside" /> -->
+    <div class="drawer-bg" v-if="(device==='mobile' && sidebarOpen)" @click="handleClickOutside" />
     <!-- 菜单 -->
     <MenuList
       ref="menuListEl"
       class="sidebar-container"
-      :isCollapse="isCollapse"
       @clickMenu="selectMenu"
     ></MenuList>
    <!-- 内容 -->
     <el-container class="main-content">
       <el-header>
         <div class="left">
-          <div class="tag-icon" @click="isCollapse = !isCollapse">
-            <el-icon v-show="isCollapse"><Expand /></el-icon>
-            <el-icon v-show="!isCollapse"><Fold /></el-icon>
+          <div class="tag-icon" @click="toggleCollapse">
+            <el-icon v-show="!sidebarOpen"><Expand /></el-icon>
+            <el-icon v-show="sidebarOpen"><Fold /></el-icon>
           </div>
           <el-breadcrumb separator="/">
             <!-- <el-breadcrumb-item to="/" @click="toMain">{{$t(`menu.home`)}}</el-breadcrumb-item> -->
@@ -38,7 +37,7 @@
           </el-dropdown>
         </div>
       </el-header>
-      <el-main class="main-content">
+      <el-main>
         <el-scrollbar class="main-scroll" ref="mainScroll">
           <router-view v-slot="{ Component }">
             <transition name="slide-fade" mode="out-in">
@@ -64,18 +63,22 @@ const mainScroll = ref()
 const route: any = useRoute()
 const router = useRouter()
 // 是否折叠
-const { device, isCollapse } = storeToRefs(commonStore())
+const { device } = storeToRefs(commonStore())
 // 面包屑内容
-let breadCrumb = ref<string[]>([])
+const breadCrumb = ref<string[]>([])
 // 菜单dom
-let menuListEl = ref<any>()
+const menuListEl = ref<any>()
 // 外层类名
-let wrapperObj = computed<any>(() => {
+const wrapperObj = computed<any>(() => {
   return {
     'mobile': device.value === 'mobile',
-    'hideSidebar': isCollapse.value,
-    'openSidebar': !isCollapse.value,
+    'hideSidebar': !commonStore().sidebar.opened,
+    'openSidebar': commonStore().sidebar.opened,
+    'withoutAnimation': commonStore().sidebar.withoutAnimation
   }
+})
+const sidebarOpen = computed(() => {
+  return commonStore().sidebar.opened
 })
 
 // 用户名
@@ -138,8 +141,22 @@ const toMain = () => {
   menuListEl.value.closeSubMenu()
 }
 
+// 切换显示
+const toggleCollapse = () => {
+  commonStore().sidebar.withoutAnimation = false
+  commonStore().changeSidebarStatus(!commonStore().sidebar.opened)
+}
+// 关闭
 const handleClickOutside = () => {
-
+  commonStore().changeSidebarStatus(false)
+}
+// 窗口大小调整
+const resizeHandler = () => {
+  // 小屏隐藏菜单栏
+  let status = document.body.getBoundingClientRect().width < commonStore().mobileWidth
+  commonStore().sidebar.withoutAnimation = true
+  status && (commonStore().sidebar.opened = false)
+  commonStore().device = status ? 'mobile' : 'desktop'
 }
 
 // 监听路由, 设置面包屑
@@ -156,6 +173,12 @@ watchEffect(() => {
 
 onMounted(() => {
   commonStore().setScrollEl(mainScroll.value)
+  resizeHandler()
+  window.addEventListener('resize', resizeHandler)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resizeHandler)
 })
 
 // 退出
@@ -179,27 +202,62 @@ const loginOut = () => {
 };
 </script>
 <style lang="scss" scoped>
+$sidebarW: 200px;
+$collapseW: 64px;
+$durationT: .25s;
+
 .app-wrapper {
   height: 100%;
+
+  &.withoutAnimation {
+    .main-container, .sidebar-container {
+      transition: none !important;
+    }
+  }
+
   &.hideSidebar {
+    .sidebar-container {
+      width: $collapseW;
+    }
     .main-content {
-      margin-left: 64px;
-    }
-    .sidebar-container {
-      width: 64px;
+      margin-left: $collapseW;
     }
   }
+
   &.openSidebar {
-    .main-content  {
-      margin-left: 200px;
-    }
     .sidebar-container {
-      width: 200px;
+      width: $sidebarW;
+    }
+    .main-content  {
+      margin-left: $sidebarW;
     }
   }
+
   .sidebar-container {
-    transition: width .25s;
+    transition: width $durationT;
   }
+  .main-container {
+    transition: margin-left $durationT;
+  }
+
+  // 移动端
+  &.mobile {
+    .sidebar-container {
+      width: $sidebarW !important;
+    }
+    .main-content {
+      margin-left: 0;
+    }
+    &.hideSidebar .sidebar-container {
+      transition: transform $durationT;
+      transform: translate3d(-$sidebarW, 0, 0);
+    }
+    &.openSidebar .sidebar-container {
+      transition: transform $durationT;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
   .drawer-bg {
     background: #000;
     opacity: 0.3;
@@ -207,10 +265,9 @@ const loginOut = () => {
     top: 0;
     height: 100%;
     position: absolute;
-    z-index: 999;
+    z-index: 1001;
   }
   .main-content {
-    transition: margin-left .25s;
     .el-header, .el-main {
       padding: 0;
       margin: 0;
@@ -223,7 +280,7 @@ const loginOut = () => {
       .left {
         display: flex;
         align-items: center;
-        min-width: 300px;
+        // min-width: 300px;
         .tag-icon {
           cursor: pointer;
           padding: 15px;
@@ -255,6 +312,11 @@ const loginOut = () => {
         }
       }
     }
+    // .main-scroll {
+    //   :deep(.el-scrollbar__view) {
+    //     height: 100%;
+    //   }
+    // }
   }
 }
 </style>
