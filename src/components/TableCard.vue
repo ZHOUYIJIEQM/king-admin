@@ -1,7 +1,7 @@
 <template>
   <div class="main-page">
     <el-card ref="elCardEl">
-      <div class="topbar" style="margin-bottom: 20px;" v-if="isShow(['admin'])">
+      <div class="topbar" style="margin-bottom: 20px; min-width: 520px;" v-if="isShow(['admin'])">
         <el-input
           class="search-input"
           :style="{

@@ -87,7 +87,7 @@ let menuList = computed<any []>(() => {
 // 点击菜单
 const selectMenu = (item: any) => {
   activeMenu.value = item.menu
-  commonStore().sidebar.opened = false
+  commonStore().device === 'mobile' && (commonStore().sidebar.opened = false)
   emit('clickMenu', item)
 }
 
