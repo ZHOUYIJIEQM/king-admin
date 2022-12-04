@@ -23,8 +23,9 @@
         </el-form-item>
         <el-form-item label="文章内容:">
           <div class="editor-box">
-            <TinyMceEditor 
-              v-model:editorContent="articleForm.content" 
+            <TinyMceEditor
+              @changeContent="(articleForm.content = $event)"
+              :editorContent="articleForm.content" 
               :setting="tinymceSetting"
             />
           </div>
@@ -85,11 +86,12 @@ const tinymceSetting = {
   images_upload_url: `${commonStore().uploadPath}/articles`,
   // 上传图片回调
   custom_images_upload_callback: (res: any) => {
-    // console.log(res.url);
+    console.log('上传回调', res.url);
     return res.url
   },
   // 以中文简体为例
   language: 'zh_CN',
+  branding: false,
 };
 
 // 设置分类
