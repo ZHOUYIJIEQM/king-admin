@@ -1,47 +1,59 @@
 <template>
-  <textarea
-    id="tinyEditor"
-    class="editor"
-    v-model="editorContent"
-  ></textarea>
+  <div id="tinyEditor" class="tiny-textarea"></div>
 </template>
+<script lang="ts">
+export default {
+  name: 'Vue3Tinymce'
+};
+</script>
 <script lang="ts" setup>
+let currentEditor = ref()
+
 const props = withDefaults(
   defineProps<{
-    editorContent: string;
-    // 富文本编辑器设置
+    modelValue: string;
+    // 编辑器设置
     setting: any;
   }>(),
   {
-    editorContent: "",
+    modelValue: "",
     setting: () => ({}),
   }
 );
-
 const emit = defineEmits<{
-  // 奇怪这里父组件数据没更新, TableCard里可以, 不知道是哪里搞错了, 有空再来看看
-  // (e: 'update:editorContent', value: string): void
-  (e: 'changeContent', value: string): void
+  (e: 'update:modelValue', value: string): void
 }>()
 
-const initTinyMce = () => {
-  const setting = {
-    selector: "#tinyEditor",
-    ...props.setting,
-    images_upload_handler: uploadHandler
-  }
-  
-  tinymce.init(setting);
+const updateValue = (val: string) => emit('update:modelValue', val);
+const getTinymce = () => {
+  const root = typeof window !== 'undefined' ? window : global;
+  return root && 'tinymce' in root ? root.tinymce : null;
 };
-
-watch(
-  () => props.editorContent,
-  (newV) => {
-    // console.log(newV);
-    emit("changeContent", newV)
+const initEditor = () => {
+  let setting = {
+    selector: '#tinyEditor',
+    ...props.setting,
+    images_upload_handler: uploadHandler,
+    setup: (editor) => {
+      currentEditor.value = editor
+      editor.on('init', () => onInited(editor))
+    }
   }
-)
-
+  // console.log('初始化');
+  getTinymce().init(setting)
+}
+const onInited = async editor => {
+  await nextTick()
+  editor.setContent(props.modelValue);
+  editor.on('change input undo redo', e => {
+    onChanged(e, editor)
+  })
+}
+// 向父组件更新内容
+const onChanged = (e, editor) => {
+  const content = editor.getContent()
+  updateValue(content)
+}
 /**
  * http://tinymce.ax-z.cn/general/upload-images.php
  * 处理文件上传
@@ -49,7 +61,7 @@ watch(
  * @param succFn
  * @param failFn
  */
-function uploadHandler(blobInfo: any, succFn: any, failFn: any) {
+const uploadHandler = (blobInfo: any, succFn: any, failFn: any) => {
   let xhr, formData, file;
   // 转化为易于理解的file对象
   file = blobInfo.blob();
@@ -95,37 +107,22 @@ function uploadHandler(blobInfo: any, succFn: any, failFn: any) {
   xhr.send(formData);
 }
 
-const getTinymce = () => {
-  return 'tinymce' in window ? (window as any).tinymce : null;
-};
-
-let intervalTimer: any = null;
-/** 给iframe 设置滚动条样式 */
-const setScroll = () => {
-  let i: any = document.querySelector('iframe[id^="tiny-vue"]');
-  if (!i) return;
-  let h = i.contentWindow.document.querySelector("head");
-  clearInterval(intervalTimer);
-  let s = document.createElement("style");
-  s.innerText = `
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+watch(
+  () => props.modelValue,
+  (val) => {
+    // console.log('传入数据文本', currentEditor.value.initialized);
+    if (currentEditor.value.initialized) {
+      currentEditor.value.setContent(val)
+    }
   }
-  ::-webkit-scrollbar-thumb {
-    background-color: hsl(0deg 0% 42% / 20%);
-    border-radius: 10px;
-    transition: all .2s ease-in-out;
-  }
-  ::-webkit-scrollbar-track {
-    border-radius: 10px;
-  }
-  `;
-  h.appendChild(s);
-};
+);
 
 onMounted(() => {
-  initTinyMce();
-});
+  initEditor()
+})
+
+onBeforeUnmount(() => {
+  getTinymce().remove()
+})
+
 </script>
-<style lang="scss" scoped></style>

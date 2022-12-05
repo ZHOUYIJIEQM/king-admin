@@ -15,6 +15,7 @@
         empty-text="暂无英雄!"
         border
         @sort-change="sortChange"
+        default-expand-all
       >
         <el-table-column class-name="expand" type="expand" :label="$t(`tableH.expand`)" width="80">
           <template #default="props">

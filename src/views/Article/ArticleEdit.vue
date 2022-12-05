@@ -24,8 +24,7 @@
         <el-form-item label="文章内容:">
           <div class="editor-box">
             <TinyMceEditor
-              @changeContent="(articleForm.content = $event)"
-              :editorContent="articleForm.content" 
+              v-model:modelValue="articleForm.content"
               :setting="tinymceSetting"
             />
           </div>
@@ -76,7 +75,24 @@ const tinymceSetting = {
   nonbreaking_force_tab: true,
   link_title: false,
   default_link_target: '_blank',
-  content_style: 'body{font-size: 16px}',
+  // 修改一些样式
+  content_style: `
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: hsl(0deg 0% 42% / 20%);
+      border-radius: 10px;
+      transition: all .2s ease-in-out;
+    }
+    ::-webkit-scrollbar-track {
+      border-radius: 10px;
+    }
+    body {
+      font-size: 16px 
+    }
+  `,
   placeholder: '请输入文章内容!',
   // 自定义 图片上传模式
   custom_images_upload: true,
@@ -86,7 +102,7 @@ const tinymceSetting = {
   images_upload_url: `${commonStore().uploadPath}/articles`,
   // 上传图片回调
   custom_images_upload_callback: (res: any) => {
-    console.log('上传回调', res.url);
+    // console.log('上传回调', res.url);
     return res.url
   },
   // 以中文简体为例
@@ -175,6 +191,11 @@ const saveContent = async () => {
     }
   }
   router.push({name: 'articleList', query: { reload: 'true' }})
+}
+
+const changeEditor = (val: string) => {
+  console.log('=====---=====', val);
+  articleForm.value.content = val
 }
 
 onMounted(async () => {
