@@ -32,6 +32,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
         <el-table-column :label="$t(`tableH.name`)" prop="name" />
         <el-table-column align="center" sortable="custom" :label="$t(`tableH.grade`)" prop="grade" />
         <el-table-column align="center" :label="$t(`tableH.type`)" prop="type" />

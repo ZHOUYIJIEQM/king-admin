@@ -29,6 +29,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
         <el-table-column min-width="85px" :label="$t(`tableH.heroName`)" prop="name"></el-table-column>
         <el-table-column align="center" width="110px" class-name='hero-avatar-box' :label="$t(`tableH.avatar`)">
           <template #default="scope">

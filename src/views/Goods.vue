@@ -46,6 +46,7 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
         <el-table-column :label="$t(`tableH.name`)" prop="name" />
         <el-table-column class-name="goods-img-box" :label="$t(`tableH.appearance`)">
           <template #default="scope">

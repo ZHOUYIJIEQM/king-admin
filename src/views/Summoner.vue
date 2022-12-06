@@ -20,7 +20,7 @@
         :default-sort="{ prop: 'rank', order: 'ascending' }"
         @sort-change="sortChange"
       >
-      <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
+        <el-table-column align="center" type="index" :label="$t(`tableH.orderNum`)" width="70" />
         <el-table-column align="center" width="80px" :label="$t(`tableH.name`)" prop="name" />
         <el-table-column width="90px" sortable="custom" :label="$t(`tableH.grade`)" align="center" prop="rank" />
         <el-table-column class-name="img-box" width="100px" :label="$t(`tableH.image`)" align="center" prop="img">
