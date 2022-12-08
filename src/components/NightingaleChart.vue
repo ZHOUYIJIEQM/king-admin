@@ -27,7 +27,13 @@ let myChart: any = null
  * 初始化图表
  */
 const initChart = () => {
-  myChart = echarts.init(chartEl.value);
+  myChart = echarts.init(chartEl.value, null, {
+    // window.devicePixelRatio 还是模糊, 调大点反而清晰了
+    devicePixelRatio: window.devicePixelRatio + 0.5,
+    // devicePixelRatio: 2,
+    // renderer: 'svg',
+    // height: 210,
+  });
   myChart.setOption(props.chartOption);
   window.addEventListener('resize', myChart.resize);
 }
