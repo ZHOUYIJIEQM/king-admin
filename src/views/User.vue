@@ -28,7 +28,7 @@
         </el-table-column>
         <el-table-column width="100px" align="center" :label="$t(`tableH.status`)" prop="status">
           <template #default="scope">
-            <el-switch @change="statusChange($event, scope.row)" v-model="scope.row.status" style="--el-switch-on-color: #409eff; --el-switch-off-color: #f56c6c" />
+            <el-switch @change="statusChange(scope.row)" v-model="scope.row.status" style="--el-switch-on-color: #409eff; --el-switch-off-color: #f56c6c" />
           </template>
         </el-table-column>
         <el-table-column sortable="custom" width="165px" :label="$t(`tableH.updateDate`)" prop="updatedAt">
@@ -227,7 +227,7 @@ const saveContent = async () => {
   }
 }
 // 状态改变
-const statusChange = async (status: boolean, row: any) => {
+const statusChange = async (row: any) => {
   try {
     const res = await updateUser(row._id, row)
     if (res.status === 200) {

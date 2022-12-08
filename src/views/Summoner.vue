@@ -30,10 +30,8 @@
         </el-table-column>
         <el-table-column min-width="250px" :label="$t(`tableH.desc`)" prop="description">
           <template #default="scope">
-            <div>
-              <span style="font-weight: bold;">{{scope.row.description.split('CD：').at(0)}}CD：</span>
-              <span>{{scope.row.description.split('CD：').slice(1).join('')}}</span>
-            </div>
+            <span style="font-weight: bold;">{{scope.row.description.split('CD：').at(0)}}CD：</span>
+            <span>{{scope.row.description.split('CD：').slice(1).join('')}}</span>
           </template>
         </el-table-column>
         <el-table-column :label="$t(`tableH.operation`)" align="center" width="150">

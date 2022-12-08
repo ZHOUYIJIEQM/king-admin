@@ -23,7 +23,7 @@ export const commonStore = defineStore("common", {
       // 桌面/移动端
       device: 'desktop',
       // 小屏
-      mobileWidth: 700,
+      mobileWidth: 750,
       // 菜单栏是否展开
       sidebar: {
         opened: Cookies.get("sidebarStatus") ? Cookies.get("sidebarStatus") === 'true' : true,

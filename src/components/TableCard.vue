@@ -1,7 +1,7 @@
 <template>
   <div class="main-page">
     <el-card ref="elCardEl">
-      <div class="topbar" style="margin-bottom: 20px; min-width: 520px;" v-if="isShow(['admin'])">
+      <div class="topbar" style="margin-bottom: 20px;" v-if="isShow(['admin'])">
         <el-input
           v-if="showSearch"
           class="search-input"
@@ -131,6 +131,14 @@ const emit = defineEmits<{
   // 关闭弹出框
   (e: 'dialogClosed'): void
 }>()
+
+// note: 有坑 'update:visible', 开发环境不会报错, 生成环境报错
+// visible not defined
+//     at te.onUpdate:modelValue.x.<computed>.x.<computed>
+let visible = computed({
+  get: () => props.visible,
+  set: (val) => emit('update:visible', val)
+})
 
 // el-card 
 const elCardEl = ref<any>()
