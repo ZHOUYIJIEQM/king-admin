@@ -134,8 +134,13 @@ const submitForm = (formEl: FormInstance | undefined) => {
           })
         }
         loading.closeLoading()
-      } catch (err) {
+      } catch (err: any) {
         console.log('登录接口错误:', err);
+        ElNotification({
+          duration: commonStore().tipDurationS,
+          message: `登录失败! ${err.message}`,
+          type: 'error',
+        })
       } finally {
         loading.closeLoading()
       }
@@ -169,21 +174,23 @@ onBeforeUnmount(() => {
 })
 </script>
 <style lang="scss" scoped>
+@media screen and (max-width: 600px) {
+  .login-rule-form {
+    width: 100% !important;
+  }
+}
 .login-page {
   height: 100%;
   background: url(../assets/img/login/login-bg.jpg) no-repeat;
   background-size: cover;
-
+  background-position: center;
+  
   .login-rule-form {
     position: absolute;
     left: 50%;
     top: 50%;
-    padding: 30px;
+    padding: 25px;
     transform: translate(-50%, -50%);
-    width: 25%;
-    height: 30%;
-    min-width: 400px;
-    min-height: 230px;
     background: #fff;
     display: flex;
     flex-direction: column;
@@ -191,6 +198,10 @@ onBeforeUnmount(() => {
     border-radius: 5px;
     box-shadow: 0 2px 12px 0 rgb(0 0 0 / 50%);
     animation: fadeUp ease-out .5s;
+    box-sizing: border-box;
+    width: 50%;
+    max-width: 480px;
+    min-width: 250px;
 
     .title {
       font-size: 30px;
