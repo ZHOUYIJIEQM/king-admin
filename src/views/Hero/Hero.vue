@@ -21,7 +21,7 @@
           <template #default="props">
             <div class="hero-detail-box">
               <div class="hero-rate detail-item">
-                <div class="title">英雄评估:</div>
+                <!-- <div class="title">英雄评估:</div> -->
                 <div class="chart-box">
                   <NightingaleChart :chartOption="getOption(props.row.scores)"></NightingaleChart>
                 </div>

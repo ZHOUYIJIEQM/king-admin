@@ -2,7 +2,6 @@
   <div class="chart-content" ref="chartEl"></div>
 </template>
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from 'vue'
 import * as echarts from 'echarts/core';
 import { TitleComponent, ToolboxComponent, TooltipComponent, LegendComponent } from 'echarts/components';
 import { PieChart } from 'echarts/charts';
@@ -29,10 +28,12 @@ let myChart: any = null
 const initChart = () => {
   myChart = echarts.init(chartEl.value, null, {
     // window.devicePixelRatio 还是模糊, 调大点反而清晰了
-    devicePixelRatio: window.devicePixelRatio + 0.5,
+    // devicePixelRatio: window.devicePixelRatio + 0.5,
     // devicePixelRatio: 2,
     // renderer: 'svg',
-    // height: 210,
+    // 设置宽高后文字清晰了
+    height: 210,
+    width: 300
   });
   myChart.setOption(props.chartOption);
   window.addEventListener('resize', myChart.resize);
@@ -42,7 +43,7 @@ onMounted(() => {
   initChart()
 })
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   window.removeEventListener('resize', myChart.resize);
   myChart.dispose
 })
@@ -52,5 +53,8 @@ onUnmounted(() => {
 .chart-content {
   height: 100%;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
