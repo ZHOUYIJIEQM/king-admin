@@ -132,7 +132,7 @@ const emit = defineEmits<{
   (e: 'dialogClosed'): void
 }>()
 
-// note: 有坑 'update:visible', 开发环境不会报错, 生成环境报错
+// note: 有坑 'update:visible', 开发环境不会报错, 生产环境报错
 // visible not defined
 //     at te.onUpdate:modelValue.x.<computed>.x.<computed>
 let visible = computed({

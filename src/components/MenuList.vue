@@ -128,6 +128,7 @@ watch(
 
 </script>
 <style lang="scss" scoped>
+$transT: .25s;
 .vertical-menu {
   border: none;
   &:not(.el-menu--collapse) {
@@ -144,7 +145,7 @@ watch(
   left: 0;
   z-index: 1001;
   overflow: hidden;
-  transition: width .25s;
+  transition: width $transT;
   background-color: #343843;
   // &.hideSidebar {
   //   width: 64px;
@@ -162,7 +163,7 @@ watch(
     }
     img {
       width: 60px;
-      transition: all .25s;
+      transition: all $transT;
     }
   }
   :deep(.el-menu-item.is-active) {

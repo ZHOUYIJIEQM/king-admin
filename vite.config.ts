@@ -30,5 +30,12 @@ export default defineConfig({
     // 设置后可以通过局域网访问
     host: '0.0.0.0',
     port: 3000,  // 端口号
-  }
+    // proxy: {
+    //   "/admin": {
+    //     target: "http://localhost:3080",
+    //     changeOrigin: true,
+    //     // rewrite: (path) => path.replace(/^\/api/, ""),
+    //   },
+    // }
+  },
 });

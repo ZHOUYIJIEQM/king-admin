@@ -31,7 +31,14 @@ apiInstance.interceptors.response.use(
       type: 'error',
     })
     // todo: 加入未登录跳转
-    if (error.response.status === 401) { }
+    if (error.response.status === 401) {
+      ElNotification({
+        duration: commonStore().tipDurationM,
+        title: '发生错误!',
+        message: `未登录！无法验证身份！`,
+        type: 'error',
+      })
+    }
     // 用户名 密码 错误
     if (error.response.status === 422) {
       ElNotification({

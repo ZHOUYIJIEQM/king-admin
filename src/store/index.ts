@@ -9,6 +9,8 @@ export const commonStore = defineStore("common", {
       elScrollEl: null,
       // 请求路径
       baseUrl: `${import.meta.env.VITE_BASE_API}/admin/api/resource`,
+      // proxy 代理
+      // baseUrl: `/admin/api/resource`,
       // 登录功能
       featureBaseUrl: `${import.meta.env.VITE_BASE_API}/admin/api`,
       // 上传路径

@@ -236,7 +236,7 @@ $durationT: .25s;
   .sidebar-container {
     transition: width $durationT;
   }
-  .main-container {
+  .main-content {
     transition: margin-left $durationT;
   }
 
