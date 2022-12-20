@@ -12,6 +12,9 @@
     @addDataItem="addDataItem"
     @saveContent="saveContent"
   >
+    <template #otherBtn>
+      <el-button :loading="exportLoading" type="primary" plain @click="exportExcel">导出Excel</el-button>
+    </template>
     <template #table>
       <el-table
         class="table"
@@ -136,6 +139,7 @@ import { Delete, Edit, Plus, CloseBold } from '@element-plus/icons-vue'
 import { getGoodsList, createGoods, updateGoods, deleteGoods, getGoodsByName } from '@/api/goods'
 import { commonStore } from '@/store/index'
 import { permissionStore } from '@/store/permission'
+import { exportExcelFile } from "@/utils/excel";
 
 const TableCardEl = ref<any>()
 const { proxy }: any = getCurrentInstance()
@@ -170,6 +174,8 @@ const imageUrl = ref<string>('')
 const actionUrl = computed<string>(() => {
   return `${commonStore().uploadPath}/items`
 })
+// 导出提示
+const exportLoading = ref<boolean>(false)
 // 上传成功
 const uploadSuccess = (val: string) => {
   imageUrl.value = val
@@ -315,6 +321,40 @@ const saveContent = async () => {
   } finally {
     tableLoading.value = false
   }
+}
+
+const exportExcel = async () => {
+  try {
+    exportLoading.value = true
+    const res = await getGoodsList({
+      pageNum: 1,
+      pageSize: totalNum.value
+    })
+    console.log('导出', res.data.data);
+    let d = res.data.data.map(i => {
+      delete i._id
+      delete i.__v
+      i.desc = i.desc.join('。')
+      i.passive = i.passive.join('。')
+      return i
+    })
+    exportExcelFile(res.data.data, '表格1', '装备.xlsx')
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      type: 'success',
+      message: `导出完成!`
+    })
+  } catch (error) {
+    console.log(error);
+    ElNotification({
+      duration: commonStore().tipDurationS,
+      type: 'error',
+      message: `导出失败!`
+    })
+  } finally {
+    exportLoading.value = false
+  }
+  
 }
 // 排序
 const sortChange = async (sortType: any) => {

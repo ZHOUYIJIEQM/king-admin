@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import Cookies from "js-cookie";
 import { markRaw } from "vue";
-import { HomeFilled, Shop, Postcard, KnifeFork, List, Grid, Management, Ticket, UserFilled, } from "@element-plus/icons-vue";
+import { HomeFilled, Shop, Postcard, KnifeFork, List, Grid, Management, Ticket, UserFilled, Document } from "@element-plus/icons-vue";
 import * as allRoutes from "@/router/index";
 
 export const permissionStore = defineStore("permission", () => {
@@ -55,6 +55,7 @@ export const permissionStore = defineStore("permission", () => {
       'Management': markRaw(Management),
       'KnifeFork': markRaw(KnifeFork),
       'Postcard': markRaw(Postcard),
+      'Document': markRaw(Document),
     }
     // 生成菜单
     accessRoutes.forEach(route => {

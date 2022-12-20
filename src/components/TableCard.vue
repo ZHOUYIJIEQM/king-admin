@@ -6,7 +6,7 @@
           v-if="showSearch"
           class="search-input"
           :style="{
-            'width': mobile ? '100%' : '50%',
+            'width': mobile ? '100%' : '35%',
             'max-width': mobile ? '' : '400px'
           }"
           clearable
@@ -34,6 +34,7 @@
             :style="{ 'margin-left': showSearch? '15px' : '0px' }"
             @click="addData"
           >{{btnAdd}}</el-button>
+          <slot name="otherBtn"></slot>
         </div>
       </div>
       <!-- 表格插槽 -->
@@ -241,15 +242,19 @@ onBeforeUnmount(() => {
 })
 </script>
 <style lang="scss" scoped>
-.mobile .main-page {
-  padding: 0;
-  :deep(.el-card) {
-    box-shadow: none;
-    border: none;
-  }
-}
 .main-page {
-  padding: 25px 25px 45px;
+  // padding: 25px 25px 45px;
+  @media (max-width: 750px) {
+    .topbar {
+      flex-direction: column;
+    }
+  }
+  .topbar {
+    display: flex;
+    .search-input {
+      flex: 1;
+    }
+  }
   .pagination-box {
     margin-top: auto;
     padding-top: 20px;

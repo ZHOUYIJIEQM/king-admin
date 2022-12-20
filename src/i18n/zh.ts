@@ -20,6 +20,7 @@ const zh = {
     user: '用户管理',
     inscription: '铭文列表',
     summoner: '召唤师技能',
+    uploadExcel: '上传Excel'
   },
   btn: {
     btnAdd: '添加',

@@ -20,6 +20,7 @@ const en = {
     user: 'User List',
     inscription: 'Inscription List',
     summoner: 'Summoner List',
+    uploadExcel: 'Upload Excel'
   },
   btn: {
     btnAdd: 'Add',

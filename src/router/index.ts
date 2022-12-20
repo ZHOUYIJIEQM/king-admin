@@ -128,6 +128,18 @@ export const routes: Array<RouteRecordRaw> = [
     ],
   },
   {
+    path: "/uploadExcel",
+    component: () => import("@/views/Main.vue"),
+    children: [
+      {
+        path: "index",
+        name: "uploadExcel",
+        component: () => import("@/views/UploadExcel.vue"),
+        meta: { icon: "Document" },
+      },
+    ],
+  },
+  {
     path: "/error",
     component: () => import("@/views/Main.vue"),
     meta: { hidden: true },

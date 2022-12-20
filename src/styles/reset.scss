@@ -139,7 +139,21 @@ $circleW: 5.6rem;
   }
 }
 
-#nprogress .bar {
-  // background: #F811B2 !important; //自定义颜色
-  height: 3px;
+@media screen and (max-width: 700px) {
+  #nprogress .bar {
+    // background: #F811B2 !important; //自定义颜色
+    height: 3px;
+  }
+}
+
+.mobile .main-page {
+  padding: 0;
+  :deep(.el-card) {
+    box-shadow: none;
+    border: none;
+  }
+}
+
+.main-page {
+  padding: 25px 25px 45px;
 }
